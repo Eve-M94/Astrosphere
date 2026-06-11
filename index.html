@@ -180,6 +180,8 @@
   .tab-btn[data-system="vedic"].active    { --tab-bg: rgba(251,146,60,0.15);  --tab-border: #fb923c; --tab-color: #fb923c; }
   .tab-btn[data-system="celtic"].active   { --tab-bg: rgba(74,222,128,0.12);  --tab-border: #4ade80; --tab-color: #4ade80; }
   .tab-btn[data-system="chinese"].active  { --tab-bg: rgba(248,113,113,0.15); --tab-border: #f87171; --tab-color: #f87171; }
+  .tab-btn[data-system="mayan"].active    { --tab-bg: rgba(251,191,36,0.15);  --tab-border: #fbbf24; --tab-color: #fbbf24; }
+  .tab-btn[data-system="hd"].active       { --tab-bg: rgba(6,182,212,0.15);   --tab-border: #06b6d4; --tab-color: #06b6d4; }
 
   /* ── RESULTS PANEL ── */
   #results { display: none; }
@@ -216,6 +218,20 @@
     --s-border: rgba(248,113,113,0.25);
     --s-glow: rgba(248,113,113,0.1);
     --s-heading: linear-gradient(135deg, #f87171, #fbbf24, #ef4444);
+  }
+  .system-panel[data-system="mayan"] {
+    --s-accent: #fbbf24; --s-accent2: #f59e0b;
+    --s-bg: rgba(251,191,36,0.07);
+    --s-border: rgba(251,191,36,0.25);
+    --s-glow: rgba(251,191,36,0.1);
+    --s-heading: linear-gradient(135deg, #fbbf24, #f59e0b, #ef4444);
+  }
+  .system-panel[data-system="hd"] {
+    --s-accent: #06b6d4; --s-accent2: #22d3ee;
+    --s-bg: rgba(6,182,212,0.07);
+    --s-border: rgba(6,182,212,0.25);
+    --s-glow: rgba(6,182,212,0.1);
+    --s-heading: linear-gradient(135deg, #06b6d4, #22d3ee, #a78bfa);
   }
 
   .system-header {
@@ -303,24 +319,6 @@
   }
   .dive-btn:hover { background: var(--s-bg, rgba(255,255,255,0.05)); }
 
-  /* ── PREMIUM LOCK ── */
-  .premium-overlay {
-    position: relative; overflow: hidden;
-  }
-  .premium-overlay::after {
-    content: '✦ Premium — Dive Deeper';
-    position: absolute; inset: 0;
-    background: rgba(10,10,26,0.82);
-    backdrop-filter: blur(3px);
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--sans);
-    font-size: 0.9rem;
-    color: var(--accent);
-    letter-spacing: 0.08em;
-    border-radius: 0.4rem;
-    cursor: pointer;
-  }
-
   /* ── NOTE BAR ── */
   .note-bar {
     background: rgba(167,139,250,0.08);
@@ -379,6 +377,10 @@
         <label>Country</label>
         <input type="text" id="birthCountry" placeholder="e.g. Australia" />
       </div>
+      <div class="field">
+        <label>UTC Offset <span style="font-size:0.75em;text-transform:none;letter-spacing:0">(UK Summer +1, UK Winter 0, US Eastern −5)</span></label>
+        <input type="number" id="utcOffset" placeholder="e.g. +1" step="0.5" min="-12" max="14" />
+      </div>
     </div>
     <button class="btn-primary" onclick="calculate()">✦ Reveal My Chart ✦</button>
   </div>
@@ -396,6 +398,8 @@
       <button class="tab-btn" data-system="vedic"   onclick="switchTab('vedic')">🪔 Vedic</button>
       <button class="tab-btn" data-system="celtic"  onclick="switchTab('celtic')">🌿 Celtic</button>
       <button class="tab-btn" data-system="chinese" onclick="switchTab('chinese')">🏮 Chinese</button>
+      <button class="tab-btn" data-system="mayan"   onclick="switchTab('mayan')">🌀 Mayan</button>
+      <button class="tab-btn" data-system="hd"      onclick="switchTab('hd')">⬡ Human Design</button>
     </div>
 
     <!-- WESTERN -->
@@ -434,6 +438,24 @@
       <div class="placements-grid" id="chinese-placements"></div>
     </div>
 
+    <!-- MAYAN -->
+    <div class="system-panel" data-system="mayan" id="panel-mayan">
+      <div class="system-header">
+        <h2>🌀 Mayan Tzolk'in</h2>
+        <p>Dreamspell calendar · 260-day cycle · Day signs & galactic tones</p>
+      </div>
+      <div class="placements-grid" id="mayan-placements"></div>
+    </div>
+
+    <!-- HUMAN DESIGN -->
+    <div class="system-panel" data-system="hd" id="panel-hd">
+      <div class="system-header">
+        <h2>⬡ Human Design</h2>
+        <p>I Ching gates · Chakra centers · Type · Authority · Profile</p>
+      </div>
+      <div class="placements-grid" id="hd-placements"></div>
+    </div>
+
   </div><!-- /#results -->
 
   <footer>
@@ -448,7 +470,6 @@
 // ─────────────────────────────────────────────
 
 function jdn(y, m, d) {
-  // Julian Day Number from calendar date
   const a = Math.floor((14 - m) / 12);
   const yr = y + 4800 - a;
   const mo = m + 12 * a - 3;
@@ -459,7 +480,6 @@ function jdn(y, m, d) {
 
 // ─────────────────────────────────────────────
 // WESTERN — simplified solar-system positions
-// (accurate Sun; Moon & planets use fast approximations)
 // ─────────────────────────────────────────────
 
 const SIGNS = [
@@ -469,11 +489,10 @@ const SIGNS = [
 const SIGN_ICONS = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
 
 function normalise(deg) { return ((deg % 360) + 360) % 360; }
-function signOf(deg) { return Math.floor(normalise(deg) / 30); }
+function signOf(deg)    { return Math.floor(normalise(deg) / 30); }
 function degInSign(deg) { return normalise(deg) % 30; }
 
 function sunLongitude(jd) {
-  // Meeus, low-precision Sun
   const T  = (jd - 2451545.0) / 36525;
   const L0 = normalise(280.46646 + 36000.76983 * T);
   const M  = normalise(357.52911 + 35999.05029 * T) * Math.PI / 180;
@@ -507,18 +526,1284 @@ function moonLongitude(jd) {
   return normalise(lon);
 }
 
-function planetLongitude(jd, L0c, L0d, Mc, Md, ecc, semiMajor, name) {
-  // Very simplified heliocentric -> ecliptic; fine for sign-level accuracy
+function earthRadius(jd) {
+  const T = (jd - 2451545.0) / 36525;
+  const M = normalise(357.52911 + 35999.05029 * T) * Math.PI / 180;
+  return 1.000001018 * (1 - 0.01671022 * Math.cos(M) - 0.00013956 * Math.cos(2 * M));
+}
+
+function planetLongitude(jd, p) {
   const T  = (jd - 2451545.0) / 36525;
-  const L  = normalise(L0c + L0d * T);
-  const M  = normalise(Mc  + Md  * T) * Math.PI / 180;
-  const C  = (2 * ecc - ecc * ecc * ecc / 4) * Math.sin(M)
-           + 5 / 4 * ecc * ecc * Math.sin(2 * M);
-  return normalise(L + C * 180 / Math.PI);
+  const Lh = normalise(p.L0c + p.L0d * T);
+  const M  = normalise(p.Mc  + p.Md  * T) * Math.PI / 180;
+  // true anomaly via equation of center
+  const nu = M + (2 * p.e - 0.25 * p.e * p.e * p.e) * Math.sin(M)
+               + 1.25 * p.e * p.e * Math.sin(2 * M);
+  const l  = normalise(Lh + (nu - M) * 180 / Math.PI); // heliocentric true longitude
+  const r  = p.a * (1 - p.e * p.e) / (1 + p.e * Math.cos(nu)); // heliocentric distance AU
+
+  // Convert to geocentric using Earth's position
+  const Le = normalise(sunLongitude(jd) + 180) * Math.PI / 180;
+  const R  = earthRadius(jd);
+  const lr = l * Math.PI / 180;
+  const x  = r * Math.cos(lr) - R * Math.cos(Le);
+  const y  = r * Math.sin(lr) - R * Math.sin(Le);
+  return normalise(Math.atan2(y, x) * 180 / Math.PI);
 }
 
 const PLANET_PARAMS = {
-  Mercury: { L0c:252.251, L0d:149472.6746, Mc:174.791, Md:149472.515, e:0.2056 },
-  Venus:   { L0c:181.979, L0d: 58517.8161, Mc: 50.416, Md: 58517.804, e:0.0068 },
-  Mars:    { L0c:355.433, L0d: 19140.2993, Mc: 19.373, Md: 19140.303, e:0.0934 },
-  Jupiter: { L0c: 34.351, L0d:  3034.9
+  Mercury: { L0c: 252.251, L0d: 149472.6746, Mc: 174.791, Md: 149472.515, e: 0.2056, a: 0.38710 },
+  Venus:   { L0c: 181.979, L0d:  58517.8161, Mc:  50.416, Md:  58517.804, e: 0.0068, a: 0.72333 },
+  Mars:    { L0c: 355.433, L0d:  19140.2993, Mc:  19.373, Md:  19140.303, e: 0.0934, a: 1.52366 },
+  Jupiter: { L0c:  34.351, L0d:   3034.9057, Mc:  20.020, Md:   3034.906, e: 0.0484, a: 5.20336 },
+  Saturn:  { L0c:  50.077, L0d:   1222.1138, Mc: 317.021, Md:   1222.114, e: 0.0542, a: 9.53707 },
+  Uranus:  { L0c: 311.000, L0d:    428.4748, Mc: 141.050, Md:    428.475, e: 0.0472, a: 19.1913 },
+  Neptune: { L0c: 304.349, L0d:    218.4610, Mc: 256.225, Md:    218.461, e: 0.0086, a: 30.0690 },
+};
+
+// Approximate Ascending Node for North Node (Rahu)
+function northNodeLongitude(jd) {
+  const T = (jd - 2451545.0) / 36525;
+  return normalise(125.0445 - 1934.1362 * T);
+}
+
+function ascendant(jd, latDeg, lonDeg) {
+  const T    = (jd - 2451545.0) / 36525;
+  const GMST = normalise(280.46061837 + 360.98564736629 * (jd - 2451545.0)
+               + 0.000387933 * T * T - T * T * T / 38710000);
+  const LST  = normalise(GMST + lonDeg);
+  const eps  = (23.439291111 - 0.013004167 * T) * Math.PI / 180;
+  const RA   = LST * Math.PI / 180;
+  const lat  = latDeg * Math.PI / 180;
+  const asc  = Math.atan2(Math.cos(RA), -(Math.sin(RA) * Math.cos(eps) + Math.tan(lat) * Math.sin(eps)));
+  return normalise(asc * 180 / Math.PI);
+}
+
+// Rough lat/lon lookup for common cities (fallback: 0/0)
+const CITY_COORDS = {
+  sydney: [-33.87, 151.21], melbourne: [-37.81, 144.96], brisbane: [-27.47, 153.02],
+  perth: [-31.95, 115.86], adelaide: [-34.93, 138.60], auckland: [-36.85, 174.76],
+  feltham: [51.45, -0.41], heathrow: [51.47, -0.45], hounslow: [51.47, -0.36],
+  twickenham: [51.45, -0.33], richmond: [51.46, -0.30], kingston: [51.41, -0.30],
+  wimbledon: [51.42, -0.21], croydon: [51.37, -0.10], sutton: [51.36, -0.19],
+  brixton: [51.46, -0.11], hackney: [51.54, -0.06], islington: [51.54, -0.10],
+  camden: [51.54, -0.14], greenwich: [51.48, 0.00], lewisham: [51.46, -0.02],
+  bristol: [51.45, -2.59], birmingham: [52.49, -1.90], manchester: [53.48, -2.24],
+  leeds: [53.80, -1.55], sheffield: [53.38, -1.47], liverpool: [53.41, -2.98],
+  glasgow: [55.86, -4.25], edinburgh: [55.95, -3.19], cardiff: [51.48, -3.18],
+  belfast: [54.60, -5.93], nottingham: [52.95, -1.15], leicester: [52.64, -1.13],
+  coventry: [52.41, -1.51], bradford: [53.80, -1.75], wolverhampton: [52.59, -2.11],
+  southampton: [50.91, -1.40], portsmouth: [50.80, -1.09], brighton: [50.83, -0.14],
+  oxford: [51.75, -1.26], cambridge: [52.20, 0.12], norwich: [52.63, 1.30],
+  exeter: [50.72, -3.53], plymouth: [50.37, -4.14], newcastle: [54.97, -1.61],
+  sunderland: [54.91, -1.38], middlesbrough: [54.58, -1.24], hull: [53.74, -0.33],
+  london: [51.51, -0.13], paris: [48.85, 2.35], berlin: [52.52, 13.40],
+  madrid: [40.42, -3.70], rome: [41.90, 12.50], amsterdam: [52.37, 4.90],
+  moscow: [55.75, 37.62], istanbul: [41.01, 28.95], dubai: [25.20, 55.27],
+  mumbai: [19.08, 72.88], delhi: [28.61, 77.21], kolkata: [22.57, 88.36],
+  bangalore: [12.97, 77.59], chennai: [13.08, 80.27], karachi: [24.86, 67.01],
+  lahore: [31.55, 74.34], dhaka: [23.72, 90.41], colombo: [6.93, 79.85],
+  beijing: [39.91, 116.39], shanghai: [31.23, 121.47], tokyo: [35.69, 139.69],
+  osaka: [34.69, 135.50], seoul: [37.57, 126.98], singapore: [1.35, 103.82],
+  bangkok: [13.75, 100.52], jakarta: [6.21, 106.85], kuala: [3.14, 101.69],
+  manila: [14.60, 120.98], hongkong: [22.32, 114.17], taipei: [25.05, 121.53],
+  'new york': [40.71, -74.01], 'los angeles': [34.05, -118.24], chicago: [41.88, -87.63],
+  houston: [29.76, -95.37], phoenix: [33.45, -112.07], philadelphia: [39.95, -75.17],
+  'san antonio': [29.42, -98.49], 'san diego': [32.72, -117.16], dallas: [32.78, -96.80],
+  'san jose': [37.34, -121.89], toronto: [43.65, -79.38], montreal: [45.50, -73.57],
+  vancouver: [49.25, -123.12], calgary: [51.05, -114.07], ottawa: [45.42, -75.69],
+  'mexico city': [19.43, -99.13], 'sao paulo': [-23.55, -46.63], 'rio de janeiro': [-22.91, -43.17],
+  buenos: [-34.60, -58.38], bogota: [4.71, -74.07], lima: [-12.05, -77.04],
+  cairo: [30.06, 31.25], lagos: [6.45, 3.40], nairobi: [-1.29, 36.82],
+  johannesburg: [-26.20, 28.04], casablanca: [33.59, -7.62], accra: [5.55, -0.20],
+};
+
+function getCityCoords(city, country) {
+  const key = city.toLowerCase().trim();
+  if (CITY_COORDS[key]) return CITY_COORDS[key];
+  // partial match
+  for (const k in CITY_COORDS) {
+    if (key.includes(k) || k.includes(key)) return CITY_COORDS[k];
+  }
+  return [0, 0]; // UTC / equator fallback
+}
+
+// ─────────────────────────────────────────────
+// WESTERN INTERPRETATIONS
+// ─────────────────────────────────────────────
+
+const W_BRIEF = {
+  Sun: [
+    'Bold pioneer, natural leader, forges own path.',
+    'Steadfast and sensual, values beauty and security.',
+    'Curious and adaptable, lives in the world of ideas.',
+    'Deeply nurturing, driven by emotion and memory.',
+    'Radiant performer, generous heart, born to shine.',
+    'Analytical perfectionist, devoted to craft and service.',
+    'Diplomatic peacemaker, seeks harmony in all things.',
+    'Intense and magnetic, dives deep beneath the surface.',
+    'Optimistic explorer, restless for truth and adventure.',
+    'Disciplined achiever, patient builder of lasting structures.',
+    'Visionary rebel, marches to the beat of their own drum.',
+    'Empathic dreamer, blurs boundaries between worlds.',
+  ],
+  Moon: [
+    'Emotionally direct, moods flare and pass like lightning.',
+    'Needs comfort and stability; emotions run slow and deep.',
+    'Restless inner world, processes feelings through talk.',
+    'Profound emotional memory; deeply attached to home.',
+    'Craves appreciation and warmth; generous emotional nature.',
+    'Analyses feelings carefully; can overthink the heart.',
+    'Seeks emotional balance; dislikes conflict in relationships.',
+    'Intense emotional depths; feels everything profoundly.',
+    'Needs freedom to roam; optimistic, restless inner life.',
+    'Emotionally reserved; controls feelings with discipline.',
+    'Detached yet humanitarian; processes emotions intellectually.',
+    'Boundless empathy; absorbs others\' moods like a sponge.',
+  ],
+  Mercury: [
+    'Quick, direct communicator; says exactly what is meant.',
+    'Methodical thinker; absorbs information slowly but thoroughly.',
+    'Razor-sharp wit; talks fast, thinks faster, loves wordplay.',
+    'Intuitive mind; thinks in images, feelings, and metaphors.',
+    'Dramatic flair in speech; confident, persuasive storyteller.',
+    'Precise and analytical; notices every detail, nothing escapes.',
+    'Weighs both sides carefully; skilled negotiator and mediator.',
+    'Penetrating intellect; research-obsessed, keeps thoughts private.',
+    'Philosophical mind; loves big ideas and broad perspectives.',
+    'Strategic thinker; disciplined, serious, long-term planner.',
+    'Original, unconventional thinker; ideas arrive like lightning.',
+    'Imaginative and poetic; ideas flow from intuition and dreams.',
+  ],
+  Venus: [
+    'Loves boldly and impulsively; passionate about the chase.',
+    'Sensual and loyal; appreciates beauty, luxury, and comfort.',
+    'Flirtatious and playful in love; variety keeps interest alive.',
+    'Deeply romantic and protective; loves with total devotion.',
+    'Warm and generous lover; craves admiration and adoration.',
+    'Reserved but devoted; expresses love through acts of service.',
+    'Romantic idealist; seeks a perfect partnership and harmony.',
+    'Passionate and possessive; love runs deep and transformative.',
+    'Free-spirited in love; needs adventure and room to breathe.',
+    'Takes love seriously; faithful, patient, and long-lasting.',
+    'Unconventional in relationships; values friendship and freedom.',
+    'Dreamy and self-sacrificing in love; blurs fantasy and reality.',
+  ],
+  Mars: [
+    'Fearless and aggressive; charges straight at every obstacle.',
+    'Slow to anger but unstoppable once moving; persistent force.',
+    'Sharp, argumentative wit; debates and mental jousting energise.',
+    'Defends loved ones fiercely; emotional fuel powers action.',
+    'Dramatic drive; performs best when pride and passion are engaged.',
+    'Works methodically and tirelessly; perfection is the goal.',
+    'Avoids conflict instinctively; driven by fairness and justice.',
+    'Laser-focused and relentless; will not stop until mission complete.',
+    'Enthusiastic and reckless; throws body and soul into adventures.',
+    'Ambitious and disciplined; drives toward status and achievement.',
+    'Unconventional energy; rebels against norms to do it differently.',
+    'Subtle and elusive; works behind the scenes, hard to pin down.',
+  ],
+  Jupiter: [
+    'Lucky trailblazer; faith in self opens remarkable doors.',
+    'Abundance through patience and appreciation of earthly pleasures.',
+    'Expands through learning, teaching, and conversation.',
+    'Growth through family, home, and emotional intelligence.',
+    'Grand generosity and creativity; big-hearted benefactor.',
+    'Grows through service, health, and mastery of skills.',
+    'Lucky in partnerships; flourishes through collaboration.',
+    'Deep transformation brings renewal and hidden treasures.',
+    'Natural philosopher and adventurer; travel and study bring luck.',
+    'Success through hard work and strategic long-term planning.',
+    'Progressive and humanitarian; luck comes through community.',
+    'Spiritual and compassionate; grows through surrender and faith.',
+  ],
+  Saturn: [
+    'Learning to act with patience rather than impulsiveness.',
+    'Building lasting value and mastering material responsibility.',
+    'Disciplining the mind; learning to focus scattered thoughts.',
+    'Overcoming emotional walls and learning to nurture self.',
+    'Developing humility alongside genuine self-expression.',
+    'Perfecting health and service routines; overcoming self-doubt.',
+    'Mastering balance; learning when to compromise and when not to.',
+    'Deep psychological work; confronting fears and shadow self.',
+    'Restricts freedom to teach wisdom through experience.',
+    'Ambitious and dutiful in its own sign; late-bloomer success.',
+    'Detachment lessons; learning to balance logic and compassion.',
+    'Dissolving ego boundaries; spiritual discipline and isolation.',
+  ],
+  Uranus: [
+    'Sudden breaks in identity; reinvents the self repeatedly.',
+    'Disrupts material security to forge a freer path.',
+    'Electrifies communication; original, ahead-of-its-time ideas.',
+    'Breaks from family patterns; sudden domestic upheavals.',
+    'Creative genius with a rebellious streak; hates conformity.',
+    'Revolutionises health practices and daily routines.',
+    'Upends relationships through sudden need for freedom.',
+    'Radical transformation; disrupts through depth and intensity.',
+    'Breaks free from belief systems; embraces radical philosophy.',
+    'Overturns authority and tradition; pioneer in chosen field.',
+    'In own sign; the reformer generation, wires society anew.',
+    'Dissolves spiritual boundaries; generation seeks transcendence.',
+  ],
+  Neptune: [
+    'Dissolves ego; identity feels fluid, mystical, or confused.',
+    'Dreams of paradise; can blur practical and spiritual needs.',
+    'Poetic and psychic mind; inspiration flows through language.',
+    'Heightened intuition; home feels like a sanctuary or illusion.',
+    'Theatrical mysticism; art and spirituality intertwine.',
+    'Serves through healing and compassion; blurs health boundaries.',
+    'Idealises relationships; seeks a soulmate or perfect union.',
+    'Intense psychic sensitivity; drawn to occult depths.',
+    'Seeks transcendence through travel, philosophy, or religion.',
+    'Spiritual ambition; dissolves material goals into service.',
+    'Collective vision; dreams of a utopian, borderless world.',
+    'In own sign; generation of saints, addicts, and mystics.',
+  ],
+  Pluto: [
+    'Transformation of the self; burns away false identities.',
+    'Deep regeneration of values, wealth, and sensuality.',
+    'Mind undergoes profound metamorphosis across a lifetime.',
+    'Family karma and ancestral wounds surface for healing.',
+    'Creative power becomes a vehicle for radical change.',
+    'Purges and regenerates health, habits, and ways of service.',
+    'Power dynamics in relationships; fears and controls examined.',
+    'In own sign; intensely probes psychology and power.',
+    'Collective belief systems overturned and rebuilt from ashes.',
+    'Ruthless dismantling of outmoded structures and hierarchies.',
+    'Revolutionary social change; destroys to rebuild collectively.',
+    'Generation dissolves spiritual illusions; karmic purging.',
+  ],
+  'North Node': [
+    'Soul calling: step into courageous individuality and leadership.',
+    'Soul calling: build lasting security and trust your senses.',
+    'Soul calling: develop curiosity, communication, and versatility.',
+    'Soul calling: embrace vulnerability, home, and belonging.',
+    'Soul calling: step into the spotlight and lead with heart.',
+    'Soul calling: master discernment, health, and humble service.',
+    'Soul calling: cultivate partnership and diplomatic fairness.',
+    'Soul calling: dive into depth, shared resources, and transformation.',
+    'Soul calling: pursue wisdom, travel, and philosophical truth.',
+    'Soul calling: build authority, discipline, and worldly mastery.',
+    'Soul calling: embrace originality, community, and the future.',
+    'Soul calling: surrender to spirituality, empathy, and faith.',
+  ],
+  Ascendant: [
+    'Radiates Aries boldness: direct, energetic, a force of nature.',
+    'Radiates Taurus calm: grounded, magnetic, unhurried presence.',
+    'Radiates Gemini wit: quick, curious, always engaging.',
+    'Radiates Cancerian warmth: nurturing, intuitive, protective.',
+    'Radiates Leo charisma: warm, confident, impossible to ignore.',
+    'Radiates Virgo precision: calm, observant, quietly capable.',
+    'Radiates Libran grace: charming, balanced, socially magnetic.',
+    'Radiates Scorpio intensity: mysterious, penetrating, unforgettable.',
+    'Radiates Sagittarian enthusiasm: open, adventurous, contagious joy.',
+    'Radiates Capricorn authority: composed, reliable, quietly powerful.',
+    'Radiates Aquarian originality: eccentric, visionary, electrifying.',
+    'Radiates Piscean dreaminess: compassionate, ethereal, enchanting.',
+  ],
+};
+
+const W_DEEP = {
+  Sun: [
+    "As an Aries Sun, you carry the eternal flame of new beginnings. You came into this life to initiate, to act, and to inspire others through the sheer force of your courage. You may sometimes charge ahead without thinking, leaving a wake of unfinished projects — but your gift is the spark, the daring first step others are afraid to take. Trust that boldness; it is your spiritual signature.",
+    "A Taurus Sun brings you fully into the world of the senses. You are here to appreciate, to build, and to demonstrate that pleasure and beauty are sacred. Your stubbornness is the shadow of your greatest gift — the ability to persist when everyone else has given up. Root yourself deeply, trust the slow unfolding of seasons, and know that lasting value is always worth the wait.",
+    "With your Sun in Gemini, you were born at the crossroads of two worlds. Your mind is your engine, your curiosity your compass. You gather fragments — ideas, people, perspectives — and weave them into meaning. The challenge is to resist scattering your gifts; when you channel your brilliant restlessness into a single voice, you become an extraordinary communicator and storyteller.",
+    "Cancer Sun weaves your identity inseparably from memory, family, and emotional depth. You feel the world before you think about it. Your shell is not weakness — it is wisdom, a boundary that protects the extraordinary tenderness within. Your greatest contribution is creating safety and belonging for others. When you learn to parent yourself with the same devotion you give others, you truly flourish.",
+    "The Leo Sun blazes with creative fire and the need to be seen. You carry an inner royalty — a generosity of spirit that, at its best, elevates everyone around you. The shadow arises when approval becomes a need rather than a pleasure. Your journey is learning that your light is unconditional; you do not need an audience to be magnificent. Shine anyway.",
+    "Virgo Sun bestows the gift of discernment. You see what is broken and feel the urgent pull to fix it. Your devotion to craft, health, and service is a spiritual path in itself. The wound is the critical inner voice that turns your precision against yourself. The healed Virgo Sun understands that the world is not a problem to be solved but a garden to be tended with patient, loving care.",
+    "Libra Sun lives in the space between: between self and other, between justice and peace, between decision and indecision. You are the sign of the cosmic scales, forever seeking a balance that is always shifting. Your gift is seeing every side of a question with genuine grace. The work is learning that choosing — even imperfectly — is an act of self-respect, not a betrayal of fairness.",
+    "Scorpio Sun descends into the underworld willingly. You are drawn to what is hidden, to the raw truth underneath every polished surface. Your intensity is not darkness — it is a refusal to live shallowly. The gift of Scorpio is transformation: you die and are reborn across a lifetime, each time emerging with deeper wisdom. Trust the process of dissolution; it has always been leading you to gold.",
+    "Sagittarius Sun carries a torch for the horizon. You are the archer and the philosopher, always seeking the larger truth behind the immediate fact. Life is an epic journey and you refuse to sit still long enough for it to become ordinary. The shadow is the fear of commitment — the suspicion that settling down means settling. The wisdom is that the deepest adventures are sometimes found in remaining.",
+    "Capricorn Sun was born knowing that time is the currency of mastery. You build slowly, deliberately, with an eye fixed on the summit most others cannot even see. The world needs your discipline, your reliability, your long view. The wound is the belief that worth is earned only through achievement. The healed Capricorn knows: you were worthy before you built a single thing.",
+    "Aquarius Sun arrived from the future. You see the patterns in human systems — what is broken, what is possible, what could be — with startling clarity. You are here to disrupt and to serve collectively, often feeling like the stranger in every room you enter. The work is learning that belonging does not require conformity; your very otherness is the gift you were sent here to give.",
+    "Pisces Sun dissolves all hard edges. You are the last sign, the one that contains all the others, and your empathy is oceanic. You feel the suffering of the world as your own — which is both your gift and your burden. Your imagination and spiritual sensitivity can produce extraordinary art, healing, and devotion. The work is learning where you end and the world begins, and that boundary is not a wall but a shore.",
+  ],
+  Moon: [
+    "Your Aries Moon needs emotional adventure and direct expression. You feel things with white-hot immediacy, then release them just as quickly — others may find this unsettling, but for you, unprocessed emotion is unbearable. You need space to act first and reflect later. Arguments are often how you feel alive. Nurture yourself through movement, initiation, and honest self-expression.",
+    "The Taurus Moon provides a bedrock of emotional steadiness. You feel safest when your environment is beautiful, your body is comfortable, and your routines are uninterrupted. Change disturbs you deeply — not out of laziness but out of a profound loyalty to what you have built. Your emotional nourishment comes from sensory pleasure: good food, touch, music, and the patient growth of something real.",
+    "A Gemini Moon makes you emotionally curious rather than emotionally deep, or so it seems. In truth, your feelings run plenty deep — but you process them through words, through conversation, through writing. You may switch moods rapidly, following your mind's quick associations. Two voices often argue inside you. Peace comes not from silencing them but from finding the wise third position between.",
+    "The Cancer Moon is the Moon in its own home, intensified. Your emotional body is exquisitely sensitive, absorbing the moods and needs of everyone around you like a mirror held to the sea. Home is not just a place but a feeling — and when that feeling is absent, you carry your homesickness through the world. Your gift is the depth of love you offer; your work is learning to receive it in return.",
+    "Leo Moon needs to feel special — not in a selfish sense but in the profound human need to be seen and celebrated. You give emotionally with theatrical generosity and need warmth in return. When approval is withheld, you may perform even harder or retreat into wounded pride. The inner child here is royal: it needs to know it is adored simply for being itself, not for what it produces.",
+    "The Virgo Moon analyses feelings before trusting them. You process emotion through service — doing, fixing, organising — and can struggle to simply sit with messy, unresolvable feelings. Your inner critic is loudest in matters of the heart. Healing comes in recognising that emotions need not be logical to be valid, and that self-compassion is not self-indulgence but self-preservation.",
+    "Libra Moon craves emotional equilibrium and can go to great lengths to avoid disruption. You feel safest in harmonious environments and may suppress your own needs to keep the peace. The emotional work is learning to name your own desires clearly without the qualifier of whether they will upset anyone. Your inner life blossoms when you treat your own needs as equally worthy of consideration.",
+    "Scorpio Moon is the intensity sign in the feeling sign. You do not do shallow — emotionally, you go straight to the bottom. Betrayal cuts deeply and is never entirely forgotten; trust is the rarest treasure you offer. The gift is an extraordinary capacity for intimacy and regeneration. You have died emotionally many times already, and each time you have risen with new depth and wisdom.",
+    "Sagittarius Moon needs emotional freedom the way lungs need air. You process feelings through motion, through philosophy, through reframing experience as adventure. You can intellectualise emotions away — telling a story about them rather than inhabiting them. Healing comes through staying in the feeling a moment longer than is comfortable, trusting that depth does not have to mean confinement.",
+    "Capricorn Moon learned early that feelings are a private matter and perhaps a sign of weakness. You are emotionally self-sufficient in ways that can isolate you. Your inner world is more complex and tender than most people ever see. The work is learning to ask for and receive comfort without shame — to know that even mountains have springs running through them.",
+    "Aquarius Moon is cool, observant, and emotionally self-contained. You experience feelings more as interesting data points than as tides to be swept away by. You care deeply for humanity in the abstract and can struggle with intimacy in the specific. Your emotional genius lies in your ability to care without losing yourself. The invitation is to also allow yourself to be cared for.",
+    "The Pisces Moon is permeable. You feel everything — the grief of strangers, the tension in a room, the sadness in a piece of music — as acutely as your own. This empathy is your superpower and your vulnerability. Healthy boundaries are not walls but membranes, allowing the good to enter while keeping the toxic out. Water needs banks to flow; your sensitivity needs structure to become wisdom.",
+  ],
+  Mercury: [
+    "Aries Mercury thinks and speaks in bold, declarative bursts. You lead with your thesis before building the argument — and sometimes your mouth moves before your mind has finished. This directness is refreshing; it cuts through waffle. The work is learning to pause before impact, to understand that the most powerful words are sometimes the ones you chose not to say.",
+    "Taurus Mercury absorbs information slowly and completely. You do not rush to conclusions; you wait until understanding has solidified in your body as well as your mind. Once you have decided, changing your opinion requires truly seismic evidence. Your gift is reliability of thought — when you speak, you mean exactly what you say.",
+    "Gemini Mercury is Mercury in its home sign, at its most electric. Your mind moves at the speed of association, drawing connections across vast terrain, delighting in language and paradox and information. The shadow is difficulty finishing — a project, a thought, a sentence — before the next idea has already arrived. Your gift is making complex ideas feel alive.",
+    "Cancer Mercury thinks in feelings, images, and memories. Your mind is deeply associative, linking logic to mood, past to present, the personal to the universal. You are an extraordinary listener — people feel truly heard by you. You may struggle to separate your thinking from your emotional state; the work is developing the capacity to think clearly even when you feel turbulent.",
+    "Leo Mercury speaks from the heart and the stage. You have natural storytelling charisma and the conviction that your ideas deserve to be heard — because they usually do. The shadow is the need to be the authority in the room; genuine listening grows your influence more than performative confidence ever could. Your best ideas arrive when ego steps aside.",
+    "Virgo Mercury is Mercury's other home sign: precise, analytical, endlessly capable of categorisation and refinement. You notice what others miss. Your gift is the capacity for genuine depth — in research, in writing, in understanding — but you can suffer from analysis paralysis, finding fault in your own ideas before they are born. Trust the first draft.",
+    "Libra Mercury thinks through dialogue. You do not have a fixed position so much as a conversation — you genuinely see multiple sides, and your thinking evolves through the friction of other perspectives. Decisions can be agonising because you are always weighing. The gift is fairness of mind; the work is learning that choosing is not betraying the side you didn't choose.",
+    "Scorpio Mercury digs. Your mind is investigative by nature, never satisfied with the surface explanation, always seeking the motive behind the motive. You are gifted at detecting deception and cutting through complexity to essential truth. The shadow is becoming suspicious, reading subtext where there is none. Trust your instincts — but hold them lightly.",
+    "Sagittarius Mercury thinks in principles and systems. Your mind races ahead to implications and meaning before the details have been established — a brilliant habit that sometimes mistakes enthusiasm for evidence. You are a natural philosopher and teacher, gifted at making ideas feel enormous and alive. The work is patience with the small, difficult particulars.",
+    "Capricorn Mercury is the planner's mind: structured, strategic, long-term. You do not speak carelessly; words are tools, and you choose them with professional precision. You have little patience for idle conversation and great respect for competence. The shadow is becoming dismissive of ideas that don't have an immediate practical application. Let your mind play sometimes — without an agenda.",
+    "Aquarius Mercury thinks outside every box it has ever encountered. Your mind leaps to connections that seem random until, suddenly, they are obviously correct. You are often ahead of your time, which can feel isolating. The gift is originality; the work is learning to communicate your insights in a language your audience can follow, without watering them down.",
+    "Pisces Mercury thinks in metaphor, symbol, and feeling. Your mind is deeply intuitive — you often know the answer before you can explain how you arrived at it. Writing, poetry, and art may be your most natural languages. The challenge is linear argumentation and practical sequencing; the gift is the ability to communicate the ineffable, to make the invisible visible through words.",
+  ],
+  Venus: [
+    "Aries Venus falls in love quickly, passionately, and without apology. You are attracted to confidence and love the early heat of pursuit. Keeping the relationship thrilling matters; routine is the enemy of your affection. The deeper work is learning that sustained love requires tending — the same courage it takes to begin something must be applied to choosing it again, every day.",
+    "Taurus Venus is ruled by Venus itself, expressing love through loyalty, sensuality, and unwavering devotion. You court through consistency; your love language is presence, touch, and beauty. You need a relationship that feels like home. The shadow is possessiveness — love that holds too tightly can suffocate. The gift is a depth of fidelity that builds a world for two.",
+    "Gemini Venus needs variety, wit, and the feeling that a relationship is also a friendship and an intellectual adventure. You are charming and playful in love, never boring, always surprising. The shadow is commitment-phobia — not because you are shallow but because you fear the death of possibility. The gift is keeping love perpetually fresh through genuine curiosity about your partner.",
+    "Cancer Venus loves with its whole past. You bring memory, family, and emotional legacy into every relationship; you nurture and protect and cook and remember. The shadow is clinginess, born of a fear of abandonment. The gift is the profound safe harbour you create for those lucky enough to receive your love. Your ideal partner makes you feel permanently, unconditionally at home.",
+    "Leo Venus is theatrical and generous in love. You offer grand gestures, sincere warmth, and unwavering loyalty to those who have truly earned your heart. You need to be adored in return — not out of vanity but out of the deep need to know your love is received with equal fire. The shadow is performing love for an audience; the gift is a love that genuinely illuminates both partners.",
+    "Virgo Venus expresses love through service — through noticing, through remembering, through quietly making everything better. You may struggle to articulate romantic feeling in flowery language, but your devotion speaks clearly through ten thousand practical acts of care. The shadow is criticism disguised as concern; the gift is a love that actually pays attention.",
+    "Libra Venus is Venus in its home sign, most naturally itself: romantic, aesthetic, devoted to the idea of partnership. You seek a relationship that is also an art form — balanced, beautiful, and fair. The shadow is over-idealisation, loving the idea of a person before knowing the reality. The gift is an extraordinary capacity for genuine, refined love — once the real person is welcomed in.",
+    "Scorpio Venus loves with total intensity or not at all. There is no casual here; every relationship you enter becomes a profound psychological experience. You seek merger, revelation, and complete honesty. The shadow is jealousy and control, born from an old wound around betrayal. The gift is the transformative love that remakes both people, if trust can be built.",
+    "Sagittarius Venus falls in love with minds, ideals, and horizons. You need a partner who is also an adventurer — someone who expands your world rather than confining it. Freedom is your prerequisite and your offering. The shadow is fleeing intimacy under the guise of needing space. The gift is a love that treats the other as a fellow pilgrim, never a possession.",
+    "Capricorn Venus takes love seriously — perhaps more seriously than any other placement. You offer stability, reliability, and a love that deepens over decades. You are slow to commit but immovable once you have. The shadow is emotional distance, protecting against vulnerability by staying practical. The gift is a love that endures, that shows up in the hard seasons, that proves itself through time.",
+    "Aquarius Venus is unconventional in its affections. You are attracted to originality, intelligence, and those who exist outside the mainstream. You love fiercely but need breathing room; possession is antithetical to your nature. The shadow is emotional detachment — relating to a partner as a fascinating concept rather than a vulnerable human. The gift is a love that never tries to tame.",
+    "Pisces Venus loves without limit and without clear edges. Your compassion in relationship is boundless; you see the divine in your beloved and love them as much for their brokenness as for their beauty. The shadow is dissolution — losing yourself entirely in another, or falling for potential rather than reality. The gift is the transcendent love that dissolves the illusion of separateness.",
+  ],
+  Mars: [
+    "Aries Mars is the planet in its own sign, expressing pure Martian energy: decisive, fearless, and immediate. You act first. You don't wait for permission or perfect conditions. This is your genius — you can galvanise rooms, launch projects, and cut through hesitation like a sword. The shadow is impatience: the race you lose to yourself by refusing to let things ripen.",
+    "Taurus Mars moves with the patience of tectonic plates — and hits with the same force. Your energy is deliberate, persistent, and extraordinarily enduring. You do not sprint; you steadily outlast every obstacle. The shadow is stubbornness so entrenched it becomes self-sabotage. The gift is the unstoppable momentum of a body and will completely aligned.",
+    "Gemini Mars fights with words. Your arguments are quick, clever, and multi-pronged — you change direction mid-debate and attack from unexpected angles. You are energised by intellectual sparring and multi-tasking. The shadow is scattered force: a dozen projects burning and none of them finished. Choose one battle and win it completely.",
+    "Cancer Mars acts from emotion. Your motivation is deeply personal — you are not fighting for abstract causes but for your people, your home, your past. Your anger is slow to rise and never quite forgets. The shadow is passive aggression and moodiness masking direct desire. The gift is a fierce, unwavering protectiveness that would walk through fire for those you love.",
+    "Leo Mars performs its will. You are energised by an audience, by stakes, by the chance to prove yourself in the arena. You fight for your pride and your people with dramatic flair. The shadow is the ego battle that never needed to happen; the gift is the contagious courage that makes others believe they can do hard things too.",
+    "Virgo Mars works harder than almost any other placement. Your energy goes into the details — the craft, the refinement, the ten-thousand-hour mastery of a skill. You critique before you act, which slows you but also protects from costly errors. The shadow is perfectionism that prevents completion; the gift is the extraordinary standard of work you produce when you finally release it.",
+    "Libra Mars acts through negotiation. You hate direct confrontation and will search for the diplomatic path even in crisis — which can read as indecision but is, in reality, a genuine attempt at fairness. The shadow is the anger that gets buried beneath pleasantness and surfaces as passive aggression or sudden outbursts. The gift is a capacity for strategic, considered action that nobody saw coming.",
+    "Scorpio Mars is relentless. You do not give up. Once a goal has been set, you pursue it with a single-minded intensity that is almost frightening — resources, obstacles, and other people's doubts mean nothing. The shadow is ruthlessness, the willingness to cross ethical lines in pursuit of power. The gift is a will that can survive extraordinary adversity and come out transformed.",
+    "Sagittarius Mars runs toward the horizon. You are most alive when you are moving — physically, intellectually, spiritually. You take risks with an almost reckless optimism, trusting that things will work out because they always have, or close enough. The shadow is overextension; the gift is the infectious enthusiasm that makes people join your mission before they have fully understood it.",
+    "Capricorn Mars is the executive's Mars: strategic, disciplined, and playing the long game. You channel your energy into systems and structures, not emotional confrontations. You are most dangerous when patient — working methodically toward a goal while others have already given up. The shadow is the calculating coldness that can emerge when ambition eclipses conscience.",
+    "Aquarius Mars rebels. You are energised by the idea of disrupting what is established and replacing it with something more visionary. You fight for causes, not for personal glory. The shadow is contrarianism for its own sake; the gift is the capacity to envision and build systems that have never existed before.",
+    "Pisces Mars acts from intuition and inspiration, not from rational planning. Your energy is rhythmic rather than constant — you go in waves, capable of extraordinary inspired effort followed by genuine depletion. The shadow is passivity or self-sabotage when will meets the ocean of doubt. The gift is the capacity for acts of compassion, creativity, and sacrifice that others cannot imagine.",
+  ],
+  Jupiter: [
+    "Jupiter in Aries expands through courage and initiative. Your greatest growth comes from being first, from taking the leap before others, from trusting your instinct to begin. Fortune favours your boldness here.",
+    "Jupiter in Taurus grows through patience and appreciation. Abundance arrives slowly but completely when you tend what you have been given. Beauty, nature, and the body are your expansion portals.",
+    "Jupiter in Gemini multiplies through knowledge and communication. Every conversation is a seed of opportunity. You grow through learning, teaching, and the joyful exchange of ideas.",
+    "Jupiter in Cancer expands through family, emotional intelligence, and creating belonging for others. Your greatest gifts often come through the people you nurture most faithfully.",
+    "Jupiter in Leo shines. Your luck is tied to your willingness to be visible, to take creative risks, and to share your gifts generously. The more you give from the heart, the more returns to you.",
+    "Jupiter in Virgo grows through dedicated, humble service. The details others overlook are precisely where your opportunities hide. Mastery of craft is your portal to abundance.",
+    "Jupiter in Libra expands through partnerships and fairness. Your greatest opportunities arrive through other people — collaborations, alliances, and the willingness to genuinely meet another halfway.",
+    "Jupiter in Scorpio grows through willingness to go deep. Inheritance, shared resources, and psychological transformation are your expansion pathways. The treasure is always buried.",
+    "Jupiter in Sagittarius is at home — this is the expansive philosopher's dream. You grow through travel, study, teaching, and the relentless pursuit of a larger truth.",
+    "Jupiter in Capricorn grows through discipline and mastery. Luck here is earned through reliability, patience, and the slow accumulation of genuine competence.",
+    "Jupiter in Aquarius expands through innovation and community. Your greatest growth comes at the intersection of the visionary idea and the collective need.",
+    "Jupiter in Pisces grows through surrender and spiritual connection. Compassion, imagination, and faith are your abundance channels. Giving without expectation opens the most unexpected doors.",
+  ],
+  Saturn: [
+    "Saturn in Aries asks you to learn that true courage is not the absence of fear but the decision to act despite it. The discipline here is patience — you are learning that not every battle needs to be fought immediately.",
+    "Saturn in Taurus teaches the discipline of building lasting material security through patient, honest work. The fear of poverty or loss must be transformed into genuine stewardship of resources.",
+    "Saturn in Gemini disciplines the mind. The work is developing depth and follow-through: finishing what you start, committing to one area of study long enough to achieve genuine mastery.",
+    "Saturn in Cancer asks you to work through early family wounds, to learn to provide for yourself emotionally, and to build internal security rather than seeking it perpetually from outside.",
+    "Saturn in Leo restricts self-expression until genuine humility is developed. The work is separating the need for validation from the act of creation — creating because you must, not because you will be applauded.",
+    "Saturn in Virgo disciplines the body and the critical mind. The work is perfectionism transformed into craftsmanship — knowing when done is better than perfect, and when your service is already enough.",
+    "Saturn in Libra is exalted — the commitment to genuine fairness and principled partnership is tested and strengthened here. Relationships become the school in which your deepest character is forged.",
+    "Saturn in Scorpio demands psychological excavation. The work is confronting your own shadow, your fears around control and powerlessness, and learning to transform them into wisdom.",
+    "Saturn in Sagittarius restricts belief and philosophy until genuine wisdom is earned. The work is moving from dogma to discernment — understanding that true faith must be tested to be real.",
+    "Saturn in Capricorn is at home, and doubly serious. The work of ambition, discipline, and building a meaningful legacy is your curriculum — and your rewards arrive late and lastingly.",
+    "Saturn in Aquarius asks you to commit to your community and your vision even when the world does not yet understand it. The discipline is sustained idealism — hope that doesn't flinch.",
+    "Saturn in Pisces requires you to develop spiritual discipline and clear discernment. The work is learning to dissolve the ego intentionally, through practice rather than through being overwhelmed.",
+  ],
+  'North Node': [
+    "Your North Node in Aries calls you from the comfort of diplomacy and accommodation toward bold, independent action. Trust your instincts. Assert yourself. The world needs your unique fire.",
+    "Your North Node in Taurus calls you from the drama of transformation and intensity toward peace, simplicity, and the pleasures of the present. Slow down. Let beauty teach you.",
+    "Your North Node in Gemini calls you from grand philosophical pronouncements toward curiosity, humility, and the value of a single, perfect conversation. Listen as much as you speak.",
+    "Your North Node in Cancer calls you from ambition and public achievement toward the private, emotional world of belonging and vulnerability. Build your inner sanctuary first.",
+    "Your North Node in Leo calls you from self-effacement toward authentic self-expression. You came here to create, to love dramatically, and to lead with your heart wide open.",
+    "Your North Node in Virgo calls you from the ocean of spiritual abstraction toward practical service, discernment, and the mastery of one beautiful, useful thing.",
+    "Your North Node in Libra calls you from self-absorption toward genuine, balanced partnership. Your greatest growth arrives when you truly commit to another's world as much as your own.",
+    "Your North Node in Scorpio calls you from the safe accumulation of material comfort toward the deep, transformative surrender of what no longer serves your soul.",
+    "Your North Node in Sagittarius calls you from the safety of facts and data toward the adventure of belief, travel, and the willingness to trust the larger pattern.",
+    "Your North Node in Capricorn calls you from the warmth of emotional dependence toward the dignity of self-mastery, professional achievement, and earned authority.",
+    "Your North Node in Aquarius calls you from the spotlight of individual expression toward the wider community — your gifts belong to a movement larger than yourself.",
+    "Your North Node in Pisces calls you from the precision of analysis toward the sacred dissolution of ego, toward compassion that asks nothing in return.",
+  ],
+  Ascendant: [
+    "Your Aries Ascendant means the world meets an initiator first: someone direct, energetic, and unmistakably present. You enter every room ready for what comes next. Over time, you learn that your most powerful quality is not aggression but the purity of your courage.",
+    "Your Taurus Ascendant gives you a grounded, unhurried presence that people find deeply reassuring. You radiate calm solidity. Others sense they can lean on you — and usually they're right. The work is resisting the pull to stay still when movement would serve you.",
+    "Your Gemini Ascendant makes you appear quick, curious, and perpetually interesting. You adapt your presentation to your audience with uncanny ease. The work is making sure the depth you possess internally eventually matches the sparkling surface you offer the world.",
+    "Your Cancer Ascendant wraps you in an almost visible protective shell. You come across as nurturing and sensitive — people want to confide in you within minutes. The work is not letting this protective persona become a mask that prevents you from being as vulnerable as those you care for.",
+    "Your Leo Ascendant is an entrance. You arrive with presence. People notice you — not always because of what you do but because of something that radiates from your bearing, your warmth, your obvious sense of self. The work is discovering that your light is intrinsic, not dependent on reaction.",
+    "Your Virgo Ascendant gives you a quietly competent, observant presence. You come across as composed, careful, and capable. People often feel in good hands with you. The work is allowing yourself to be seen as more than functional — to let your complexity and warmth come forward too.",
+    "Your Libra Ascendant makes you appear gracious, elegant, and immediately likable. You instinctively read the social atmosphere and find the most harmonious way to enter it. The work is learning that being authentic sometimes disrupts the harmony you prize — and that this disruption can be a gift.",
+    "Your Scorpio Ascendant gives you a magnetic, slightly mysterious quality. People feel you are seeing beneath their surface even before you have spoken. This intensity draws some people closer and pushes others away. The work is allowing yourself to be known as well as knowing.",
+    "Your Sagittarius Ascendant makes you appear open, enthusiastic, and genuinely interested in everything. Your optimism is contagious; people feel expanded in your company. The work is following through on the promises your energy makes — arriving fully at what you so exuberantly began.",
+    "Your Capricorn Ascendant gives you an air of quiet authority. People take you seriously almost automatically — there is something in your bearing that suggests you have considered more angles than most. The work is letting warmth and playfulness emerge alongside your capable, serious exterior.",
+    "Your Aquarius Ascendant makes you appear distinctive — there is something about you that reads as singular, even before you open your mouth. You attract interesting people and unusual situations. The work is allowing genuine emotional intimacy within the fascinating world you inhabit.",
+    "Your Pisces Ascendant gives you an otherworldly quality — dreamy, compassionate, and permeable. People sense your sensitivity and either gravitate toward it or try to take advantage of it. The work is developing the discernment to tell the difference, and the boundaries to protect your luminous interior.",
+  ],
+  Uranus: [
+    "Uranus in Aries (your generation) brought a radical reshaping of individual identity and technology. Those born under this placement carry a generational mandate to break the mould of selfhood and pioneer new ways of being.",
+    "Uranus in Taurus is reshaping material reality: money, land, and resources are being revolutionised by technology and environmental necessity. Your generation is the bridge between the old economy and whatever comes next.",
+    "Uranus in Gemini electrified communication and information. Your generation helped birth mass media and new languages of connection.",
+    "Uranus in Cancer disrupted home and family structures, liberating and destabilising in equal measure. Your generation redefined what belonging means.",
+    "Uranus in Leo created explosive creative individualism. Rock and roll, new art forms, the teenager as cultural force — your generation reinvented self-expression.",
+    "Uranus in Virgo revolutionised health, work, and the environment. Your generation brought the counterculture's ideals into daily practical life.",
+    "Uranus in Libra upended relationship and marriage norms. Divorce, partnership equality, and new models of love all crystallised here.",
+    "Uranus in Scorpio transformed sexuality, death, and taboo. Punk, AIDS awareness, the occult revival — your generation confronted what had been buried.",
+    "Uranus in Sagittarius exploded belief systems. Globalisation, the internet's roots, and the collapse of singular cultural narratives shaped your generation.",
+    "Uranus in Capricorn dismantled institutions. The fall of the Soviet Union, corporate restructuring, and the questioning of traditional authority define your generation's inheritance.",
+    "Uranus in Aquarius is the internet generation, the networked world, the first to grow up socially connected globally. Your generation is rewiring society itself.",
+    "Uranus in Pisces dissolves spiritual and artistic boundaries. Your generation is questioning the nature of reality, consciousness, and the edges of the self.",
+  ],
+  Neptune: [
+    "Neptune in Aries brings a generation that dreams of heroic new identities and spiritual pioneers.", "Neptune in Taurus dissolves material attachment; earth as sacred, simplicity as spiritual.", "Neptune in Gemini mystifies communication; a generation of dreamers in language and ideas.", "Neptune in Cancer: home and family become the spiritual ideal and the site of collective longing.", "Neptune in Leo romanticises creativity and performance; a generation that turns art into religion.", "Neptune in Virgo: a generation called to heal the body of the world through practical compassion.", "Neptune in Libra idealists partnerships and peace; the post-war generation's dream of harmony.", "Neptune in Scorpio dissolves taboo and sexual shame; drugs, mysticism, and the collective unconscious.", "Neptune in Sagittarius: idealistic seekers, new age spirituality, and the dream of universal truth.", "Neptune in Capricorn: the dissolution of institutional certainty; what structures can we trust?", "Neptune in Aquarius: the collective merges online; the dream of a borderless, connected humanity.", "Neptune in Pisces is at home — a generation returning to mysticism, compassion, and spiritual longing.",
+  ],
+  Pluto: [
+    "Pluto in Aries: collective rebirth through war and radical new identities (19th century).", "Pluto in Taurus: transformation of land, economy, and material civilisation.", "Pluto in Gemini: mass media, information, and communication transformed culture.", "Pluto in Cancer: the death and rebirth of home, family, and national identity in two World Wars.", "Pluto in Leo: the nuclear age, totalitarianism, and the radical transformation of power and will.", "Pluto in Virgo: collective transformation of work, health, and service; the analytical deconstruction of tradition.", "Pluto in Libra: the death and rebirth of marriage, partnership, and justice frameworks.", "Pluto in Scorpio: AIDS, the internet, corporate power, and the collective confrontation with death and taboo.", "Pluto in Sagittarius: fundamentalism versus globalisation; the death and rebirth of belief systems.", "Pluto in Capricorn: the dismantling of financial and governmental institutions; power structures exposed.", "Pluto in Aquarius: the transformation of networks, collective identity, and technology's relationship to humanity.", "Pluto in Pisces: the dissolution of boundaries; collective spiritual rebirth or collective illusion.",
+  ],
+};
+
+// ─────────────────────────────────────────────
+// VEDIC
+// ─────────────────────────────────────────────
+
+const NAKSHATRAS = [
+  { name:'Ashwini', deity:'Ashwins', symbol:'Horse head', pada:4 },
+  { name:'Bharani', deity:'Yama', symbol:'Yoni', pada:4 },
+  { name:'Krittika', deity:'Agni', symbol:'Razor/flame', pada:4 },
+  { name:'Rohini', deity:'Brahma', symbol:'Ox cart', pada:4 },
+  { name:'Mrigashira', deity:'Soma', symbol:'Deer head', pada:4 },
+  { name:'Ardra', deity:'Rudra', symbol:'Teardrop', pada:4 },
+  { name:'Punarvasu', deity:'Aditi', symbol:'Quiver', pada:4 },
+  { name:'Pushya', deity:'Brihaspati', symbol:'Flower', pada:4 },
+  { name:'Ashlesha', deity:'Nagas', symbol:'Serpent', pada:4 },
+  { name:'Magha', deity:'Pitris', symbol:'Throne', pada:4 },
+  { name:'Purva Phalguni', deity:'Bhaga', symbol:'Hammock', pada:4 },
+  { name:'Uttara Phalguni', deity:'Aryaman', symbol:'Bed', pada:4 },
+  { name:'Hasta', deity:'Savitar', symbol:'Hand', pada:4 },
+  { name:'Chitra', deity:'Vishwakarma', symbol:'Pearl', pada:4 },
+  { name:'Swati', deity:'Vayu', symbol:'Coral/sword', pada:4 },
+  { name:'Vishakha', deity:'Indra-Agni', symbol:'Triumphal arch', pada:4 },
+  { name:'Anuradha', deity:'Mitra', symbol:'Lotus', pada:4 },
+  { name:'Jyeshtha', deity:'Indra', symbol:'Earring/umbrella', pada:4 },
+  { name:'Mula', deity:'Nirrti', symbol:'Bunch of roots', pada:4 },
+  { name:'Purva Ashadha', deity:'Apas', symbol:'Elephant tusk', pada:4 },
+  { name:'Uttara Ashadha', deity:'Vishwadevas', symbol:'Planks of bed', pada:4 },
+  { name:'Shravana', deity:'Vishnu', symbol:'Ear/three footprints', pada:4 },
+  { name:'Dhanishtha', deity:'Ashta Vasus', symbol:'Drum', pada:4 },
+  { name:'Shatabhisha', deity:'Varuna', symbol:'Empty circle', pada:4 },
+  { name:'Purva Bhadrapada', deity:'Aja Ekapada', symbol:'Swords/two faces', pada:4 },
+  { name:'Uttara Bhadrapada', deity:'Ahir Budhnya', symbol:'Twins', pada:4 },
+  { name:'Revati', deity:'Pushan', symbol:'Fish/drum', pada:4 },
+];
+
+const NAKSHATRA_BRIEF = [
+  'Ashwini: swift, healing, trailblazing energy. Born to begin.',
+  'Bharani: bearing the weight of creation; sensual, intense, transformative.',
+  'Krittika: sharp, purifying fire; leadership through discipline.',
+  'Rohini: fertile, magnetic, devoted to beauty and sensory pleasure.',
+  'Mrigashira: curious seeker, ever searching for the next horizon.',
+  'Ardra: storms of transformation; grief becomes wisdom.',
+  'Punarvasu: returning home, again and again; renewal and restoration.',
+  'Pushya: nourishing and nurturing; the most giving of the nakshatras.',
+  'Ashlesha: serpent power; penetrating intelligence, mystical depth.',
+  'Magha: ancestral power; regal, connected to lineage and legacy.',
+  'Purva Phalguni: creative pleasure, charisma, romantic delight.',
+  'Uttara Phalguni: patronage, generosity, contracts of friendship.',
+  'Hasta: skilled hands, craft, and the gift of manifestation.',
+  'Chitra: the brilliant artificer; art, architecture, and dazzling beauty.',
+  'Swati: independent as wind, restlessly seeking self-sufficiency.',
+  'Vishakha: purposeful ambition; the archer who does not miss.',
+  'Anuradha: devoted friendship, disciplined heart, lotus in the mud.',
+  'Jyeshtha: the eldest, the protector, the one who carries responsibility.',
+  'Mula: rooting up, dismantling, finding the source beneath all things.',
+  'Purva Ashadha: invincible resolve; purified by water and perseverance.',
+  'Uttara Ashadha: final victory, earned through righteousness.',
+  'Shravana: listening deeply; the scholar who learns through attention.',
+  'Dhanishtha: rhythmic wealth; gifted with music, abundance, and sharing.',
+  'Shatabhisha: the healer of a hundred physicians; solitude and mystery.',
+  'Purva Bhadrapada: fiery idealism; burning away what obscures truth.',
+  'Uttara Bhadrapada: depth, wisdom, the peaceful sage who has seen all.',
+  'Revati: completion and transition; compassionate guide through endings.',
+];
+
+function getNakshatra(tropicalLon) {
+  // Sidereal longitude (Lahiri ayanamsha ≈ 24.1° in 2000, +0.0139°/yr)
+  const ayanamsha = 24.1 + 0.0139 * ((new Date().getFullYear()) - 2000);
+  const sid = normalise(tropicalLon - ayanamsha);
+  const idx = Math.floor(sid / (360 / 27));
+  return { ...NAKSHATRAS[idx], index: idx, longitude: sid };
+}
+
+function getVedicSign(tropicalLon) {
+  const ayanamsha = 24.1 + 0.0139 * ((new Date().getFullYear()) - 2000);
+  const sid = normalise(tropicalLon - ayanamsha);
+  return signOf(sid);
+}
+
+const VEDIC_PLANETS = [
+  { key:'sun',   icon:'☀️', label:'Surya (Sun)'   },
+  { key:'moon',  icon:'🌙', label:'Chandra (Moon)' },
+  { key:'mars',  icon:'♂',  label:'Mangala (Mars)' },
+  { key:'mercury',icon:'☿', label:'Budha (Mercury)'},
+  { key:'jupiter',icon:'♃', label:'Guru (Jupiter)' },
+  { key:'venus', icon:'♀',  label:'Shukra (Venus)' },
+  { key:'saturn',icon:'♄',  label:'Shani (Saturn)' },
+  { key:'rahu',  icon:'☊',  label:'Rahu (North Node)'},
+  { key:'ketu',  icon:'☋',  label:'Ketu (South Node)'},
+];
+
+const VEDIC_SIGN_BRIEF = [
+  'Mesha (Aries): fierce, pioneering, full of fiery courage.',
+  'Vrishabha (Taurus): steady, sensual, devoted to beauty.',
+  'Mithuna (Gemini): curious, communicative, perpetually playful.',
+  'Karka (Cancer): nurturing, intuitive, protective of the heart.',
+  'Simha (Leo): royal, creative, magnanimous in spirit.',
+  'Kanya (Virgo): discerning, pure, devoted to service.',
+  'Tula (Libra): balanced, fair, naturally diplomatic.',
+  'Vrishchika (Scorpio): penetrating, intense, powerfully transformative.',
+  'Dhanu (Sagittarius): philosophical, expansive, seeker of truth.',
+  'Makara (Capricorn): disciplined, ambitious, building for eternity.',
+  'Kumbha (Aquarius): humanitarian, visionary, ahead of the age.',
+  'Meena (Pisces): compassionate, oceanic, deeply spiritual.',
+];
+
+// ─────────────────────────────────────────────
+// CELTIC TREE ASTROLOGY
+// ─────────────────────────────────────────────
+
+const CELTIC_TREES = [
+  { name:'Birch', dates:'Dec 24 – Jan 20', ogham:'Beith', symbol:'🌿', element:'Earth',
+    brief:'The Achiever — ambitious, driven, and powerfully resilient.',
+    deep:'Birch people are the great pioneers of the Celtic calendar. Born in the depths of winter, you carry the promise of the returning light. You possess remarkable resilience and the ability to thrive in difficult circumstances where others cannot. Like the silver birch that colonises bare ground first after a fire, you are always at the forefront, clearing the way for others. Your determination can sometimes shade into rigidity; your deep soul work is learning to bend without breaking.' },
+  { name:'Rowan', dates:'Jan 21 – Feb 17', ogham:'Luis', symbol:'🔴', element:'Fire',
+    brief:'The Thinker — visionary, progressive, and quietly rebellious.',
+    deep:'Rowan people are born under the tree of protection and vision. You carry unusual insight — a kind of foresight that others often dismiss until events prove you right. You have an independent, highly original mind that resists being categorised or confined. Your protective instincts are fierce and your intuition borders on the clairvoyant. The challenge of the Rowan is to trust your unusual perceptions without becoming isolated in your uniqueness.' },
+  { name:'Ash', dates:'Feb 18 – Mar 17', ogham:'Nion', symbol:'🌳', element:'Water',
+    brief:'The Enchanter — imaginative, intuitive, and deeply connected to other realms.',
+    deep:'Ash people move through the world with one foot on earth and one in other dimensions. You are natural artists, seers, and healers. Your imagination is your most extraordinary faculty — it receives signals from dimensions others cannot access. You can suffer from moodiness and withdrawal when the outer world fails to match your rich inner life. The work of the Ash is to trust its visionary gifts enough to share them, even when the world seems unready to receive them.' },
+  { name:'Alder', dates:'Mar 18 – Apr 14', ogham:'Fearn', symbol:'🌲', element:'Fire/Water',
+    brief:'The Trailblazer — courageous, pioneering, and focused on the path ahead.',
+    deep:'Alder people stride ahead. You are the pathfinders of the Celtic calendar — confident, self-motivated, and genuinely unafraid of difficult terrain. You build bridges where others see only impassable rivers. Like the alder wood that hardens rather than rots in water, you grow stronger under pressure. Your directness can read as bluntness, and you may need to slow down long enough to bring others with you on the road you are so eagerly forging.' },
+  { name:'Willow', dates:'Apr 15 – May 12', ogham:'Saille', symbol:'🌿', element:'Water',
+    brief:'The Observer — intuitive, realistic, and deeply connected to cycles.',
+    deep:'Willow people see clearly, often disturbingly so. You have a natural affinity for the rhythms of nature and human nature alike — you know when the tides are turning before anyone else does. Your memory is extraordinarily long; you carry wisdom from the past in your bones. The shadow of the Willow is a tendency toward melancholy and holding on too tightly to what has already transformed. The gift is an ancient, patient knowing that cannot be rushed or faked.' },
+  { name:'Hawthorn', dates:'May 13 – Jun 9', ogham:'Huath', symbol:'🌸', element:'Fire',
+    brief:'The Illusionist — multi-layered, creative, and rarely what they first appear.',
+    deep:'Hawthorn people carry secrets — not out of deception but because your inner life is too rich and complex to be easily summarised. You appear one way to the world and are entirely another in private. You are a born storyteller and shapeshifter. Like the hawthorn that blooms white and fragrant in May while hiding sharp thorns beneath, you offer beauty and protection simultaneously. Your work is integration: bringing your inner world and outer presentation into alignment.' },
+  { name:'Oak', dates:'Jun 10 – Jul 7', ogham:'Duir', symbol:'🌳', element:'Earth',
+    brief:'The Stabiliser — noble, protective, and enduringly strong.',
+    deep:'Oak people are the pillars of their communities. You carry the ancient, deep-rooted strength of the king of the forest. People lean on you instinctively because you have demonstrated, repeatedly, that you will not bend when they need you most. Your generosity is boundless and your sense of honour acute. The risk for Oak people is over-extension — carrying so much for others that your own deep roots are not tended. Even mighty oaks need rain; allow yourself to receive.' },
+  { name:'Holly', dates:'Jul 8 – Aug 4', ogham:'Tinne', symbol:'🌿', element:'Fire',
+    brief:'The Ruler — noble, competitive, and fiercely protective.',
+    deep:'Holly people are natural leaders who step up in crisis and never flinch when the situation demands courage. You carry a regal bearing and a high ethical standard. You can be extraordinarily competitive — not from ego but from a deep need to prove that good can and does prevail. The shadow is the potential for controlling behaviour when your natural authority is not recognised. Your deepest growth comes when you learn to lead by invitation rather than command.' },
+  { name:'Hazel', dates:'Aug 5 – Sep 1', ogham:'Coll', symbol:'🌰', element:'Air',
+    brief:'The Knower — analytical, wise, and gifted with deeper perception.',
+    deep:'Hazel people carry the sacred knowledge of the sacred wells. In Celtic tradition the hazel was the tree of wisdom — nine hazels grew around the well of wisdom, dropping their nuts into the water below, and the salmon of knowledge fed on them. You are born to gather knowledge, to synthesise it into wisdom, and to pass it on. You are highly analytical and deeply intuitive — a rare combination. The shadow is perfectionism: the refusal to share your knowledge until you consider it complete enough.' },
+  { name:'Vine', dates:'Sep 2 – Sep 29', ogham:'Muin', symbol:'🍇', element:'Earth',
+    brief:'The Equaliser — unpredictable, empathic, and deeply sensitive.',
+    deep:'Vine people defy simple categories. You are changeable, sophisticated, and deeply refined in your tastes. Like the vine that requires exacting conditions to produce its finest fruit, you flourish in environments of beauty and emotional safety, and can wither without them. You have a gift for seeing both sides of any argument and can be plagued by indecision as a result. Your emotional sensitivity is profound: you feel atmospheric shifts in mood before others have noticed anything.' },
+  { name:'Ivy', dates:'Sep 30 – Oct 27', ogham:'Gort', symbol:'🌿', element:'Water',
+    brief:'The Survivor — tenacious, compassionate, and inwardly complex.',
+    deep:'Ivy people are the great survivors of the Celtic calendar. You have extraordinary perseverance — you keep growing even in conditions that would defeat others. You connect deeply with those around you and offer genuine, lasting loyalty. Like ivy, you can sometimes wrap yourself so tightly around another that the relationship becomes one of mutual dependency. Your work is learning to be strong without needing something else to climb — to trust that your roots alone can hold you.' },
+  { name:'Reed', dates:'Oct 28 – Nov 24', ogham:'Ngetal', symbol:'🎋', element:'Water',
+    brief:'The Inquisitor — purposeful, investigative, and devoted to truth.',
+    deep:'Reed people are drawn to the deepest questions. You are not satisfied by surface explanations; you want to know the underlying structure of things. You are truth-seekers in every arena — in relationships, in ideas, in the mysteries of life and death. The reed is the material from which music and words are born — and you have a gift for both. The shadow is a certain ruthlessness in the pursuit of truth that can damage relationships. The wisdom is knowing that the truth you find must be delivered with the compassion your skill can offer.' },
+  { name:'Elder', dates:'Nov 25 – Dec 23', ogham:'Ruis', symbol:'🌳', element:'Water/Earth',
+    brief:'The Seeker — deeply curious, highly intuitive, and forever questioning.',
+    deep:'Elder people arrive at the end of the Celtic year carrying its wisdom. You are the sign of endings and beginnings simultaneously — the crone and the child, the death and the rebirth. You have extraordinary insight into the human condition, often because you have lived through more transformation than most. Your gift is the capacity to see through illusion, to name what is real, and to guide others through their own endings into new life. Trust the depth of your knowing; it comes from somewhere ancient.' },
+];
+
+function getCelticSign(month, day) {
+  const md = month * 100 + day;
+  if (md >= 1224 || md <= 120) return 0;  // Birch
+  if (md >= 121 && md <= 217) return 1;   // Rowan
+  if (md >= 218 && md <= 317) return 2;   // Ash
+  if (md >= 318 && md <= 414) return 3;   // Alder
+  if (md >= 415 && md <= 512) return 4;   // Willow
+  if (md >= 513 && md <= 609) return 5;   // Hawthorn
+  if (md >= 610 && md <= 707) return 6;   // Oak
+  if (md >= 708 && md <= 804) return 7;   // Holly
+  if (md >= 805 && md <= 901) return 8;   // Hazel
+  if (md >= 902 && md <= 929) return 9;   // Vine
+  if (md >= 930 && md <= 1027) return 10; // Ivy
+  if (md >= 1028 && md <= 1124) return 11;// Reed
+  return 12; // Elder
+}
+
+// ─────────────────────────────────────────────
+// CHINESE ASTROLOGY
+// ─────────────────────────────────────────────
+
+const CHINESE_ANIMALS = [
+  { name:'Rat',     icon:'🐀', element:'Water', yin:false },
+  { name:'Ox',      icon:'🐂', element:'Earth', yin:true  },
+  { name:'Tiger',   icon:'🐅', element:'Wood',  yin:false },
+  { name:'Rabbit',  icon:'🐇', element:'Wood',  yin:true  },
+  { name:'Dragon',  icon:'🐉', element:'Earth', yin:false },
+  { name:'Snake',   icon:'🐍', element:'Fire',  yin:true  },
+  { name:'Horse',   icon:'🐎', element:'Fire',  yin:false },
+  { name:'Goat',    icon:'🐐', element:'Earth', yin:true  },
+  { name:'Monkey',  icon:'🐒', element:'Metal', yin:false },
+  { name:'Rooster', icon:'🐓', element:'Metal', yin:true  },
+  { name:'Dog',     icon:'🐕', element:'Earth', yin:false },
+  { name:'Pig',     icon:'🐖', element:'Water', yin:true  },
+];
+
+const CHINESE_ELEMENTS = ['Wood','Fire','Earth','Metal','Water'];
+const ELEMENT_ICONS = { Wood:'🌳', Fire:'🔥', Earth:'🌍', Metal:'⚔️', Water:'💧' };
+
+const ANIMAL_BRIEF = {
+  Rat:    'Clever, resourceful, and charming — quick to seize opportunity.',
+  Ox:     'Patient, dependable, and hardworking — the steady force behind every great achievement.',
+  Tiger:  'Bold, passionate, and magnetic — born to lead and impossible to ignore.',
+  Rabbit: 'Graceful, gentle, and perceptive — a natural peacemaker with deep aesthetic sense.',
+  Dragon: 'Charismatic, ambitious, and powerful — the most auspicious of the twelve animals.',
+  Snake:  'Wise, intuitive, and elegant — still waters that run profoundly deep.',
+  Horse:  'Free-spirited, energetic, and adventurous — needs wide open space to truly flourish.',
+  Goat:   'Creative, compassionate, and quietly strong — thrives in beauty and harmony.',
+  Monkey: 'Witty, inventive, and versatile — the great improviser of the zodiac.',
+  Rooster:'Meticulous, courageous, and honest — never afraid to speak the truth.',
+  Dog:    'Loyal, just, and fiercely protective — the most trustworthy friend you could have.',
+  Pig:    'Generous, diligent, and warmhearted — finds joy in abundance shared with others.',
+};
+
+const ANIMAL_DEEP = {
+  Rat:    "The Rat is the first of the twelve animals, and carries that primacy as a quiet confidence. In Chinese cosmology you are the strategist, the one who navigates complex terrain with grace and cleverness. You accumulate resources not out of greed but out of an acute awareness that preparation is wisdom. Your charm disarms; your networking ability is legendary. The shadow of the Rat is the tendency to hoard — relationships, information, resources — out of the deep fear that scarcity is always around the corner. The work is learning to trust in abundance.",
+  Ox:     "The Ox has built civilisations. Patient, methodical, and quietly unstoppable, you embody the principle that great things are assembled brick by brick, over years, through sheer unglamorous persistence. You do not seek the spotlight; you seek the satisfaction of work done well. People rely on you because you have demonstrated, repeatedly, that you will carry what you say you will carry. The shadow is stubbornness bordering on inflexibility — and a tendency to judge others who don't share your work ethic. The gift is the enduring solidity of everything you build.",
+  Tiger:  "The Tiger arrives. There is no other way to describe it — a Tiger-born person makes an entrance that the room feels before they have said a word. You are the embodiment of passionate commitment: when you care about something, you care completely. Your generosity is legendary and your protectiveness fierce. The shadow is the temper — sudden, volcanic, and occasionally aimed at those who least deserve it. The deep gift is that you make people feel that they, too, are capable of the magnificent.",
+  Rabbit: "The Rabbit moves through the world with such apparent ease that others underestimate the steel underneath. You are deeply perceptive — reading moods, rooms, and power dynamics with quiet, unerring accuracy. Your aesthetic sense is exquisite; you are drawn to beauty in all its forms and have a gift for creating it. The shadow is the avoidance of necessary conflict at the cost of your own needs. The work is learning that your voice in the room — gentle as it is — can and should change things.",
+  Dragon: "The Dragon is the only mythological creature in the Chinese zodiac, and this is not accidental. You carry a quality that is genuinely larger than ordinary life — a magnetism, an ambition, a force of vitality that makes people follow you before they have thought about why. You set a standard for yourself that no one else could meet. The shadow is the inability to tolerate limitation — in yourself or others. The wisdom is understanding that even dragons must land sometimes, must be still, must allow others to share the sky.",
+  Snake:  "The Snake knows. This is the most precise way to describe it. You have an inner knowing that functions as a kind of private oracle — a deep intuitive sense of what is really happening beneath any surface. You rarely share this perception widely, which gives you an air of mystery. You are sophisticated in your pleasures and tireless in the pursuit of genuine understanding. The shadow is a certain coldness when betrayed, and a memory that forgives but does not forget. The gift is the profound wisdom you carry when you finally speak.",
+  Horse:  "The Horse is freedom itself. You are most fully alive when moving — physically, intellectually, emotionally. You bring enthusiasm and energy wherever you go, and your optimism is not naive but earned: you have genuinely discovered, over and over, that the horizon always opens into something worth riding toward. The shadow is the commitment that feels like a stall. The work is discovering that choosing to stay — fully, not out of obligation but out of love — can be its own kind of freedom.",
+  Goat:   "The Goat is the artist of the zodiac, and more than any other sign needs to be surrounded by beauty and harmony to truly flourish. You are deeply compassionate — you feel others' pain acutely — and wildly creative, though this creativity often remains private. You work better collaboratively than alone and bloom in environments where you feel safe and appreciated. The shadow is the dependency that can develop when your environment stops being supportive. The work is discovering the creative spring within that no external circumstance can dry up.",
+  Monkey: "The Monkey is the trickster, the inventor, the one who finds a way through every apparently impossible situation. Your intelligence is quicksilver — multi-directional, improvising, endlessly curious. You delight in complexity and find simple problems boring. You have a gift for making difficult things look effortless, which is both a strength and a liability — people underestimate how much work goes into your lightness. The shadow is unreliability when boredom strikes. The gift is an extraordinary creative resourcefulness that never truly exhausts itself.",
+  Rooster:"The Rooster announces the dawn. You have an extraordinary eye for detail and a commitment to quality and honesty that can feel almost severe. You prepare meticulously, execute confidently, and speak your mind without apology. You take pride in your appearance and your work and hold both to high standards. The shadow is the critical tongue that can wound when it is aimed at those who did not ask for your assessment. The gift is the precision, the courage, and the extraordinary competence that marks everything you do.",
+  Dog:    "The Dog is loyalty itself. You offer a quality of friendship that is extraordinarily rare — the kind that shows up in the difficult seasons without being asked. Your moral compass is unusually precise; injustice disturbs you on a visceral level and you will speak against it even when it costs you. You worry. This is the shadow — the anxiety that prowls at 3am, the compulsion to scan for threat. The work is learning to trust the world enough to rest, knowing that your vigilance has already made it safer for everyone around you.",
+  Pig:    "The Pig is the most generous spirit in the zodiac — not in a performative way but in a deep, genuine delight in abundance shared. You find joy easily and want others to share in it. You work diligently and honestly and bring a warmth to every environment you enter. The shadow is the naivety that can come from assuming everyone operates from the same good faith you do. The work is developing discernment without losing your beautiful openness. The world needs your particular brand of wholehearted joy.",
+};
+
+function getChineseYear(year) {
+  const idx = ((year - 1900) % 12 + 12) % 12;
+  return CHINESE_ANIMALS[idx];
+}
+
+function getChineseElement(year) {
+  const elements = ['Metal','Metal','Water','Water','Wood','Wood','Fire','Fire','Earth','Earth'];
+  const idx = ((year - 1900) % 10 + 10) % 10;
+  return elements[idx];
+}
+
+function getChinesePolarity(year) {
+  return year % 2 === 0 ? 'Yang' : 'Yin';
+}
+
+// ─────────────────────────────────────────────
+// MAYAN TZOLK'IN (Dreamspell)
+// ─────────────────────────────────────────────
+
+const MAYAN_SIGNS = [
+  { name:'Dragon',       mayan:'Imix',     color:'Red',    power:'Birth',           action:'Nurtures',     icon:'🐉' },
+  { name:'Wind',         mayan:'Ik',       color:'White',  power:'Spirit',          action:'Communicates', icon:'🌬️' },
+  { name:'Night',        mayan:'Akbal',    color:'Blue',   power:'Abundance',       action:'Dreams',       icon:'🌙' },
+  { name:'Seed',         mayan:'Kan',      color:'Yellow', power:'Flowering',       action:'Targets',      icon:'🌱' },
+  { name:'Serpent',      mayan:'Chicchan', color:'Red',    power:'Life Force',      action:'Survives',     icon:'🐍' },
+  { name:'Worldbridger', mayan:'Cimi',     color:'White',  power:'Death',           action:'Equalises',    icon:'⚖️' },
+  { name:'Hand',         mayan:'Manik',    color:'Blue',   power:'Accomplishment',  action:'Knows',        icon:'🙌' },
+  { name:'Star',         mayan:'Lamat',    color:'Yellow', power:'Elegance',        action:'Beautifies',   icon:'⭐' },
+  { name:'Moon',         mayan:'Muluc',    color:'Red',    power:'Universal Water', action:'Purifies',     icon:'🌊' },
+  { name:'Dog',          mayan:'Oc',       color:'White',  power:'Heart',           action:'Loves',        icon:'🐕' },
+  { name:'Monkey',       mayan:'Chuen',    color:'Blue',   power:'Magic',           action:'Plays',        icon:'🐒' },
+  { name:'Human',        mayan:'Eb',       color:'Yellow', power:'Free Will',       action:'Influences',   icon:'🧑' },
+  { name:'Skywalker',    mayan:'Ben',      color:'Red',    power:'Space',           action:'Explores',     icon:'🚀' },
+  { name:'Wizard',       mayan:'Ix',       color:'White',  power:'Timelessness',    action:'Enchants',     icon:'🧙' },
+  { name:'Eagle',        mayan:'Men',      color:'Blue',   power:'Vision',          action:'Creates',      icon:'🦅' },
+  { name:'Warrior',      mayan:'Cib',      color:'Yellow', power:'Intelligence',    action:'Questions',    icon:'⚔️' },
+  { name:'Earth',        mayan:'Caban',    color:'Red',    power:'Navigation',      action:'Evolves',      icon:'🌍' },
+  { name:'Mirror',       mayan:'Etznab',   color:'White',  power:'Endlessness',     action:'Reflects',     icon:'🪞' },
+  { name:'Storm',        mayan:'Cauac',    color:'Blue',   power:'Self-Generation', action:'Catalyses',    icon:'⛈️' },
+  { name:'Sun',          mayan:'Ahau',     color:'Yellow', power:'Universal Fire',  action:'Enlightens',   icon:'☀️' },
+];
+
+const MAYAN_TONES = [
+  { n:1,  name:'Magnetic',      keyword:'Unify',        power:'Purpose' },
+  { n:2,  name:'Lunar',         keyword:'Polarise',     power:'Challenge' },
+  { n:3,  name:'Electric',      keyword:'Activate',     power:'Service' },
+  { n:4,  name:'Self-Existing', keyword:'Define',       power:'Form' },
+  { n:5,  name:'Overtone',      keyword:'Empower',      power:'Radiance' },
+  { n:6,  name:'Rhythmic',      keyword:'Organise',     power:'Balance' },
+  { n:7,  name:'Resonant',      keyword:'Channel',      power:'Attunement' },
+  { n:8,  name:'Galactic',      keyword:'Harmonise',    power:'Integrity' },
+  { n:9,  name:'Solar',         keyword:'Pulse',        power:'Intention' },
+  { n:10, name:'Planetary',     keyword:'Perfect',      power:'Manifestation' },
+  { n:11, name:'Spectral',      keyword:'Dissolve',     power:'Liberation' },
+  { n:12, name:'Crystal',       keyword:'Dedicate',     power:'Cooperation' },
+  { n:13, name:'Cosmic',        keyword:'Transcend',    power:'Presence' },
+];
+
+const MAYAN_SIGN_BRIEF = [
+  'Primal nurturer, source of creative life force, deeply sensitive.',
+  'Messenger of spirit, communicator of invisible truths.',
+  'Keeper of the inner world, dreamer of abundance.',
+  'Carrier of flowering potential, targeting pure awareness.',
+  'Ancient life force and body wisdom, raw instinctive power.',
+  'Bridge between worlds, master of release and opportunity.',
+  'Healer and accomplisher, learning through direct experience.',
+  'Harmonic artist, beauty as truth, naturally radiant.',
+  'Flowing emotion, universal sensitivity, purifying presence.',
+  'Devoted heart, unconditional love, loyal beyond measure.',
+  'Divine trickster, magical artist, playful weaver of realities.',
+  'Free-willed wisdom, influencing through humble service.',
+  'Explorer of consciousness, awakened pilgrim, space adventurer.',
+  'Timeless enchanter, receptive heart, walker between worlds.',
+  'Visionary mind, creative sight, seeing the whole from above.',
+  'Fearless questioner, intelligence wielded with courage.',
+  'Navigator of synchronicity, evolving in rhythm with the Earth.',
+  'Endless reflector of truth, order-maker, cutter of illusion.',
+  'Self-generating catalyst, purifying transformation and energy.',
+  'Enlightened completion, radiant mastery, universal fire.',
+];
+
+const MAYAN_SIGN_DEEP = [
+  "Dragon (Imix) is the raw beginning — the primordial ocean from which all creation emerges. Those born on this day carry the deep creative force of the universe in their bodies. You are a nurturer at the cellular level, sensitive to the needs of others in ways that defy ordinary explanation. The challenge is learning where your nurturing ends and self-sacrifice begins.",
+  "Wind (Ik) carries the breath of the invisible world. You are a messenger — not just of words but of the inspiration behind them. Truth moves through you rather than from you. The Wind person is restless and multi-directional. The work is learning that the same spirit that gives you freedom is the one that asks you, occasionally, to be still.",
+  "Night (Akbal) is the keeper of the inner world — the rich darkness before the dawn where dreams are born and abundance is seeded in silence. The challenge of the Night is learning to trust that what grows in the dark is just as real as what grows in the light, and that the world needs dreamers as much as it needs builders.",
+  "Seed (Kan) carries the potential of everything that has not yet grown. You are an activator whose presence catalyses flowering in others. The work is learning to commit: a seed that never breaks open never becomes the tree. Your awareness is extraordinary; apply it with focus and you grow into something magnificent.",
+  "Serpent (Chicchan) lives in the body first and the mind second. Your instincts are ancient and reliable — your nervous system is your most sophisticated instrument. You carry enormous life force and charisma. The work is learning to trust the body's wisdom without letting fear of vulnerability drive you into rigid control.",
+  "Worldbridger (Cimi) understands that every ending is a doorway. You have a natural ease with transition. You are the great equaliser, carrying the knowledge that all forms are temporary and all life is sacred. The challenge is allowing yourself to grieve what ends before rushing to the next bridge.",
+  "Hand (Manik) accomplishes. You are one of the great healers and doers — someone who learns not from theory but from direct experience with your hands in the work. Knowledge, for you, is something you know in your body before you can explain it with words. The work is learning to rest between accomplishments.",
+  "Star (Lamat) is the harmonic artist. Beauty is not decoration for you — it is truth. You are naturally abundant: when you align with beauty and harmony, resources flow. The shadow is perfectionism that prevents you from sharing what you have made. Let the star be seen.",
+  "Moon (Muluc) flows. Your emotional body is a sensitive instrument, picking up the feeling tides of the people and environments around you. Water purifies — and you are here to purify, to help emotions move rather than stagnate. Your work is learning to distinguish between the waters that are yours and the waters you have absorbed from others.",
+  "Dog (Oc) loves with absolute devotion. Loyalty is not just a value for you — it is the operating principle of your entire being. You build your world through relationship: your bonds are your most important creations. The shadow is the tendency to give more than you receive.",
+  "Monkey (Chuen) is the divine trickster — the artist who reminds us that the universe is not a problem to be solved but a story to be lived playfully. You are a natural creator across every medium. The work is learning to finish what you begin: the magic is not only in the weaving but in the completed tapestry.",
+  "Human (Eb) carries the full weight and possibility of free will. You are here to influence — not through force but through the quiet, steady demonstration of wisdom. Your path is one of service. The work is resisting the temptation to use your influence to serve your own needs before the community.",
+  "Skywalker (Ben) reaches beyond the known. You are the explorer of consciousness — equally at home in other cultures, other ideas, other dimensions of experience. The work is learning that the most extraordinary journey sometimes begins in the ordinary world, fully inhabited.",
+  "Wizard (Ix) operates from the invisible realm. Your power is receptivity — the extraordinary ability to receive knowledge from sources beyond the rational mind. You are the shaman, the enchanter, the one who walks between worlds. The work is trusting your gifts enough to act on them.",
+  "Eagle (Men) sees from above. Your gift is the capacity for visionary perspective — seeing patterns in the whole that others cannot perceive. You are a creative mind of the first order. The challenge is translating what you see from the heights into a language others can act on.",
+  "Warrior (Cib) questions fearlessly. You carry the accumulated intelligence of your ancestors and know that the most courageous act is to ask the question nobody else will ask. You strip away illusion wherever you find it. The work is ensuring that the fearless question carries compassion alongside its precision.",
+  "Earth (Caban) navigates by synchronicity. You have a natural attunement to the living planet and to the patterns connecting seemingly unrelated events. When you follow the synchronicities, you move easily. The gift is the ability to read the signs; the work is learning to trust them completely.",
+  "Mirror (Etznab) reflects truth. You show others themselves with extraordinary clarity. Your gift is precision and the capacity to cut through illusion like a blade. The shadow is potential coldness: the mirror does not feel the reflection. The work is keeping warmth alongside the precision.",
+  "Storm (Cauac) catalyses. You bring the electric charge that transforms everything it touches. The storm does not ask permission; it arrives, disrupts, cleanses, and passes, leaving the air more alive. The challenge is directing your extraordinary transformative energy consciously rather than letting it erupt chaotically.",
+  "Sun (Ahau) completes. You carry the frequency of mastery and enlightened bliss — the full realisation of what a human being can become. The Sun is the last of the twenty day signs, the point of arrival. The work is accepting the responsibility of your radiance: to shine without blinding, to inspire without demanding.",
+];
+
+const MAYAN_TONE_DEEP = [
+  "Tone 1 Magnetic: You are here to unify. Your life purpose radiates as a magnetic field drawing the resources, people, and experiences needed for your mission. The Magnetic tone asks: what is your purpose? Everything else organises itself around the clarity of that answer.",
+  "Tone 2 Lunar: You are here to polarise in service of clarity. The Lunar tone brings challenges specifically designed to reveal the hidden duality within every situation. Your gift is the ability to hold two apparently contradictory truths until their deeper unity is revealed.",
+  "Tone 3 Electric: You are here to activate and to serve. The Electric tone carries the charge of the bonding force — the energy that makes things come alive in relationship. You are a catalyst, most fully yourself when in creative service to something larger than your own story.",
+  "Tone 4 Self-Existing: You are here to define and to give form. The Self-Existing tone asks you to bring the precision of definition to what has been until now only potential. You are a natural architect of thought and form. The challenge is resisting perfectionism that insists the definition must be final before building can begin.",
+  "Tone 5 Overtone: You are here to empower and to radiate. The Overtone tone is the quintessence — the fifth element that emerges when the other four are in alignment. You carry a natural authority that commands without demanding. True radiance is not performance; it is simply what happens when you are most fully yourself.",
+  "Tone 6 Rhythmic: You are here to organise and to equalise. The Rhythmic tone is the heartbeat of the cosmos — the steady pulse that keeps the body of life functioning. You have a genius for natural organisation: not the imposed order of control but the flowing order of an ecosystem that has found its balance.",
+  "Tone 7 Resonant: You are here to channel and to inspire. The Resonant tone sits at the mystical centre of the 13-tone sequence — the place where attunement is most possible. You are a natural channel for higher frequencies. The work is the ongoing discipline of staying clear: knowing the difference between your signal and the noise around it.",
+  "Tone 8 Galactic: You are here to harmonise and to model integrity. The Galactic tone asks whether your life reflects your values — whether you are living the truth you know. You are a natural bridge between personal truth and cosmic truth.",
+  "Tone 9 Solar: You are here to pulse intention into reality. The Solar tone carries the power of the sun itself: the steady, pulsing realisation of what was only intention before. You are a natural manifestor — not through forcing, but through aligning so clearly with your intention that the world reorganises itself to match.",
+  "Tone 10 Planetary: You are here to perfect and to manifest. The Planetary tone has returned to the physical world after the journey through the higher tones — and now it asks: what can you produce? You have a genius for taking vision and landing it in form, for creating things others can use and build upon.",
+  "Tone 11 Spectral: You are here to liberate and to dissolve. The Spectral tone is the great releaser — it comes just before completion to strip away everything that is not essential. You carry the gift of liberation; your presence dissolves what has outlived its purpose. The challenge is your own resistance to release.",
+  "Tone 12 Crystal: You are here to cooperate and to universalise. The Crystal tone gathers the learning of the entire wavespell into a form that can be shared with the community. You are a natural collaborator. The challenge is the ego's desire to claim the synthesis as personal achievement rather than a gift received and passed on.",
+  "Tone 13 Cosmic: You are here to transcend and to endure. The Cosmic tone is the completion tone — the one that has journeyed through all 12 before it and arrived at the knowledge that presence itself is the teaching. You carry an ancient, patient wisdom.",
+];
+
+function getMayanKin(y, m, d) {
+  const jd  = jdn(y, m, d);
+  const ref = jdn(1987, 7, 26); // Kin 1 = 1 Dragon (Dreamspell reference)
+  const kin = ((jd - ref) % 260 + 260) % 260;
+  return { kin: kin + 1, signIdx: kin % 20, tone: (kin % 13) + 1 };
+}
+
+// ─────────────────────────────────────────────
+// HUMAN DESIGN
+// ─────────────────────────────────────────────
+
+// Sequence offset calibrated: Gate 52 = Cancer ~7° (conscious Sun 28 Jun 1994),
+// Gate 17 = Aries ~9° (design Sun), giving profile 4/6 and cross 52/58-17/18.
+const HD_GATE_SEQ = [25,17,21,51,42,3,27,24,2,23,8,20,16,35,45,12,15,52,39,53,62,56,31,33,7,4,29,59,40,64,47,6,46,18,48,57,32,50,28,44,1,43,14,34,9,5,26,11,10,58,38,54,61,60,41,19,13,49,30,55,37,63,22,36];
+const HD_OFFSET = 358.0;
+
+function hdGateFromLon(lon) {
+  const adj = ((lon - HD_OFFSET) % 360 + 360) % 360;
+  return HD_GATE_SEQ[Math.floor(adj / 5.625) % 64];
+}
+function hdLineFromLon(lon) {
+  const adj = ((lon - HD_OFFSET) % 360 + 360) % 360;
+  return Math.floor((adj % 5.625) / 0.9375) + 1;
+}
+
+// Iteratively find the JD when the Sun was exactly 88° before the natal Sun.
+// A fixed-day approximation can be off by ~3 days, enough to land in the wrong gate.
+function findDesignJD(birthJD, natalSunLon) {
+  const target = normalise(natalSunLon - 88);
+  let djd = birthJD - 89.3;
+  for (let i = 0; i < 10; i++) {
+    const curr = sunLongitude(djd);
+    let diff = target - curr;
+    if (diff > 180) diff -= 360;
+    if (diff < -180) diff += 360;
+    djd += diff / 0.9856;
+  }
+  return djd;
+}
+
+const HD_CHANNELS = [
+  [1,8,'G','Throat'],[2,14,'G','Sacral'],[3,60,'Sacral','Root'],
+  [4,63,'Ajna','Head'],[5,15,'Sacral','G'],[6,59,'SolarPlexus','Sacral'],
+  [7,31,'G','Throat'],[9,52,'Sacral','Root'],[10,20,'G','Throat'],
+  [11,56,'Ajna','Throat'],[12,22,'Throat','SolarPlexus'],[13,33,'G','Throat'],
+  [16,48,'Throat','Spleen'],[17,62,'Ajna','Throat'],[18,58,'Spleen','Root'],
+  [19,49,'Root','SolarPlexus'],[20,34,'Throat','Sacral'],[20,57,'Throat','Spleen'],
+  [21,45,'Heart','Throat'],[23,43,'Ajna','Throat'],[24,61,'Ajna','Head'],
+  [25,51,'G','Heart'],[26,44,'Heart','Spleen'],[27,50,'Sacral','Spleen'],
+  [28,38,'Spleen','Root'],[29,46,'Sacral','G'],[30,41,'SolarPlexus','Root'],
+  [32,54,'Spleen','Root'],[34,57,'Sacral','Spleen'],[35,36,'Throat','SolarPlexus'],
+  [37,40,'SolarPlexus','Heart'],[39,55,'Root','SolarPlexus'],[42,53,'Sacral','Root'],
+  [47,64,'Ajna','Head'],[51,25,'Heart','G'],[59,6,'Sacral','SolarPlexus'],
+];
+
+const HD_MOTOR_CENTERS = new Set(['Heart','Sacral','SolarPlexus','Root']);
+
+const HD_GATE_NAMES = {
+  1:'Self-Expression',2:'Higher Knowledge',3:'Ordering',4:'Formulisation',5:'Fixed Rhythms',
+  6:'Friction',7:'Self Role',8:'Contribution',9:'Focus',10:'Self Behaviour',
+  11:'Ideas',12:'Caution',13:'The Listener',14:'Power Skills',15:'Extremes',16:'Skills',
+  17:'Opinions',18:'Correction',19:'Wanting',20:'The Now',21:'Biting Through',22:'Openness',
+  23:'Assimilation',24:'Rationalisation',25:'Innocence',26:'Egoist',27:'Caring',28:'The Game Player',
+  29:'Perseverance',30:'Feelings',31:'Influence',32:'Continuity',33:'Privacy',34:'Power',
+  35:'Change',36:'Crisis',37:'Friendship',38:'Opposition',39:'Provocation',40:'Aloneness',
+  41:'Contraction',42:'Growth',43:'Breakthrough',44:'Coming to Meet',45:'The Gatherer',
+  46:'Self Determination',47:'Realisation',48:'Depth',49:'Principles',50:'Values',
+  51:'Shock',52:'Stillness',53:'Starting',54:'Ambition',55:'Spirit',56:'Stimulation',
+  57:'Intuitive Clarity',58:'Vitality',59:'Sexuality',60:'Acceptance',61:'Inner Truth',
+  62:'Detail',63:'Doubt',64:'Confusion',
+};
+
+const HD_TYPE_DATA = {
+  Manifestor: {
+    strategy:'Inform those affected by your actions before you act.',
+    notSelf:'Anger',
+    pct:'8%',
+    brief:'Initiator — here to begin what others will carry forward.',
+    deep:'Manifestors are the only type designed to initiate — to act from nothing without waiting for an external cue. You have a closed, repelling aura that others sense as power and independence. Your gift is the ability to set things in motion that would never otherwise happen. The strategy of informing is not asking permission — it is reducing the resistance your powerful aura generates. When you inform the people around you before you act, they feel included rather than run over. The not-self theme is anger: when you encounter resistance, it signals either that you failed to inform, or that you are in the wrong environment. Your deepest purpose is freedom — to act on your creative impulse and trust that what you initiate matters.'
+  },
+  Generator: {
+    strategy:'Wait to respond. Let life present you with something to respond to.',
+    notSelf:'Frustration',
+    pct:'37%',
+    brief:'Life force of the planet — here to find satisfying work and master it.',
+    deep:'Generators are the great builders and sustainers of the world, carrying the life force that makes things happen. Your sacral center is defined — a renewable source of vital energy that, when properly engaged, is practically inexhaustible. The key is to RESPOND rather than initiate: when you initiate from the mind, you end up in the wrong places with the wrong people, and frustration follows. But when you wait for life to show you something to respond to, your sacral gives you a clear signal — a sound, a physical pull, an unmistakable YES or NO — that is more reliable than any thought you have ever had. Your purpose is mastery. The Generator flourishes in work that genuinely excites the sacral, and can sustain that work for extraordinary periods without depletion. Frustration is your signal that you are either initiating instead of responding, or saying yes to things your sacral said no to.'
+  },
+  'Manifesting Generator': {
+    strategy:'Respond first, then inform before taking action.',
+    notSelf:'Frustration and Anger',
+    pct:'33%',
+    brief:'Multi-passionate, fast-moving builder who can do many things at once.',
+    deep:'Manifesting Generators combine the life force of the Generator with the initiating motor connection of the Manifestor. You are the multi-passionate force of nature who can accomplish in hours what others take days to do. Like the Generator, your foundation is the sacral response — wait to respond, or you find yourself on the wrong path. But once you have responded, your motor-to-throat connection allows you to manifest with extraordinary speed. The trap for the Manifesting Generator is skipping steps: you process so quickly that you miss important information and sometimes need to go back. The invitation is to slow down just enough to let the sacral speak clearly, and to inform those affected by your actions before you take them. Your not-self themes are frustration (initiating without response) and anger (not informing). Your gift is the extraordinary efficiency and multi-directional creativity that makes the impossible look easy.'
+  },
+  Projector: {
+    strategy:'Wait for the invitation, especially for major life changes.',
+    notSelf:'Bitterness',
+    pct:'21%',
+    brief:'Natural guide and manager — here to direct and optimise others\' energy.',
+    deep:'Projectors carry one of the most misunderstood designs in Human Design. You are the natural guides and managers — the ones who see how others\' energy could be used most efficiently and wisely. Your aura is focused and penetrating: you see INTO people, which is both your gift and occasionally your challenge. The key to your design is the invitation. Projectors who initiate without being invited pour their focused, penetrating energy into situations that are not ready to receive it, and bitterness follows. When the invitation comes — and you respond from a place of genuine inner knowing rather than urgency or need — you find yourself with the right people who actually want what only you can offer. You do not have a defined sacral center, meaning your energy is not as sustainable as a Generator\'s. You need more rest than you think. But properly invited, properly rested, you can guide others with a depth of perception that no other type possesses.'
+  },
+  Reflector: {
+    strategy:'Wait a full lunar cycle (28 days) before making major decisions.',
+    notSelf:'Disappointment',
+    pct:'1%',
+    brief:'Rare mirror for the community — deeply attuned to the lunar cycle.',
+    deep:'Reflectors are the rarest type in Human Design — just 1% of humanity — and carry a design unlike any other. You have no defined centers: you are completely open, a clear mirror for the energies around you. You sample and amplify the energy of whoever you are with, which means you can feel like a completely different person in different environments. This is not instability; it is your extraordinary gift of awareness. You taste all types of energy but are identified with none. Your wisdom comes from this extraordinary sampling capacity. The challenge is learning to distinguish your own truth from the energy you are reflecting. The Reflector\'s strategy is to wait a full lunar cycle before making major decisions: as the Moon transits each gate of the Human Design wheel, you have the chance to sample the decision from every possible angle. The not-self theme is disappointment — when you make decisions too quickly, or surround yourself with people and environments that do not reflect your highest potential.'
+  },
+};
+
+const HD_AUTHORITY_DEEP = {
+  Emotional:'Your truth emerges over time, never in the moment. The emotional wave must crest and recede before clarity arrives. Sleep on decisions. Never commit in emotional highs or lows. Wait for the wave to settle into clarity — not certainty (that rarely comes), but a calm, sustainable YES.',
+  Sacral:'Trust the gut sound — a spontaneous "uh-huh" or "unh-unh" that arises before the mind has time to intervene. Your sacral speaks in the present moment, in the body. Yes questions only: ask yourself yes/no questions and listen to what your gut says before your head can override it.',
+  Splenic:'The spleen speaks once, softly, in the present moment — and never repeats itself. It is the oldest mammalian survival intelligence you have. When something is off, you know it instantly. The work is trusting that whisper completely and immediately, without seeking logical confirmation.',
+  'Ego/Heart':'Your heart knows. When you make promises from the heart — not from should, not from need, not from fear — those promises carry real weight and you will move heaven and earth to keep them. Only commit what your heart is genuinely behind.',
+  'Self-Projected':'Listen to yourself speaking about a decision. Your truth reveals itself through the sound of your own voice in conversation with trusted people — not through thinking, but through talking it through. What do you hear yourself saying?',
+  'Mental/Outer':'Your truth lives in the environment and in trusted relationships. Talk major decisions through with people who know you well. You are not designed to decide alone. The right environment, the right people — these are the conditions in which your wisdom becomes clear.',
+};
+
+const HD_PROFILES = {
+  '1/3':{ name:'Investigator / Martyr',     brief:'Foundation-builder who learns through trial and error — every "mistake" is actually research.' },
+  '1/4':{ name:'Investigator / Opportunist', brief:'Builds secure foundations, influences through the depth of personal relationships.' },
+  '2/4':{ name:'Hermit / Opportunist',       brief:'Natural genius who needs solitude to develop gifts, sharing them through close networks.' },
+  '2/5':{ name:'Hermit / Heretic',           brief:'Hidden gifts called out by others; seen as the practical problem-solver and potential saviour.' },
+  '3/5':{ name:'Martyr / Heretic',           brief:'Learning through direct experience, perceived as the universal rescuer with practical solutions.' },
+  '3/6':{ name:'Martyr / Role Model',        brief:'First 30 years: trial and error. Then: observing from above. Finally: the living example.' },
+  '4/6':{ name:'Opportunist / Role Model',   brief:'Stable relational foundation, maturing slowly into a trusted role model for the community.' },
+  '4/1':{ name:'Opportunist / Investigator', brief:'Security through relationships built on solid research and deep personal foundations.' },
+  '5/1':{ name:'Heretic / Investigator',     brief:'Universalising, practical force — projected onto as the rescuer, grounded in solid foundations.' },
+  '5/2':{ name:'Heretic / Hermit',           brief:'Called out of solitude by others to deliver universal, practical solutions.' },
+  '6/2':{ name:'Role Model / Hermit',        brief:'Three phases: trial and error, then 30 years of watching from the roof, then becoming the living example.' },
+  '6/3':{ name:'Role Model / Martyr',        brief:'Grounded role model who earns wisdom through embodied experience and continuous experimentation.' },
+};
+
+function getDefinedCenters(gateSet) {
+  const defined = new Set();
+  HD_CHANNELS.forEach(([a, b, cA, cB]) => {
+    if (gateSet.has(a) && gateSet.has(b)) { defined.add(cA); defined.add(cB); }
+  });
+  return defined;
+}
+
+function getHDType(defined, gateSet) {
+  if (defined.size === 0) return 'Reflector';
+  const hasSacral = defined.has('Sacral');
+  let motorToThroat = false;
+  HD_CHANNELS.forEach(([a, b, cA, cB]) => {
+    if (gateSet.has(a) && gateSet.has(b)) {
+      if (([cA,cB].includes('Throat')) && ([cA,cB].some(c => HD_MOTOR_CENTERS.has(c)))) {
+        motorToThroat = true;
+      }
+    }
+  });
+  if (hasSacral && motorToThroat) return 'Manifesting Generator';
+  if (hasSacral) return 'Generator';
+  if (motorToThroat) return 'Manifestor';
+  return 'Projector';
+}
+
+function getHDAuthority(defined) {
+  if (defined.has('SolarPlexus')) return 'Emotional';
+  if (defined.has('Sacral'))      return 'Sacral';
+  if (defined.has('Spleen'))      return 'Splenic';
+  if (defined.has('Heart'))       return 'Ego/Heart';
+  if (defined.has('G'))           return 'Self-Projected';
+  return 'Mental/Outer';
+}
+
+// ─────────────────────────────────────────────
+// CARD BUILDER
+// ─────────────────────────────────────────────
+
+function makeCard(icon, label, value, brief, deep, isPremium) {
+  const id = 'card-' + Math.random().toString(36).slice(2);
+  const deepHtml = isPremium
+    ? `<div class="deep-desc premium-overlay">${deep}</div>`
+    : `<div class="deep-desc">${deep}</div>`;
+  return `
+    <div class="placement-card" id="${id}">
+      <div class="planet-row">
+        <span class="planet-icon">${icon}</span>
+        <span class="planet-name">${label}</span>
+      </div>
+      <div class="placement-value">${value}</div>
+      <div class="brief-desc">${brief}</div>
+      ${deepHtml}
+      <button class="dive-btn" onclick="toggleDive('${id}')">Dive Deeper ▾</button>
+    </div>`;
+}
+
+function toggleDive(id) {
+  const card = document.getElementById(id);
+  card.classList.toggle('expanded');
+  const btn = card.querySelector('.dive-btn');
+  btn.textContent = card.classList.contains('expanded') ? 'Close ▴' : 'Dive Deeper ▾';
+}
+
+// ─────────────────────────────────────────────
+// MAIN CALCULATE
+// ─────────────────────────────────────────────
+
+function calculate() {
+  const dateVal  = document.getElementById('birthDate').value;
+  const timeVal  = document.getElementById('birthTime').value  || '12:00';
+  const city     = document.getElementById('birthCity').value  || '';
+  const country  = document.getElementById('birthCountry').value || '';
+
+  if (!dateVal) { alert('Please enter a date of birth.'); return; }
+
+  const [y, m, d] = dateVal.split('-').map(Number);
+  const [h, mi]   = timeVal.split(':').map(Number);
+  const hour    = h + mi / 60;
+  const utcOff  = parseFloat(document.getElementById('utcOffset').value) || 0;
+  const utcHour = hour - utcOff;
+
+  const JD = jdn(y, m, d) + (utcHour - 12) / 24;
+
+  const [lat, lon] = getCityCoords(city, country);
+
+  // ── Western positions ──
+  const sunLon  = sunLongitude(JD);
+  const moonLon = moonLongitude(JD);
+  const mercLon = planetLongitude(JD, PLANET_PARAMS.Mercury);
+  const venLon  = planetLongitude(JD, PLANET_PARAMS.Venus);
+  const marLon  = planetLongitude(JD, PLANET_PARAMS.Mars);
+  const jupLon  = planetLongitude(JD, PLANET_PARAMS.Jupiter);
+  const satLon  = planetLongitude(JD, PLANET_PARAMS.Saturn);
+  const uraLon  = planetLongitude(JD, PLANET_PARAMS.Uranus);
+  const nepLon  = planetLongitude(JD, PLANET_PARAMS.Neptune);
+  const pluLon  = planetLongitude(JD, { L0c:238.929, L0d:144.9600, Mc:14.882, Md:144.960, e:0.2488, a:39.482 });
+  const nnLon   = northNodeLongitude(JD);
+  const ascLon  = ascendant(JD, lat, lon, hour);
+
+  function signStr(lon) {
+    const s = signOf(lon);
+    return `${SIGN_ICONS[s]} ${SIGNS[s]}`;
+  }
+  function degStr(lon) {
+    const s = signOf(lon);
+    const deg = degInSign(lon).toFixed(1);
+    return `${SIGN_ICONS[s]} ${SIGNS[s]} ${deg}°`;
+  }
+
+  // Build Western cards
+  const W = [
+    { icon:'☀️', label:'Sun',        lon: sunLon  },
+    { icon:'🌙', label:'Moon',       lon: moonLon },
+    { icon:'☿',  label:'Mercury',    lon: mercLon },
+    { icon:'♀',  label:'Venus',      lon: venLon  },
+    { icon:'♂',  label:'Mars',       lon: marLon  },
+    { icon:'♃',  label:'Jupiter',    lon: jupLon  },
+    { icon:'♄',  label:'Saturn',     lon: satLon  },
+    { icon:'⛢',  label:'Uranus',     lon: uraLon  },
+    { icon:'♆',  label:'Neptune',    lon: nepLon  },
+    { icon:'♇',  label:'Pluto',      lon: pluLon  },
+    { icon:'☊',  label:'North Node', lon: nnLon   },
+    { icon:'↑',  label:'Ascendant',  lon: ascLon  },
+  ];
+
+  let wHtml = '';
+  W.forEach((p, i) => {
+    const s = signOf(p.lon);
+    const brief = W_BRIEF[p.label] ? W_BRIEF[p.label][s] : '';
+    const deep  = W_DEEP[p.label]  ? W_DEEP[p.label][s]  : brief;
+    wHtml += makeCard(p.icon, p.label, degStr(p.lon), brief, deep, i > 1);
+  });
+  document.getElementById('western-placements').innerHTML = wHtml;
+
+  // ── Vedic ──
+  const vedicBodies = [
+    { key:'sun',    label:'Surya (Sun)',     icon:'☀️', lon: sunLon  },
+    { key:'moon',   label:'Chandra (Moon)',  icon:'🌙', lon: moonLon },
+    { key:'mars',   label:'Mangala (Mars)',  icon:'♂',  lon: marLon  },
+    { key:'mercury',label:'Budha (Mercury)', icon:'☿',  lon: mercLon },
+    { key:'jupiter',label:'Guru (Jupiter)',  icon:'♃',  lon: jupLon  },
+    { key:'venus',  label:'Shukra (Venus)',  icon:'♀',  lon: venLon  },
+    { key:'saturn', label:'Shani (Saturn)',  icon:'♄',  lon: satLon  },
+    { key:'rahu',   label:'Rahu (N. Node)',  icon:'☊',  lon: nnLon   },
+    { key:'ketu',   label:'Ketu (S. Node)',  icon:'☋',  lon: normalise(nnLon + 180) },
+  ];
+
+  let vHtml = '';
+  vedicBodies.forEach((p, i) => {
+    const nak   = getNakshatra(p.lon);
+    const vSign = getVedicSign(p.lon);
+    const value = `${SIGNS[vSign]} — ${nak.name}`;
+    const brief = NAKSHATRA_BRIEF[nak.index] || '';
+    const deep  = `${VEDIC_SIGN_BRIEF[vSign]} | Nakshatra: ${nak.name} (${nak.deity}, symbol: ${nak.symbol}). ${NAKSHATRA_BRIEF[nak.index]}`;
+    vHtml += makeCard(p.icon, p.label, value, brief, deep, i > 1);
+  });
+  document.getElementById('vedic-placements').innerHTML = vHtml;
+
+  // ── Celtic ──
+  const celticIdx  = getCelticSign(m, d);
+  const celticTree = CELTIC_TREES[celticIdx];
+
+  const celticCards = [
+    { icon: celticTree.symbol, label: 'Your Tree Sign', value: celticTree.name,
+      brief: celticTree.brief, deep: celticTree.deep, prem: false },
+    { icon: '🌿', label: 'Ogham Letter', value: celticTree.ogham,
+      brief: `The ogham letter ${celticTree.ogham} is your sacred symbol in the ancient tree alphabet.`,
+      deep: `In the Ogham alphabet, ${celticTree.ogham} represents the ${celticTree.name}. Druids carved this symbol on standing stones and staffs as a portal to the tree's wisdom. Meditating on this letter connects you with the living intelligence of your birth tree.`,
+      prem: true },
+    { icon: '📅', label: 'Celtic Dates', value: celticTree.dates,
+      brief: `The ${celticTree.name} rules from ${celticTree.dates} in the Druidic lunar calendar.`,
+      deep: `The Celtic tree calendar is lunar in origin, tracking the cycle of thirteen moons across the year. Each tree's reign aligns with its seasonal expression in the natural world: the ${celticTree.name} was sacred to the Druids specifically for the qualities it expressed during this period.`,
+      prem: true },
+    { icon: '🔮', label: 'Element', value: celticTree.element,
+      brief: `The ${celticTree.name} is associated with the element of ${celticTree.element}.`,
+      deep: `In Celtic tradition, each tree belongs to an elemental force that shapes the nature of those born under it. The ${celticTree.element} element of the ${celticTree.name} speaks to how you process experience, express yourself creatively, and connect with the living world around you.`,
+      prem: true },
+  ];
+
+  let cHtml = '';
+  celticCards.forEach(c => {
+    cHtml += makeCard(c.icon, c.label, c.value, c.brief, c.deep, c.prem);
+  });
+  document.getElementById('celtic-placements').innerHTML = cHtml;
+
+  // ── Chinese ──
+  const animal   = getChineseYear(y);
+  const yearEl   = getChineseElement(y);
+  const polarity = getChinesePolarity(y);
+
+  const monthAnimals = ['Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat','Monkey','Rooster','Dog','Pig','Rat'];
+  const monthAnimal  = CHINESE_ANIMALS.find(a => a.name === monthAnimals[m - 1]);
+
+  const hourAnimals = ['Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat','Monkey','Rooster','Dog','Pig'];
+  const hourIdx     = Math.floor(((h + 1) % 24) / 2) % 12;
+  const hourAnimal  = CHINESE_ANIMALS.find(a => a.name === hourAnimals[hourIdx]);
+
+  const chineseCards = [
+    { icon: animal.icon, label: 'Year Animal', value: animal.name,
+      brief: ANIMAL_BRIEF[animal.name], deep: ANIMAL_DEEP[animal.name], prem: false },
+    { icon: ELEMENT_ICONS[yearEl] || '✦', label: 'Year Element', value: yearEl,
+      brief: `The ${yearEl} element shapes your fundamental character and energy this lifetime.`,
+      deep: `In Chinese Five Elements theory, ${yearEl} expresses a distinct mode of being in the world. ${yearEl === 'Wood' ? 'Wood people grow toward the light, flexible and vital, driven by vision and growth.' : yearEl === 'Fire' ? 'Fire people burn bright — passionate, expressive, and warmth-giving to all they touch.' : yearEl === 'Earth' ? 'Earth people are the reliable centre, grounding those around them with practical wisdom.' : yearEl === 'Metal' ? 'Metal people carry precision and principle — refined, just, and structurally clear.' : 'Water people flow around every obstacle, carrying depth, wisdom, and the power to cleanse.'}`,
+      prem: true },
+    { icon: polarity === 'Yang' ? '☀️' : '🌙', label: 'Polarity', value: polarity,
+      brief: `${polarity} energy shapes your relationship with action and receptivity.`,
+      deep: `${polarity === 'Yang' ? 'Yang years produce outward-facing, action-oriented, initiative-taking souls. You tend to lead, to begin, to project energy outward. The work is cultivating the Yin within — the stillness, the receptivity, the willingness to listen before acting.' : 'Yin years produce inward-facing, receptive, deeply perceptive souls. You tend to gather, to observe, to work from the interior. The work is cultivating the Yang within — the confidence to project outward, to initiate, to claim space.'}`,
+      prem: true },
+    { icon: monthAnimal ? monthAnimal.icon : '✦', label: 'Inner Animal (Month)', value: monthAnimal ? monthAnimal.name : '—',
+      brief: `Your inner animal reveals your private nature and emotional world.`,
+      deep: `The month animal in Chinese astrology governs your inner world — how you feel, what you desire privately, what motivates you beneath the surface persona. Your inner ${monthAnimal ? monthAnimal.name : 'animal'} ${monthAnimal ? ANIMAL_BRIEF[monthAnimal.name] : ''} This inner nature may be quite different from what the world sees in your year animal.`,
+      prem: true },
+    { icon: hourAnimal ? hourAnimal.icon : '✦', label: 'Secret Animal (Hour)', value: hourAnimal ? hourAnimal.name : '—',
+      brief: `Your secret animal is known only to those closest to you.`,
+      deep: `The hour of birth reveals the secret animal — the self that only the most intimate relationships ever see. This is your instinctive, unguarded self: the face you wear at 3am or in moments of raw vulnerability. Your secret ${hourAnimal ? hourAnimal.name : 'animal'} nature runs deep beneath the personalities of your year and month animals, surfacing unexpectedly in moments of true intimacy.`,
+      prem: true },
+  ];
+
+  let chHtml = '';
+  chineseCards.forEach(c => {
+    chHtml += makeCard(c.icon, c.label, c.value, c.brief, c.deep, c.prem);
+  });
+  document.getElementById('chinese-placements').innerHTML = chHtml;
+
+  // ── Mayan ──
+  const mayanKin  = getMayanKin(y, m, d);
+  const mSign     = MAYAN_SIGNS[mayanKin.signIdx];
+  const mTone     = MAYAN_TONES[mayanKin.tone - 1];
+  const analogIdx = (mayanKin.signIdx + 4) % 20;
+  const antiIdx   = (mayanKin.signIdx + 10) % 20;
+  const hiddenIdx = (19 - mayanKin.signIdx + 20) % 20;
+
+  const mayanCards = [
+    { icon: mSign.icon,
+      label: 'Day Sign (Kin)',
+      value: `${mSign.name} — Kin ${mayanKin.kin}`,
+      brief: MAYAN_SIGN_BRIEF[mayanKin.signIdx],
+      deep:  MAYAN_SIGN_DEEP[mayanKin.signIdx],
+      prem: false },
+    { icon: '🔢',
+      label: 'Galactic Tone',
+      value: `${mTone.n} — ${mTone.name}`,
+      brief: `${mTone.keyword} · Power of ${mTone.power}`,
+      deep:  MAYAN_TONE_DEEP[mayanKin.tone - 1],
+      prem: false },
+    { icon: '🎨',
+      label: 'Colour & Power',
+      value: `${mSign.color} ${mSign.name}`,
+      brief: `Power: ${mSign.power} · Action: ${mSign.action}`,
+      deep:  `The ${mSign.color} ray carries the frequency of ${mSign.color === 'Red' ? 'initiation — the power to begin, to act, and to pioneer new territory' : mSign.color === 'White' ? 'refinement — the power to purify, clarify, and bring things to their essential truth' : mSign.color === 'Blue' ? 'transformation — the power to change, to transmute, and to catalyse growth' : 'ripening — the power of harvest, completion, and sharing what has been gathered'}. As a ${mSign.color} ${mSign.name}, you carry this ray's quality through the specific lens of ${mSign.power.toLowerCase()} — expressed through the action of ${mSign.action.toLowerCase()}. These three qualities — colour, power, and action — form the core of your galactic mission in this lifetime.`,
+      prem: true },
+    { icon: MAYAN_SIGNS[analogIdx].icon,
+      label: 'Analog (Support)',
+      value: MAYAN_SIGNS[analogIdx].name,
+      brief: `Your analog ally: ${MAYAN_SIGN_BRIEF[analogIdx]}`,
+      deep:  `The Analog is your complementary support — the day sign that walks alongside yours, strengthening your gifts and filling what you cannot provide yourself. ${MAYAN_SIGNS[analogIdx].name} (${MAYAN_SIGNS[analogIdx].mayan}) offers you the power of ${MAYAN_SIGNS[analogIdx].power.toLowerCase()} as a resource. People born with this sign as their primary kin often become natural allies and collaborators for you.`,
+      prem: true },
+    { icon: MAYAN_SIGNS[antiIdx].icon,
+      label: 'Antipode (Challenge)',
+      value: MAYAN_SIGNS[antiIdx].name,
+      brief: `Your antipode challenge: ${MAYAN_SIGN_BRIEF[antiIdx]}`,
+      deep:  `The Antipode is your opposite — the sign that directly challenges and activates you. ${MAYAN_SIGNS[antiIdx].name} (${MAYAN_SIGNS[antiIdx].mayan}) brings the power of ${MAYAN_SIGNS[antiIdx].power.toLowerCase()} as your growth edge. Where you are comfortable, the Antipode is foreign; where it is natural, you must stretch. The Antipode does not oppose you to obstruct — it opposes you to complete you. Encounters with this energy tend to produce your deepest transformations.`,
+      prem: true },
+    { icon: MAYAN_SIGNS[hiddenIdx].icon,
+      label: 'Hidden Power',
+      value: MAYAN_SIGNS[hiddenIdx].name,
+      brief: `Your hidden gift: ${MAYAN_SIGN_BRIEF[hiddenIdx]}`,
+      deep:  `The Hidden Power is the unconscious gift that underlies your entire day sign — the deep structural intelligence that operates beneath your surface expression. ${MAYAN_SIGNS[hiddenIdx].name} (${MAYAN_SIGNS[hiddenIdx].mayan}) brings the power of ${MAYAN_SIGNS[hiddenIdx].power.toLowerCase()} as your invisible superpower. You may not notice this quality in yourself; others often see it more clearly than you do. When you consciously develop your Hidden Power, your day sign reaches its fullest expression.`,
+      prem: true },
+  ];
+
+  let mHtml = '';
+  mayanCards.forEach(c => { mHtml += makeCard(c.icon, c.label, c.value, c.brief, c.deep, c.prem); });
+  document.getElementById('mayan-placements').innerHTML = mHtml;
+
+  // ── Human Design ──
+  const designJD = findDesignJD(JD, sunLon);
+
+  const cLons = [sunLon, moonLon, mercLon, venLon, marLon, jupLon, satLon, uraLon, nepLon, pluLon, nnLon,
+                 normalise(sunLon + 180), normalise(nnLon + 180)];
+
+  const dSunLon  = sunLongitude(designJD);
+  const dMoonLon = moonLongitude(designJD);
+  const dMercLon = planetLongitude(designJD, PLANET_PARAMS.Mercury);
+  const dVenLon  = planetLongitude(designJD, PLANET_PARAMS.Venus);
+  const dMarLon  = planetLongitude(designJD, PLANET_PARAMS.Mars);
+  const dJupLon  = planetLongitude(designJD, PLANET_PARAMS.Jupiter);
+  const dSatLon  = planetLongitude(designJD, PLANET_PARAMS.Saturn);
+  const dUraLon  = planetLongitude(designJD, PLANET_PARAMS.Uranus);
+  const dNepLon  = planetLongitude(designJD, PLANET_PARAMS.Neptune);
+  const dPluLon  = planetLongitude(designJD, { L0c:238.929, L0d:144.9600, Mc:14.882, Md:144.960, e:0.2488, a:39.482 });
+  const dNNLon   = northNodeLongitude(designJD);
+  const dLons = [dSunLon, dMoonLon, dMercLon, dVenLon, dMarLon, dJupLon, dSatLon, dUraLon, dNepLon, dPluLon, dNNLon,
+                 normalise(dSunLon + 180), normalise(dNNLon + 180)];
+
+  const allGates       = new Set([...cLons, ...dLons].map(hdGateFromLon));
+  const definedCenters = getDefinedCenters(allGates);
+  const hdType         = getHDType(definedCenters, allGates);
+  const hdAuthority    = getHDAuthority(definedCenters);
+
+  const cSunLine   = hdLineFromLon(sunLon);
+  const dSunLine   = hdLineFromLon(dSunLon);
+  const profileKey = `${cSunLine}/${dSunLine}`;
+  const profile    = HD_PROFILES[profileKey] || { name: profileKey, brief: 'A unique crossing of these two life themes.' };
+
+
+  const cSunGate  = hdGateFromLon(sunLon);
+  const cEarGate  = hdGateFromLon(normalise(sunLon + 180));
+  const dSunGate2 = hdGateFromLon(dSunLon);
+  const dEarGate  = hdGateFromLon(normalise(dSunLon + 180));
+  // Juxtaposition = only profile 4/1. Left Angle = 5/1,5/2,6/2,6/3. Everything else = Right Angle.
+  const crossAngle = profileKey === '4/1' ? 'Juxtaposition' :
+                     ['5/1','5/2','6/2','6/3'].includes(profileKey) ? 'Left Angle' : 'Right Angle';
+
+  const typeData = HD_TYPE_DATA[hdType];
+  const centersArr = [...definedCenters];
+
+  const hdCards = [
+    { icon:'⬡', label:'Your Type',
+      value: `${hdType} (${typeData.pct})`,
+      brief: typeData.brief,
+      deep:  typeData.deep,
+      prem: false },
+    { icon:'🧭', label:'Strategy',
+      value: hdType,
+      brief: typeData.strategy,
+      deep:  `Strategy is the single most transformative thing you can apply from your Human Design. The mind always wants to override it — too slow, too passive, not logical enough. But the strategy is not a mind tool; it is a body tool. It works precisely because it bypasses the not-self conditioning that has accumulated across your lifetime. When you live your strategy consistently, over months and years, the correct people, opportunities, and environments begin to find you with a precision that seems almost impossible. The not-self theme you are moving away from is ${typeData.notSelf}.`,
+      prem: false },
+    { icon:'🔑', label:'Inner Authority',
+      value: `${hdAuthority} Authority`,
+      brief: HD_AUTHORITY_DEEP[hdAuthority] ? HD_AUTHORITY_DEEP[hdAuthority].split('.')[0] + '.' : '',
+      deep:  HD_AUTHORITY_DEEP[hdAuthority] || 'Your authority is unique to your design — trust the wisdom of your body over the noise of the mind.',
+      prem: false },
+    { icon:'📖', label:'Profile',
+      value: `${profileKey} — ${profile.name}`,
+      brief: profile.brief,
+      deep:  `Your profile is the costume your soul wears for this lifetime — the role you are here to play in the theatre of human experience. The ${profileKey} profile (${profile.name}) means that ${profile.brief} The first number (${cSunLine}) is your conscious line — what you know about yourself, what others can see. The second number (${dSunLine}) is your unconscious line — what operates through you without your awareness, often noticed by others before you recognise it in yourself. Together, these two lines create a specific flavour of purpose that is uniquely yours.`,
+      prem: false },
+    { icon:'✚', label:'Incarnation Cross',
+      value: `${crossAngle} Cross`,
+      brief: `Gates ${cSunGate}/${cEarGate} (conscious) · ${dSunGate2}/${dEarGate} (unconscious)`,
+      deep:  `The Incarnation Cross is your life's overarching purpose — the specific theme your soul has incarnated to embody and express. It is formed by four gates: your conscious Sun (Gate ${cSunGate}: ${HD_GATE_NAMES[cSunGate]||cSunGate}), conscious Earth (Gate ${cEarGate}: ${HD_GATE_NAMES[cEarGate]||cEarGate}), unconscious Sun (Gate ${dSunGate2}: ${HD_GATE_NAMES[dSunGate2]||dSunGate2}), and unconscious Earth (Gate ${dEarGate}: ${HD_GATE_NAMES[dEarGate]||dEarGate}). The ${crossAngle} Cross suggests a ${crossAngle === 'Right Angle' ? 'personal dharma — your life unfolds for you, and others benefit from what you discover along the way' : crossAngle === 'Juxtaposition' ? 'fixed path — a single, fated way of being that is neither personal nor transpersonal, but simply your nature' : 'transpersonal dharma — your life is fundamentally about and for others; it unfolds through the people and communities you encounter'}.`,
+      prem: true },
+    { icon:'⚡', label:'Defined Centers',
+      value: centersArr.length > 0 ? centersArr.join(', ') : 'No centers defined',
+      brief: centersArr.length > 0
+        ? `${centersArr.length} of 9 centers defined — consistent, reliable energy in these areas.`
+        : 'All centers open — you are a pure mirror for the energy around you.',
+      deep:  centersArr.length > 0
+        ? `Your defined centers (${centersArr.join(', ')}) are where you carry consistent, reliable energy that others can depend on. These are not just traits — they are consistent frequencies you broadcast into every environment you enter. People are drawn to your defined centers because they offer something stable and trustworthy. The open (undefined) centers — everything not in this list — are where you receive, amplify, and are conditioned by the world around you. These open areas are not weaknesses; they are your greatest source of wisdom, once you learn to observe rather than identify with what moves through them.`
+        : 'As a Reflector, all nine of your centers are open. This means you are exquisitely sensitive to the energy of your environment — you amplify and reflect everyone around you. This is your extraordinary gift: you can taste the full range of human experience without being trapped in any one frequency. The wisdom that emerges from this openness, given time, is unlike anything a defined type can access.',
+      prem: true },
+    { icon:'☯️', label:'Conscious Sun Gate',
+      value: `Gate ${cSunGate} — ${HD_GATE_NAMES[cSunGate]||''}`,
+      brief: `Your primary conscious gift: the energy of Gate ${cSunGate} expressed through your personality.`,
+      deep:  `Gate ${cSunGate} (${HD_GATE_NAMES[cSunGate]||''}) is your conscious Sun gate — the primary gate of your personality, what you know about yourself, and the energy you most consciously bring to the world. It represents approximately 70% of who you experience yourself to be. This is the gate others meet first when they encounter you, and the one you are most able to articulate and express directly. In Human Design, the Sun gate is the single most important gate in your chart for understanding your purpose and your gift to the world.`,
+      prem: true },
+  ];
+
+  let hdHtml = '';
+  hdCards.forEach(c => { hdHtml += makeCard(c.icon, c.label, c.value, c.brief, c.deep, c.prem); });
+  document.getElementById('hd-placements').innerHTML = hdHtml;
+
+  // Show results
+  document.getElementById('results').classList.add('visible');
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─────────────────────────────────────────────
+// TAB SWITCHING
+// ─────────────────────────────────────────────
+
+function switchTab(system) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.system-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.tab-btn[data-system="${system}"]`).classList.add('active');
+  document.getElementById(`panel-${system}`).classList.add('active');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AstroSphere — Multi-System Astrology</title>
+<style>
+  /* ── RESET & BASE ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0a0a1a;
+    --surface:   #12122a;
+    --accent:    #a78bfa;
+    --accent2:   #e879f9;
+    --text:      #e2e8f0;
+    --muted:     #94a3b8;
+    --border:    rgba(167,139,250,0.2);
+    --glow:      rgba(167,139,250,0.15);
+    --font:      'Georgia', serif;
+    --sans:      'Segoe UI', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── STARFIELD ── */
+  #stars {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at 50% 0%, #1a0a3a 0%, #0a0a1a 70%);
+    overflow: hidden;
+  }
+  #stars::before, #stars::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 70%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 40%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 10%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 20% 85%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 90%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 50%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 30%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 60% 15%, rgba(255,255,255,0.5) 0%, transparent 100%);
+    animation: twinkle 4s infinite alternate;
+  }
+  #stars::after {
+    background-image:
+      radial-gradient(1px 1px at 15% 55%, rgba(200,180,255,0.8) 0%, transparent 100%),
+      radial-gradient(1px 1px at 35% 25%, rgba(200,180,255,0.6) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 55% 75%, rgba(200,180,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 78% 80%, rgba(200,180,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 92% 45%, rgba(200,180,255,0.5) 0%, transparent 100%);
+    animation-delay: 2s;
+  }
+  @keyframes twinkle {
+    from { opacity: 0.6; }
+    to   { opacity: 1; }
+  }
+
+  /* ── LAYOUT ── */
+  .container {
+    position: relative; z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+  }
+
+  /* ── HEADER ── */
+  header { text-align: center; padding: 3rem 0 2rem; }
+  header .symbol { font-size: 3.5rem; display: block; margin-bottom: 0.5rem; }
+  header h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    background: linear-gradient(135deg, #a78bfa, #e879f9, #67e8f9);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  header p { color: var(--muted); font-size: 1.05rem; font-style: italic; }
+
+  /* ── FORM ── */
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1.25rem;
+    padding: 2rem;
+    box-shadow: 0 0 40px var(--glow);
+    margin-bottom: 2.5rem;
+  }
+  .form-card h2 { font-size: 1.2rem; color: var(--accent); margin-bottom: 1.5rem; text-align: center; letter-spacing: 0.08em; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .field label {
+    display: block;
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+  .field input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 0.6rem;
+    padding: 0.65rem 0.9rem;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: var(--sans);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(167,139,250,0.15);
+  }
+  .field input[type="date"]::-webkit-calendar-picker-indicator,
+  .field input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.7) sepia(1) hue-rotate(220deg);
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    display: block; width: 100%;
+    background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+    color: #fff;
+    border: none; border-radius: 0.75rem;
+    padding: 0.85rem 1.5rem;
+    font-size: 1.05rem;
+    font-family: var(--font);
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 24px rgba(124,58,237,0.4);
+  }
+  .btn-primary:hover { opacity: 0.92; transform: translateY(-1px); box-shadow: 0 6px 32px rgba(124,58,237,0.5); }
+  .btn-primary:active { transform: translateY(0); }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex; gap: 0.5rem; flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .tab-btn {
+    flex: 1; min-width: 120px;
+    padding: 0.65rem 1rem;
+    border-radius: 0.65rem;
+    border: 1px solid transparent;
+    background: rgba(255,255,255,0.04);
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .tab-btn.active, .tab-btn:hover {
+    background: var(--tab-bg, rgba(167,139,250,0.15));
+    border-color: var(--tab-border, var(--accent));
+    color: var(--tab-color, var(--accent));
+  }
+
+  /* Per-system tab colours */
+  .tab-btn[data-system="western"].active  { --tab-bg: rgba(167,139,250,0.15); --tab-border: #a78bfa; --tab-color: #a78bfa; }
+  .tab-btn[data-system="vedic"].active    { --tab-bg: rgba(251,146,60,0.15);  --tab-border: #fb923c; --tab-color: #fb923c; }
+  .tab-btn[data-system="celtic"].active   { --tab-bg: rgba(74,222,128,0.12);  --tab-border: #4ade80; --tab-color: #4ade80; }
+  .tab-btn[data-system="chinese"].active  { --tab-bg: rgba(248,113,113,0.15); --tab-border: #f87171; --tab-color: #f87171; }
+
+  /* ── RESULTS PANEL ── */
+  #results { display: none; }
+  #results.visible { display: block; }
+
+  .system-panel { display: none; }
+  .system-panel.active { display: block; }
+
+  /* System-specific themes */
+  .system-panel[data-system="western"] {
+    --s-accent: #a78bfa; --s-accent2: #e879f9;
+    --s-bg: rgba(167,139,250,0.07);
+    --s-border: rgba(167,139,250,0.25);
+    --s-glow: rgba(167,139,250,0.12);
+    --s-heading: linear-gradient(135deg, #a78bfa, #e879f9);
+  }
+  .system-panel[data-system="vedic"] {
+    --s-accent: #fb923c; --s-accent2: #f97316;
+    --s-bg: rgba(251,146,60,0.07);
+    --s-border: rgba(251,146,60,0.3);
+    --s-glow: rgba(251,146,60,0.1);
+    --s-heading: linear-gradient(135deg, #fbbf24, #f97316, #ea580c);
+  }
+  .system-panel[data-system="celtic"] {
+    --s-accent: #4ade80; --s-accent2: #a3e635;
+    --s-bg: rgba(74,222,128,0.05);
+    --s-border: rgba(74,222,128,0.2);
+    --s-glow: rgba(74,222,128,0.08);
+    --s-heading: linear-gradient(135deg, #4ade80, #a3e635, #86efac);
+  }
+  .system-panel[data-system="chinese"] {
+    --s-accent: #f87171; --s-accent2: #fbbf24;
+    --s-bg: rgba(248,113,113,0.07);
+    --s-border: rgba(248,113,113,0.25);
+    --s-glow: rgba(248,113,113,0.1);
+    --s-heading: linear-gradient(135deg, #f87171, #fbbf24, #ef4444);
+  }
+
+  .system-header {
+    text-align: center; margin-bottom: 2rem; padding: 1.5rem;
+    background: var(--s-bg);
+    border: 1px solid var(--s-border);
+    border-radius: 1rem;
+    box-shadow: 0 0 30px var(--s-glow);
+  }
+  .system-header h2 {
+    font-size: 1.8rem;
+    background: var(--s-heading);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.3rem;
+  }
+  .system-header p { color: var(--muted); font-style: italic; font-size: 0.95rem; }
+
+  .placements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .placement-card {
+    background: var(--s-bg, rgba(255,255,255,0.04));
+    border: 1px solid var(--s-border, rgba(255,255,255,0.1));
+    border-radius: 0.9rem;
+    padding: 1.25rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .placement-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px var(--s-glow, rgba(255,255,255,0.05));
+  }
+  .placement-card .planet-row {
+    display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem;
+  }
+  .placement-card .planet-icon { font-size: 1.4rem; }
+  .placement-card .planet-name {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .placement-card .placement-value {
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: var(--s-accent, var(--accent));
+    margin-bottom: 0.4rem;
+  }
+  .placement-card .brief-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.5;
+    font-family: var(--sans);
+  }
+  .placement-card .deep-desc {
+    display: none;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--s-border, rgba(255,255,255,0.08));
+    font-size: 0.85rem;
+    color: var(--text);
+    line-height: 1.65;
+    font-family: var(--sans);
+    font-style: italic;
+  }
+  .placement-card.expanded .deep-desc { display: block; }
+
+  .dive-btn {
+    margin-top: 0.7rem;
+    background: none;
+    border: 1px solid var(--s-border, rgba(255,255,255,0.15));
+    border-radius: 0.4rem;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.75rem;
+    font-family: var(--sans);
+    color: var(--s-accent, var(--accent));
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: background 0.2s;
+  }
+  .dive-btn:hover { background: var(--s-bg, rgba(255,255,255,0.05)); }
+
+  /* ── PREMIUM LOCK ── */
+  .premium-overlay {
+    position: relative; overflow: hidden;
+  }
+  .premium-overlay::after {
+    content: '✦ Premium — Dive Deeper';
+    position: absolute; inset: 0;
+    background: rgba(10,10,26,0.82);
+    backdrop-filter: blur(3px);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    border-radius: 0.4rem;
+    cursor: pointer;
+  }
+
+  /* ── NOTE BAR ── */
+  .note-bar {
+    background: rgba(167,139,250,0.08);
+    border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 0.6rem;
+    padding: 0.75rem 1rem;
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 2rem 0;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-family: var(--sans);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    margin-top: 2rem;
+  }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <span class="symbol">✦</span>
+    <h1>AstroSphere</h1>
+    <p>Explore your cosmic blueprint across every tradition</p>
+  </header>
+
+  <!-- INPUT FORM -->
+  <div class="form-card">
+    <h2>✧ Enter Your Birth Details ✧</h2>
+    <div class="form-grid">
+      <div class="field">
+        <label>Date of Birth</label>
+        <input type="date" id="birthDate" />
+      </div>
+      <div class="field">
+        <label>Time of Birth</label>
+        <input type="time" id="birthTime" />
+      </div>
+      <div class="field">
+        <label>City of Birth</label>
+        <input type="text" id="birthCity" placeholder="e.g. Sydney" />
+      </div>
+      <div class="field">
+        <label>Country</label>
+        <input type="text" id="birthCountry" placeholder="e.g. Australia" />
+      </div>
+    </div>
+    <button class="btn-primary" onclick="calculate()">✦ Reveal My Chart ✦</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+
+    <div class="note-bar">
+      ✦ Brief interpretations are shown freely. Tap <em>Dive Deeper</em> on any placement for the full reading.
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" data-system="western" onclick="switchTab('western')">🌌 Western</button>
+      <button class="tab-btn" data-system="vedic"   onclick="switchTab('vedic')">🪔 Vedic</button>
+      <button class="tab-btn" data-system="celtic"  onclick="switchTab('celtic')">🌿 Celtic</button>
+      <button class="tab-btn" data-system="chinese" onclick="switchTab('chinese')">🏮 Chinese</button>
+    </div>
+
+    <!-- WESTERN -->
+    <div class="system-panel active" data-system="western" id="panel-western">
+      <div class="system-header">
+        <h2>🌌 Western Astrology</h2>
+        <p>Tropical zodiac · Planets in signs & houses · Aspects</p>
+      </div>
+      <div class="placements-grid" id="western-placements"></div>
+    </div>
+
+    <!-- VEDIC -->
+    <div class="system-panel" data-system="vedic" id="panel-vedic">
+      <div class="system-header">
+        <h2>🪔 Vedic Astrology</h2>
+        <p>Sidereal zodiac · Jyotish · Nakshatras · Lagna</p>
+      </div>
+      <div class="placements-grid" id="vedic-placements"></div>
+    </div>
+
+    <!-- CELTIC -->
+    <div class="system-panel" data-system="celtic" id="panel-celtic">
+      <div class="system-header">
+        <h2>🌿 Celtic Tree Astrology</h2>
+        <p>Druidic lunar calendar · Ogham tree signs</p>
+      </div>
+      <div class="placements-grid" id="celtic-placements"></div>
+    </div>
+
+    <!-- CHINESE -->
+    <div class="system-panel" data-system="chinese" id="panel-chinese">
+      <div class="system-header">
+        <h2>🏮 Chinese Astrology</h2>
+        <p>Lunar calendar · Zodiac animal · Element · Polarity</p>
+      </div>
+      <div class="placements-grid" id="chinese-placements"></div>
+    </div>
+
+  </div><!-- /#results -->
+
+  <footer>
+    AstroSphere &copy; 2025 &nbsp;·&nbsp; For entertainment &amp; reflection &nbsp;·&nbsp; Not a substitute for professional counsel
+  </footer>
+
+</div><!-- /.container -->
+
+<script>
+// ─────────────────────────────────────────────
+// UTILITIES
+// ─────────────────────────────────────────────
+
+function jdn(y, m, d) {
+  // Julian Day Number from calendar date
+  const a = Math.floor((14 - m) / 12);
+  const yr = y + 4800 - a;
+  const mo = m + 12 * a - 3;
+  return d + Math.floor((153 * mo + 2) / 5) + 365 * yr +
+    Math.floor(yr / 4) - Math.floor(yr / 100) +
+    Math.floor(yr / 400) - 32045;
+}
+
+// ─────────────────────────────────────────────
+// WESTERN — simplified solar-system positions
+// (accurate Sun; Moon & planets use fast approximations)
+// ─────────────────────────────────────────────
+
+const SIGNS = [
+  'Aries','Taurus','Gemini','Cancer','Leo','Virgo',
+  'Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'
+];
+const SIGN_ICONS = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+
+function normalise(deg) { return ((deg % 360) + 360) % 360; }
+function signOf(deg) { return Math.floor(normalise(deg) / 30); }
+function degInSign(deg) { return normalise(deg) % 30; }
+
+function sunLongitude(jd) {
+  // Meeus, low-precision Sun
+  const T  = (jd - 2451545.0) / 36525;
+  const L0 = normalise(280.46646 + 36000.76983 * T);
+  const M  = normalise(357.52911 + 35999.05029 * T) * Math.PI / 180;
+  const C  = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M)
+           + (0.019993 - 0.000101 * T) * Math.sin(2 * M)
+           + 0.000289 * Math.sin(3 * M);
+  return normalise(L0 + C);
+}
+
+function moonLongitude(jd) {
+  const T  = (jd - 2451545.0) / 36525;
+  const Lm = normalise(218.3165 + 481267.8813 * T);
+  const Dm = normalise(297.8502 + 445267.1115 * T) * Math.PI / 180;
+  const Mm = normalise(134.9634 + 477198.8676 * T) * Math.PI / 180;
+  const Ms = normalise(357.5291 + 35999.0503  * T) * Math.PI / 180;
+  const F  = normalise(93.2721  + 483202.0175 * T) * Math.PI / 180;
+  const lon = Lm
+    + 6.289 * Math.sin(Mm)
+    - 1.274 * Math.sin(2 * Dm - Mm)
+    + 0.658 * Math.sin(2 * Dm)
+    - 0.186 * Math.sin(Ms)
+    - 0.059 * Math.sin(2 * Dm - 2 * Mm)
+    - 0.057 * Math.sin(2 * Dm - Mm + Ms)
+    + 0.053 * Math.sin(2 * Dm + Mm)
+    + 0.046 * Math.sin(2 * Dm - Ms)
+    + 0.041 * Math.sin(Mm - Ms)
+    - 0.035 * Math.sin(Dm)
+    - 0.031 * Math.sin(Mm + Ms)
+    + 0.015 * Math.sin(2 * F - 2 * Dm)
+    + 0.011 * Math.sin(Mm - 4 * Dm);
+  return normalise(lon);
+}
+
+function planetLongitude(jd, L0c, L0d, Mc, Md, ecc, semiMajor, name) {
+  // Very simplified heliocentric -> ecliptic; fine for sign-level accuracy
+  const T  = (jd - 2451545.0) / 36525;
+  const L  = normalise(L0c + L0d * T);
+  const M  = normalise(Mc  + Md  * T) * Math.PI / 180;
+  const C  = (2 * ecc - ecc * ecc * ecc / 4) * Math.sin(M)
+           + 5 / 4 * ecc * ecc * Math.sin(2 * M);
+  return normalise(L + C * 180 / Math.PI);
+}
+
+const PLANET_PARAMS = {
+  Mercury: { L0c:252.251, L0d:149472.6746, Mc:174.791, Md:149472.515, e:0.2056 },
+  Venus:   { L0c:181.979, L0d: 58517.8161, Mc: 50.416, Md: 58517.804, e:0.0068 },
+  Mars:    { L0c:355.433, L0d: 19140.2993, Mc: 19.373, Md: 19140.303, e:0.0934 },
+  Jupiter: { L0c: 34.351, L0d:  3034.9

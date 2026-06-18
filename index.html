@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>AstroSphere — Multi-System Astrology</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Danfo&display=swap" rel="stylesheet">
 <style>
   /* ── RESET & BASE ── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -76,8 +78,23 @@
 
   /* ── HEADER ── */
   header { text-align: center; padding: 3rem 0 2rem; }
-  header .symbol { font-size: 3.5rem; display: block; margin-bottom: 0.5rem; }
+
+  .title-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  .orbit-svg {
+    position: absolute;
+    top: 50%;
+    left: 56%;
+    transform: translate(-50%, -50%);
+    width: 180px;
+    height: 80px;
+    overflow: visible;
+    pointer-events: none;
+  }
   header h1 {
+    font-family: 'Danfo', serif;
     font-size: clamp(2rem, 5vw, 3.2rem);
     background: linear-gradient(135deg, #a78bfa, #e879f9, #67e8f9);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -181,7 +198,9 @@
   .tab-btn[data-system="celtic"].active   { --tab-bg: rgba(74,222,128,0.12);  --tab-border: #4ade80; --tab-color: #4ade80; }
   .tab-btn[data-system="chinese"].active  { --tab-bg: rgba(248,113,113,0.15); --tab-border: #f87171; --tab-color: #f87171; }
   .tab-btn[data-system="mayan"].active    { --tab-bg: rgba(251,191,36,0.15);  --tab-border: #fbbf24; --tab-color: #fbbf24; }
-  .tab-btn[data-system="hd"].active       { --tab-bg: rgba(6,182,212,0.15);   --tab-border: #06b6d4; --tab-color: #06b6d4; }
+  .tab-btn[data-system="hd"].active          { --tab-bg: rgba(6,182,212,0.15);    --tab-border: #06b6d4; --tab-color: #06b6d4; }
+  .tab-btn[data-system="numerology"].active  { --tab-bg: rgba(232,121,249,0.15);  --tab-border: #e879f9; --tab-color: #e879f9; }
+  .tab-btn[data-system="compat"].active      { --tab-bg: rgba(251,113,133,0.15);  --tab-border: #fb7185; --tab-color: #fb7185; }
 
   /* ── RESULTS PANEL ── */
   #results { display: none; }
@@ -233,6 +252,47 @@
     --s-glow: rgba(6,182,212,0.1);
     --s-heading: linear-gradient(135deg, #06b6d4, #22d3ee, #a78bfa);
   }
+  .system-panel[data-system="numerology"] {
+    --s-accent: #e879f9; --s-accent2: #a78bfa;
+    --s-bg: rgba(232,121,249,0.07);
+    --s-border: rgba(232,121,249,0.25);
+    --s-glow: rgba(232,121,249,0.1);
+    --s-heading: linear-gradient(135deg, #e879f9, #a78bfa, #67e8f9);
+  }
+  .system-panel[data-system="compat"] {
+    --s-accent: #fb7185; --s-accent2: #f43f5e;
+    --s-bg: rgba(251,113,133,0.07);
+    --s-border: rgba(251,113,133,0.25);
+    --s-glow: rgba(251,113,133,0.1);
+    --s-heading: linear-gradient(135deg, #fb7185, #f43f5e, #fb923c);
+  }
+
+  /* ── VIEW TOGGLE (chart wheel / placements) ── */
+  .view-btns { margin-top: 0.8rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+  .view-btn { background: transparent; border: 1px solid var(--s-border, var(--border)); color: var(--muted); padding: 0.3rem 0.9rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.8rem; font-family: var(--sans); transition: all 0.2s; }
+  .view-btn.active { background: var(--s-accent, var(--accent)); border-color: var(--s-accent, var(--accent)); color: #fff; }
+  #western-wheel { display: none; padding: 1rem 0; }
+  #western-wheel.visible { display: block; }
+
+  /* ── COMPATIBILITY FORM ── */
+  .compat-type-btns { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .compat-type-btn { padding: 0.4rem 1.1rem; border-radius: 2rem; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-family: var(--sans); font-size: 0.85rem; transition: all 0.2s; }
+  .compat-type-btn.active { background: #fb7185; border-color: #fb7185; color: #fff; }
+
+  /* ── PARTNER PROFILES ── */
+  .partner-bar { display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap; margin-bottom:1rem; }
+  .partner-bar select { flex:1; min-width:140px; background:var(--surface); border:1px solid var(--border); color:var(--text); padding:0.35rem 0.6rem; border-radius:0.5rem; font-family:var(--sans); font-size:0.8rem; }
+  .partner-bar input  { flex:1; min-width:120px; background:var(--surface); border:1px solid var(--border); color:var(--text); padding:0.35rem 0.6rem; border-radius:0.5rem; font-family:var(--sans); font-size:0.8rem; }
+  .partner-bar input::placeholder { color:var(--muted); }
+  .btn-partner { padding:0.35rem 0.8rem; border-radius:0.5rem; border:1px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; font-family:var(--sans); font-size:0.8rem; white-space:nowrap; transition:all 0.2s; }
+  .btn-partner:hover { border-color:#fb7185; color:#fb7185; }
+  #composite-section { margin-top:1.5rem; }
+  #composite-section h3 { text-align:center; color:var(--accent); font-size:1rem; margin-bottom:1rem; letter-spacing:0.05em; }
+
+  /* ── SAVE/LOAD BAR ── */
+  .save-bar { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+  .btn-save { padding: 0.4rem 1.1rem; border-radius: 0.5rem; border: 1px solid #a78bfa55; background: transparent; color: var(--muted); cursor: pointer; font-family: var(--sans); font-size: 0.8rem; transition: all 0.2s; }
+  .btn-save:hover { border-color: var(--accent); color: var(--accent); }
 
   .system-header {
     text-align: center; margin-bottom: 2rem; padding: 1.5rem;
@@ -352,9 +412,26 @@
 
   <!-- HEADER -->
   <header>
-    <span class="symbol">✦</span>
-    <h1>AstroSphere</h1>
-    <p>Explore your cosmic blueprint across every tradition</p>
+    <div class="title-wrapper">
+      <h1>AstroSphere</h1>
+      <svg class="orbit-svg" xmlns="http://www.w3.org/2000/svg" viewBox="-90 -40 180 80" aria-hidden="true">
+        <defs>
+          <filter id="cometGlow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g filter="url(#cometGlow)">
+          <animateMotion dur="3s" repeatCount="indefinite" rotate="auto"
+            path="M 66.6,-21.6 A 70,22 -18 1,0 -66.6,21.6 A 70,22 -18 1,0 66.6,-21.6"/>
+          <circle cx="-18" cy="0" r="1"   fill="#a78bfa" opacity="0.3"/>
+          <circle cx="-12" cy="0" r="1.5" fill="#c479f9" opacity="0.5"/>
+          <circle cx="-6"  cy="0" r="2"   fill="#e879f9" opacity="0.7"/>
+          <circle cx="0"   cy="0" r="3.5" fill="#f0a0ff"/>
+        </g>
+      </svg>
+    </div>
+    <p>Explore your unique cosmic blueprint across many traditions</p>
   </header>
 
   <!-- INPUT FORM -->
@@ -381,8 +458,16 @@
         <label>UTC Offset <span style="font-size:0.75em;text-transform:none;letter-spacing:0">(UK Summer +1, UK Winter 0, US Eastern −5)</span></label>
         <input type="number" id="utcOffset" placeholder="e.g. +1" step="0.5" min="-12" max="14" />
       </div>
+      <div class="field" style="grid-column: 1 / -1;">
+        <label>Full Birth Name <span style="font-size:0.75em;text-transform:none;letter-spacing:0">(as on birth certificate — used for Numerology)</span></label>
+        <input type="text" id="birthName" placeholder="e.g. Jane Marie Smith" />
+      </div>
     </div>
     <button class="btn-primary" onclick="calculate()">✦ Reveal My Chart ✦</button>
+    <div class="save-bar">
+      <button class="btn-save" onclick="saveChart()">💾 Save to this device</button>
+      <button class="btn-save" onclick="loadChart()">📂 Load saved chart</button>
+    </div>
   </div>
 
   <!-- RESULTS -->
@@ -400,6 +485,8 @@
       <button class="tab-btn" data-system="chinese" onclick="switchTab('chinese')">🏮 Chinese</button>
       <button class="tab-btn" data-system="mayan"   onclick="switchTab('mayan')">🌀 Mayan</button>
       <button class="tab-btn" data-system="hd"      onclick="switchTab('hd')">⬡ Human Design</button>
+      <button class="tab-btn" data-system="numerology" onclick="switchTab('numerology')">🔢 Numerology</button>
+      <button class="tab-btn" data-system="compat"     onclick="switchTab('compat')">💞 Compatibility</button>
     </div>
 
     <!-- WESTERN -->
@@ -407,8 +494,13 @@
       <div class="system-header">
         <h2>🌌 Western Astrology</h2>
         <p>Tropical zodiac · Planets in signs & houses · Aspects</p>
+        <div class="view-btns">
+          <button class="view-btn active" onclick="setWesternView('placements',this)">📋 Placements</button>
+          <button class="view-btn"        onclick="setWesternView('wheel',this)">🔮 Chart Wheel</button>
+        </div>
       </div>
       <div class="placements-grid" id="western-placements"></div>
+      <div id="western-wheel"></div>
     </div>
 
     <!-- VEDIC -->
@@ -456,6 +548,53 @@
       <div class="placements-grid" id="hd-placements"></div>
     </div>
 
+    <!-- NUMEROLOGY -->
+    <div class="system-panel" data-system="numerology" id="panel-numerology">
+      <div class="system-header">
+        <h2>🔢 Numerology</h2>
+        <p>The vibrational language of numbers · Life Path · Soul purpose</p>
+      </div>
+      <div class="placements-grid" id="numerology-placements"></div>
+    </div>
+
+    <!-- COMPATIBILITY -->
+    <div class="system-panel" data-system="compat" id="panel-compat">
+      <div class="system-header">
+        <h2>💞 Compatibility</h2>
+        <p>Compare two charts · Synastry · Friend · Colleague · Romance</p>
+      </div>
+      <div class="compat-type-btns">
+        <button class="compat-type-btn active" onclick="setCompatType('romance',this)">💕 Romance</button>
+        <button class="compat-type-btn"        onclick="setCompatType('friend',this)">🤝 Friendship</button>
+        <button class="compat-type-btn"        onclick="setCompatType('colleague',this)">💼 Colleagues</button>
+      </div>
+      <div class="form-card" style="margin-bottom:1.5rem;">
+        <h2 style="font-size:1rem;margin-bottom:1rem;color:var(--accent)">✦ Person B — Birth Details ✦</h2>
+        <div class="partner-bar">
+          <select id="partnerSelect" onchange="loadPartner()"><option value="">— Saved partners —</option></select>
+          <input  id="partnerName" placeholder="Partner name to save…" />
+          <button class="btn-partner" onclick="savePartner()">💾 Save</button>
+          <button class="btn-partner" onclick="deletePartner()" style="color:#f87171;border-color:#f8717144">🗑 Delete</button>
+        </div>
+        <div class="form-grid">
+          <div class="field"><label>Date of Birth</label><input type="date" id="compatDate"/></div>
+          <div class="field"><label>Time of Birth</label><input type="time" id="compatTime"/></div>
+          <div class="field"><label>City of Birth</label><input type="text" id="compatCity" placeholder="e.g. Paris"/></div>
+          <div class="field"><label>Country</label><input type="text" id="compatCountry" placeholder="e.g. France"/></div>
+          <div class="field"><label>UTC Offset</label><input type="number" id="compatUtc" placeholder="e.g. +1" step="0.5" min="-12" max="14"/></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.75rem;">
+          <button class="btn-primary" onclick="calculateCompatibility()">💞 Compare Charts</button>
+          <button class="btn-primary" onclick="renderCompositeChart()" style="background:linear-gradient(135deg,#fb7185,#f43f5e)">🌀 Composite Chart</button>
+        </div>
+      </div>
+      <div class="placements-grid" id="compat-placements"></div>
+      <div id="composite-section" style="display:none">
+        <h3>🌀 Composite Chart — the relationship itself</h3>
+        <div id="composite-wheel"></div>
+      </div>
+    </div>
+
   </div><!-- /#results -->
 
   <footer>
@@ -468,6 +607,9 @@
 // ─────────────────────────────────────────────
 // UTILITIES
 // ─────────────────────────────────────────────
+
+let gChartData = null;
+let gCompatType = 'romance';
 
 function jdn(y, m, d) {
   const a = Math.floor((14 - m) / 12);
@@ -1525,6 +1667,23 @@ function calculate() {
   const nnLon   = northNodeLongitude(JD);
   const ascLon  = ascendant(JD, lat, lon, hour);
 
+  gChartData = {
+    ascLon,
+    planets: [
+      { name:'Sun',     glyph:'☉', lon: sunLon  },
+      { name:'Moon',    glyph:'☽', lon: moonLon },
+      { name:'Mercury', glyph:'☿', lon: mercLon },
+      { name:'Venus',   glyph:'♀', lon: venLon  },
+      { name:'Mars',    glyph:'♂', lon: marLon  },
+      { name:'Jupiter', glyph:'♃', lon: jupLon  },
+      { name:'Saturn',  glyph:'♄', lon: satLon  },
+      { name:'Uranus',  glyph:'⛢', lon: uraLon  },
+      { name:'Neptune', glyph:'♆', lon: nepLon  },
+      { name:'Pluto',   glyph:'♇', lon: pluLon  },
+      { name:'N.Node',  glyph:'☊', lon: nnLon   },
+    ]
+  };
+
   function signStr(lon) {
     const s = signOf(lon);
     return `${SIGN_ICONS[s]} ${SIGNS[s]}`;
@@ -1789,10 +1948,551 @@ function calculate() {
   hdCards.forEach(c => { hdHtml += makeCard(c.icon, c.label, c.value, c.brief, c.deep, c.prem); });
   document.getElementById('hd-placements').innerHTML = hdHtml;
 
+  buildNumerology(y, m, d);
+  renderChartWheel();
+
   // Show results
   document.getElementById('results').classList.add('visible');
   document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
+// ─────────────────────────────────────────────
+// NUMEROLOGY
+// ─────────────────────────────────────────────
+
+const PYTH = { a:1,b:2,c:3,d:4,e:5,f:6,g:7,h:8,i:9,j:1,k:2,l:3,m:4,n:5,o:6,p:7,q:8,r:9,s:1,t:2,u:3,v:4,w:5,x:6,y:7,z:8 };
+const VOWELS = new Set(['a','e','i','o','u']);
+
+const LIFE_PATH_DATA = {
+  1:  { name: 'The Pioneer',      brief: 'Independent, driven, and boldly original — you are here to lead.',
+        deep: 'Life Path 1 carries the energy of new beginnings. You are a natural leader with a powerful sense of self and an instinct to forge your own path. At your best you are courageous, inventive, and fiercely self-reliant. The lesson is to lead with generosity rather than ego, and to remember that true strength includes knowing when to ask for help.' },
+  2:  { name: 'The Peacemaker',   brief: 'Sensitive, cooperative, and gifted at bringing people together.',
+        deep: 'Life Path 2 is the number of partnership and diplomacy. You feel deeply, listen well, and have an almost psychic ability to sense what others need. Your gift is creating harmony in any space you enter. The lesson is to trust your own needs as much as you honour others\', and to find the courage to speak your truth even when it risks disrupting the peace.' },
+  3:  { name: 'The Creative',     brief: 'Expressive, joyful, and here to share your gifts with the world.',
+        deep: 'Life Path 3 vibrates with creativity, self-expression, and delight. You are a natural communicator — through words, art, music, or simply the warmth of your presence. Joy is not frivolous for you; it is your purpose. The lesson is to channel your abundant creative energy with focus and follow-through, resisting the scattered restlessness that can leave ideas unfinished.' },
+  4:  { name: 'The Builder',      brief: 'Disciplined, loyal, and here to create something lasting.',
+        deep: 'Life Path 4 is the number of foundations. You are steady, trustworthy, and gifted at turning vision into reality through patient, methodical work. You understand that anything worth having is worth building properly. The lesson is to loosen your grip on control occasionally, allow for spontaneity, and recognise that rigidity can become its own kind of limitation.' },
+  5:  { name: 'The Free Spirit',  brief: 'Adventurous, versatile, and alive when experiencing the new.',
+        deep: 'Life Path 5 craves freedom, variety, and the electric charge of new experience. You are adaptable, magnetic, and at your best when life is moving. Change is not something that happens to you — it is your natural environment. The lesson is to find depth within freedom; true liberation comes not from avoiding commitment but from choosing it consciously.' },
+  6:  { name: 'The Nurturer',     brief: 'Loving, responsible, and here to care for home and community.',
+        deep: 'Life Path 6 is the number of love, family, and service. You feel a deep responsibility for the wellbeing of those around you and often carry others with warmth and grace. Beauty, harmony, and a nurturing home matter deeply to you. The lesson is to extend to yourself the same compassion you so readily give to others — and to release the perfectionism that can make love feel like a burden.' },
+  7:  { name: 'The Seeker',       brief: 'Introspective, analytical, and drawn toward life\'s deeper truths.',
+        deep: 'Life Path 7 is the number of the mystic and the philosopher. You are here to go beneath the surface — of ideas, of people, of existence itself. Solitude is sacred to you, and your inner life is extraordinarily rich. The lesson is to trust your intuition alongside your intellect, and to open your heart to others, knowing that true wisdom is found in connection as much as in contemplation.' },
+  8:  { name: 'The Powerhouse',   brief: 'Ambitious, authoritative, and here to master the material world.',
+        deep: 'Life Path 8 carries the vibration of abundance, authority, and achievement. You have a natural command, a strategic mind, and the resilience to rebuild after any setback. Power and material success are not distractions for you — they are your arena. The lesson is to ensure your ambition serves something larger than personal gain, and to remember that genuine authority is earned through integrity.' },
+  9:  { name: 'The Humanitarian', brief: 'Compassionate, wise, and here to serve the greater good.',
+        deep: 'Life Path 9 is the number of completion and universal love. You have lived many experiences — you can feel it — and carry a wisdom that transcends the personal. Generosity, artistry, and a deep empathy for all living things define you. The lesson is to release what no longer serves: old wounds, relationships, or identities. Your freedom lies in surrender, and your purpose in giving without expectation of return.' },
+  11: { name: 'The Intuitive (Master 11)', brief: 'A master number: highly sensitive, visionary, and spiritually attuned.',
+        deep: 'Master Number 11 is one of the most spiritually significant life paths. You are a channel — for inspiration, for healing, for light. Your intuition borders on the psychic, and you are here to uplift others simply by being fully yourself. The shadow is anxiety and self-doubt born from the intensity of your own perception. The lesson is to ground your vision in the everyday without dimming it, and to trust that your sensitivity is a superpower, not a wound.' },
+  22: { name: 'The Master Builder (Master 22)', brief: 'A master number: the visionary who builds dreams into reality.',
+        deep: 'Master Number 22 is the most powerful of all life paths. You carry the dreams of an 11 and the practical discipline of a 4 — a rare combination that allows you to manifest on a truly grand scale. You are here to build something that outlasts you. The lesson is to resist the paralysing weight of your own potential. You do not need to save the world overnight. Begin where you are, with what you have.' },
+  33: { name: 'The Master Teacher (Master 33)', brief: 'A master number: the compassionate teacher who heals through love.',
+        deep: 'Master Number 33 is the rarest life path — the Master Teacher. You carry the gifts of both 11 and 22, channelled entirely into service through love. Your presence heals, your words transform, and your life is a living teaching. The lesson is not to lose yourself in devotion to others. You cannot pour from an empty vessel, and your own joy, rest, and creativity are not luxuries — they are your fuel.' },
+};
+
+const EXPRESSION_DATA = {
+  1:  { name: 'The Original',       brief: 'You are here to lead, innovate, and stand apart from the crowd.',
+        deep: 'Your Expression Number reveals a soul wired for independence and originality. You are at your best when charting your own course — in career, in creativity, in life. Others look to you naturally, even when you aren\'t trying to lead. The invitation is to honour your pioneering spirit without letting pride close you off to collaboration. Your greatest work will carry your unmistakable signature.' },
+  2:  { name: 'The Diplomat',       brief: 'You are here to cooperate, mediate, and build bridges between people.',
+        deep: 'Your Expression Number speaks of exquisite sensitivity and relational intelligence. You read rooms and people with uncanny accuracy, and your greatest power lies in partnership rather than solo endeavour. You may downplay your own gifts — resist this. The world needs your ability to hold space for opposing truths, to find the thread of agreement where others see only conflict.' },
+  3:  { name: 'The Communicator',   brief: 'You are here to express, inspire, and bring beauty into the world.',
+        deep: 'Your Expression Number is one of pure creative output. Words, images, music, performance — some form of creative expression is not optional for you, it is oxygen. When you share your inner world with others, something shifts in the room. The lesson is discipline: your gifts are most transformative when given form and focus, not scattered across a dozen unfinished projects.' },
+  4:  { name: 'The Architect',      brief: 'You are here to build, organise, and create lasting structures.',
+        deep: 'Your Expression Number carries the energy of foundations. You have a rare gift for turning abstract ideas into concrete reality through careful, systematic effort. Reliability, precision, and loyalty define you. The invitation is to build structures that serve not just yourself but others — and to occasionally release your grip on how things must be done, allowing life a little creative chaos.' },
+  5:  { name: 'The Adventurer',     brief: 'You are here to explore, adapt, and show others the joy of freedom.',
+        deep: 'Your Expression Number vibrates with restless brilliance. You are a natural catalyst — your presence accelerates things, shifts perspectives, breaks open old patterns. You are most alive when moving, learning, experiencing. The lesson is to distinguish between freedom and avoidance. Your greatest adventures will be the ones you stay present for long enough to see through to the end.' },
+  6:  { name: 'The Caretaker',      brief: 'You are here to nurture, heal, and create beauty in the lives of others.',
+        deep: 'Your Expression Number is rooted in love and responsibility. You carry an innate sense of duty toward those in your life, and your presence makes people feel held. Beauty, harmony, and a well-tended home or community are not vanities for you — they are vocations. The lesson is to receive as graciously as you give, and to recognise that your own needs are as valid as anyone else\'s.' },
+  7:  { name: 'The Truth-Seeker',   brief: 'You are here to question, analyse, and illuminate life\'s deeper mysteries.',
+        deep: 'Your Expression Number belongs to the philosopher and the mystic. You are drawn to the question beneath the question, the pattern beneath the surface. Research, contemplation, and specialised knowledge are your natural territory. The invitation is to share what you discover — your insights are most powerful not when hoarded in solitude, but when offered as a gift to the wider world.' },
+  8:  { name: 'The Achiever',       brief: 'You are here to master ambition, create abundance, and lead with authority.',
+        deep: 'Your Expression Number carries considerable force. You have the capacity to achieve at the highest levels in whatever arena you choose, and you understand instinctively how systems of power and money work. The invitation is to use that power consciously — to build enterprises and legacies that elevate others alongside yourself. True mastery, for you, includes generosity.' },
+  9:  { name: 'The Idealist',       brief: 'You are here to serve humanity, inspire compassion, and complete great cycles.',
+        deep: 'Your Expression Number is the most universally oriented of all. You feel the suffering of the world as if it were your own, and your impulse to help, to heal, to create art that speaks to the human condition is genuine and deep. The lesson is non-attachment: your greatest service comes when you give without needing to see the outcome, and love without condition or expectation of return.' },
+  11: { name: 'The Visionary (Master 11)', brief: 'A master number: you are here to inspire, illuminate, and channel higher wisdom.',
+        deep: 'Master Expression 11 is among the rarest and most demanding paths. You carry an elevated frequency — others sense it even before you speak. Your life\'s work is to become a clear channel for inspiration, healing, or spiritual truth. The shadow is nervous sensitivity and self-doubt that can keep your gifts locked inside. The practice is to trust the transmission, even when you can\'t yet see who it will reach.' },
+  22: { name: 'The Master Builder (Master 22)', brief: 'A master number: you are here to build systems and structures that serve the world.',
+        deep: 'Master Expression 22 is the most powerful in terms of earthly potential. You have the spiritual sensitivity of an 11 fused with the practical genius of a 4 — a combination that allows you to dream on a grand scale and then actually build it. Your work may outlive you. The lesson is to begin before you feel ready, to trust that the vision will clarify as you move toward it.' },
+  33: { name: 'The Master Teacher (Master 33)', brief: 'A master number: you are here to teach, heal, and love without condition.',
+        deep: 'Master Expression 33 is extraordinarily rare. You are not here to teach in any conventional sense — you teach through the quality of your presence, your compassion, and your willingness to carry others while still carrying yourself. Your life is the curriculum. The lesson is to accept that you cannot save everyone, and that your own wholeness is the most powerful thing you can offer the world.' },
+};
+
+const SOUL_URGE_DATA = {
+  1:  { name: 'The Need to Lead',      brief: 'Deep down, your soul craves independence, recognition, and the freedom to forge its own path.',
+        deep: 'Your Soul Urge is the quiet hunger beneath everything you do: to be seen as capable, original, and self-determined. You may not always show this need — you may even mask it with self-sufficiency — but at your core you want to matter, to make your mark, to be acknowledged as someone who did something that was unmistakably yours. Environments that stifle your autonomy drain you. Those that honour it light you up.' },
+  2:  { name: 'The Need to Connect',   brief: 'Deep down, your soul craves love, deep partnership, and a sense of true belonging.',
+        deep: 'Your Soul Urge is for genuine intimacy — not just romance, but the kind of connection where you are fully known and fully accepted. You long for harmony, for a partner who truly sees you, for relationships that feel like coming home. Because this need is so central, rejection or conflict can wound you disproportionately. The work is to build that same quality of accepting, non-judgemental presence within yourself.' },
+  3:  { name: 'The Need to Express',   brief: 'Deep down, your soul craves creative expression, joy, and the freedom to be fully yourself.',
+        deep: 'Your Soul Urge is to live colourfully, to express the full range of what moves through you — joy, grief, humour, beauty — and to share it with others. When you are not creating, you feel it in your body as a kind of restlessness or low-grade sadness you can\'t quite name. When you are expressing freely — through art, conversation, writing, performance — you feel most alive. That aliveness is not a luxury. It is your north star.' },
+  4:  { name: 'The Need for Security', brief: 'Deep down, your soul craves stability, order, and a solid foundation beneath your feet.',
+        deep: 'Your Soul Urge is for certainty in an uncertain world. You want to know that the ground will hold, that your efforts will be rewarded, that what you build will last. This is not timidity — it is wisdom. You understand that freedom without structure is chaos, and that real creativity requires a reliable container. The invitation is to recognise when the need for security tips into rigidity, and to practise trusting the ground even when it shifts.' },
+  5:  { name: 'The Need for Freedom',  brief: 'Deep down, your soul craves variety, adventure, and the exhilaration of endless possibility.',
+        deep: 'Your Soul Urge is for an unlocked life — unlocked from routine, from expectation, from any box someone else has built for you. You are drawn to new experiences, new places, new ideas with an almost physical pull. Boredom is not just uncomfortable for you; it is genuinely intolerable. The lesson is to distinguish between the freedom that expands your life and the restlessness that keeps you skimming the surface of it. Depth is also a kind of freedom.' },
+  6:  { name: 'The Need to Love',      brief: 'Deep down, your soul craves deep love, a beautiful home, and the feeling of being truly needed.',
+        deep: 'Your Soul Urge is rooted in the heart. You want to love and be loved well, to create a home that is a sanctuary, to tend a community or family that reflects the care you pour into it. When those around you are flourishing, you flourish. When they suffer, you suffer. The work is to ensure your caretaking comes from fullness rather than need — to love as an act of choice, not as a way of earning your place.' },
+  7:  { name: 'The Need to Know',      brief: 'Deep down, your soul craves understanding, solitude, and the pursuit of truth.',
+        deep: 'Your Soul Urge is for depth — of knowledge, of experience, of inner life. You are not satisfied by surface answers or shallow company. You need time alone to process, to think, to feel into the mystery of things. This is not antisocial; it is your mode of spiritual nourishment. The invitation is to share what you find in those depths — to let your hard-won insights become a bridge rather than a private refuge.' },
+  8:  { name: 'The Need to Achieve',   brief: 'Deep down, your soul craves success, influence, and the satisfaction of mastery.',
+        deep: 'Your Soul Urge is for accomplishment in the tangible world — status, financial security, the respect of peers, the knowledge that your efforts have produced something real and substantial. This is not vanity; it is a genuine drive for excellence. The lesson is to ensure the scoreboard you are playing on is your own, not someone else\'s definition of success. When your ambition is aligned with your deeper values, it becomes a force for extraordinary good.' },
+  9:  { name: 'The Need to Transcend', brief: 'Deep down, your soul craves to give, to heal, and to love beyond personal boundaries.',
+        deep: 'Your Soul Urge reaches beyond the personal. You are moved by the suffering of others in ways that feel almost unbearable, and you carry a deep longing to make the world better — not in an abstract way, but now, here, in the lives of real people. The lesson is that you cannot pour from an empty vessel. Your compassion for the world must begin with compassion for yourself, or it will exhaust rather than sustain you.' },
+  11: { name: 'The Need to Inspire (Master 11)', brief: 'Deep down, your soul craves spiritual truth, inner peace, and to be a light for others.',
+        deep: 'Your Soul Urge is both a hunger and a calling. You feel drawn toward spiritual understanding, toward the invisible dimensions of life, toward connection with something that transcends the ordinary. You long to be a source of inspiration and healing for others — and yet this very sensitivity can make the world feel overwhelming. The practice is to tend your own inner flame with great care, knowing that your light is most useful when it burns steadily rather than brilliantly and briefly.' },
+  22: { name: 'The Need to Create (Master 22)', brief: 'Deep down, your soul craves to build something meaningful that outlasts you.',
+        deep: 'Your Soul Urge is vast. At the level of the heart, you want to leave the world genuinely better than you found it — not through small gestures, but through the construction of something enduring: an institution, a body of work, a community, a legacy. The challenge is the gap between the scale of the vision and the patience required to build it. The practice is to begin humbly and trust that the grandest things are built one quiet day at a time.' },
+  33: { name: 'The Need to Heal (Master 33)', brief: 'Deep down, your soul craves to love unconditionally, to teach, and to be of profound service.',
+        deep: 'Your Soul Urge is rooted in unconditional love — not the romantic kind, but the vast, clear, undemanding love that simply holds space for others to become who they are. You are here to heal, to teach by example, to be a steady presence in a turbulent world. The deepest lesson of this Soul Urge is learning to receive: to allow yourself to be held, loved, and nourished in return. Your capacity to give is extraordinary. Your capacity to receive is the practice.' },
+};
+
+function reduceToSingle(n, keepMaster) {
+  while (n > 9) {
+    if (keepMaster && (n === 11 || n === 22 || n === 33)) break;
+    n = String(n).split('').reduce((a, d) => a + Number(d), 0);
+  }
+  return n;
+}
+
+function lifePathNumber(y, m, d) {
+  const rd = reduceToSingle(d, true);
+  const rm = reduceToSingle(m, true);
+  const ry = reduceToSingle(y, true);
+  return reduceToSingle(rd + rm + ry, true);
+}
+
+function nameToNumber(name, vowelsOnly) {
+  const letters = name.toLowerCase().replace(/[^a-z]/g, '').split('');
+  const filtered = vowelsOnly ? letters.filter(l => VOWELS.has(l)) : letters;
+  const total = filtered.reduce((sum, l) => sum + (PYTH[l] || 0), 0);
+  return reduceToSingle(total, true);
+}
+
+function buildNumerology(y, m, d) {
+  const name = (document.getElementById('birthName').value || '').trim();
+  const lp   = lifePathNumber(y, m, d);
+  const lpData = LIFE_PATH_DATA[lp];
+
+  let html = makeCard('🔢', 'Life Path Number', `${lp} — ${lpData.name}`, lpData.brief, lpData.deep, false);
+
+  if (name) {
+    const exp    = nameToNumber(name, false);
+    const expData = EXPRESSION_DATA[exp];
+    html += makeCard('✍️', 'Expression Number', `${exp} — ${expData.name}`, expData.brief, expData.deep, false);
+
+    const su     = nameToNumber(name, true);
+    const suData = SOUL_URGE_DATA[su];
+    html += makeCard('💜', 'Soul Urge Number', `${su} — ${suData.name}`, suData.brief, suData.deep, false);
+  } else {
+    html += makeCard('✍️', 'Expression Number', 'Enter your full birth name above', 'Add your full name as it appears on your birth certificate to unlock your Expression and Soul Urge numbers.', '', false);
+  }
+
+  document.getElementById('numerology-placements').innerHTML = html;
+}
+
+// ─────────────────────────────────────────────
+// CHART WHEEL
+// ─────────────────────────────────────────────
+
+function setWesternView(view, btn) {
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('western-placements').style.display = view === 'placements' ? '' : 'none';
+  const wheel = document.getElementById('western-wheel');
+  wheel.style.display = view === 'wheel' ? 'block' : 'none';
+}
+
+function buildWheelSVG(planets, ascLon, gradId) {
+  const CX = 250, CY = 250, RO = 236, RI = 200, RH = 160, RL = 116;
+  const SIGN_SYMS = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+  const ELEM_COLS = ['#e07060','#7db87a','#5ec4f0','#9b7de8','#e07060','#7db87a','#5ec4f0','#9b7de8','#e07060','#7db87a','#5ec4f0','#9b7de8'];
+  const ASP_STYLES = [
+    { angle:0,   orb:8, color:'#f0e060', w:'1.2' },
+    { angle:60,  orb:5, color:'#7de8a0', w:'0.8' },
+    { angle:90,  orb:7, color:'#f07070', w:'1.0' },
+    { angle:120, orb:7, color:'#5ec4f0', w:'1.0' },
+    { angle:180, orb:8, color:'#f0a040', w:'0.9' },
+  ];
+
+  function svgAngle(lon) { return (180 - ((lon - ascLon + 360) % 360)) * Math.PI / 180; }
+  function pt(lon, r) { const a = svgAngle(lon); return { x: CX + r*Math.cos(a), y: CY + r*Math.sin(a) }; }
+  function f(n) { return n.toFixed(1); }
+
+  let s = `<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:480px;display:block;margin:0 auto">`;
+  s += `<defs><radialGradient id="${gradId}" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#181830"/><stop offset="100%" stop-color="#0a0a1a"/></radialGradient></defs>`;
+  s += `<circle cx="${CX}" cy="${CY}" r="${RO}" fill="url(#${gradId})" stroke="#a78bfa" stroke-width="1.5"/>`;
+
+  // Zodiac sectors
+  for (let i = 0; i < 12; i++) {
+    const l1=i*30, l2=l1+30, lm=l1+15;
+    const p1=pt(l1,RO), p4=pt(l2,RO), p3=pt(l2,RI), p2=pt(l1,RI);
+    s += `<path d="M${f(p1.x)},${f(p1.y)} A${RO},${RO} 0 0,0 ${f(p4.x)},${f(p4.y)} L${f(p3.x)},${f(p3.y)} A${RI},${RI} 0 0,1 ${f(p2.x)},${f(p2.y)} Z" fill="${ELEM_COLS[i]}25" stroke="#ffffff18" stroke-width="0.5"/>`;
+    const sm=pt(lm,(RO+RI)/2);
+    s += `<text x="${f(sm.x)}" y="${f(sm.y)}" text-anchor="middle" dominant-baseline="central" font-size="13" fill="${ELEM_COLS[i]}" font-family="serif">${SIGN_SYMS[i]}</text>`;
+  }
+
+  s += `<circle cx="${CX}" cy="${CY}" r="${RI}" fill="#10102e" stroke="#a78bfa55" stroke-width="1"/>`;
+
+  // House lines + numbers
+  for (let i = 0; i < 12; i++) {
+    const hLon=(ascLon+i*30+360)%360, isAxis=i%3===0;
+    const pi2=pt(hLon,RH), po=pt(hLon,RI);
+    s += `<line x1="${f(pi2.x)}" y1="${f(pi2.y)}" x2="${f(po.x)}" y2="${f(po.y)}" stroke="${isAxis?'#e879f9':'#a78bfa44'}" stroke-width="${isAxis?'1.5':'0.7'}"/>`;
+    const hn=pt((hLon+15+360)%360,(RI+RH)/2);
+    s += `<text x="${f(hn.x)}" y="${f(hn.y)}" text-anchor="middle" dominant-baseline="central" font-size="8" fill="#94a3b8" font-family="sans-serif">${i+1}</text>`;
+  }
+
+  s += `<circle cx="${CX}" cy="${CY}" r="${RH}" fill="#0a0a1a" stroke="#a78bfa33" stroke-width="1"/>`;
+
+  // Aspect lines inside inner circle
+  for (let i = 0; i < planets.length; i++) {
+    for (let j = i+1; j < planets.length; j++) {
+      const diff = Math.abs(((planets[i].lon - planets[j].lon + 360) % 360));
+      const ang  = diff > 180 ? 360 - diff : diff;
+      for (const asp of ASP_STYLES) {
+        if (Math.abs(ang - asp.angle) <= asp.orb) {
+          const pi2 = pt(planets[i].lon, RL), pj = pt(planets[j].lon, RL);
+          s += `<line x1="${f(pi2.x)}" y1="${f(pi2.y)}" x2="${f(pj.x)}" y2="${f(pj.y)}" stroke="${asp.color}" stroke-width="${asp.w}" opacity="0.45"/>`;
+          break;
+        }
+      }
+    }
+  }
+
+  // Planet glyphs + degree labels
+  const sorted = [...planets].sort((a,b) => ((a.lon-ascLon+360)%360) - ((b.lon-ascLon+360)%360));
+  const placed = [];
+  sorted.forEach(p => {
+    let dl = p.lon;
+    for (const q of placed) { if (((dl-q+360)%360) < 8) dl = (q+8+360)%360; }
+    placed.push(dl);
+    const t1=pt(p.lon,RI-1), t2=pt(p.lon,RI-9);
+    s += `<line x1="${f(t1.x)}" y1="${f(t1.y)}" x2="${f(t2.x)}" y2="${f(t2.y)}" stroke="#e879f9bb" stroke-width="1.5"/>`;
+    const t3=pt(dl,RI-9), gp=pt(dl,RI-23), dp=pt(dl,RI-36);
+    if (Math.round(dl) !== Math.round(p.lon)) {
+      s += `<line x1="${f(t2.x)}" y1="${f(t2.y)}" x2="${f(t3.x)}" y2="${f(t3.y)}" stroke="#e879f944" stroke-width="0.8"/>`;
+    }
+    s += `<text x="${f(gp.x)}" y="${f(gp.y)}" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#e879f9" font-family="serif">${p.glyph}</text>`;
+    const deg = Math.floor(p.lon % 30), signSym = SIGN_SYMS[Math.floor(p.lon / 30) % 12];
+    s += `<text x="${f(dp.x)}" y="${f(dp.y)}" text-anchor="middle" dominant-baseline="central" font-size="6.5" fill="#94a3b8" font-family="sans-serif">${deg}°${signSym}</text>`;
+  });
+
+  // Axis labels
+  [{lon:ascLon,label:'ASC'},{lon:(ascLon+180)%360,label:'DSC'},{lon:(ascLon+90)%360,label:'IC'},{lon:(ascLon+270)%360,label:'MC'}].forEach(ax => {
+    const ap=pt(ax.lon,RI+11);
+    s += `<text x="${f(ap.x)}" y="${f(ap.y)}" text-anchor="middle" dominant-baseline="central" font-size="7.5" fill="#67e8f9" font-weight="bold" font-family="sans-serif">${ax.label}</text>`;
+  });
+
+  // Aspect legend
+  const legendItems = [{c:'#f0e060',l:'Conjunction'},{c:'#5ec4f0',l:'Trine'},{c:'#7de8a0',l:'Sextile'},{c:'#f07070',l:'Square'},{c:'#f0a040',l:'Opposition'}];
+  legendItems.forEach((li, i) => {
+    const lx = 18 + i * 94, ly = 490;
+    s += `<line x1="${lx}" y1="${ly}" x2="${lx+18}" y2="${ly}" stroke="${li.c}" stroke-width="1.5"/>`;
+    s += `<text x="${lx+22}" y="${ly}" dominant-baseline="central" font-size="7" fill="#94a3b8" font-family="sans-serif">${li.l}</text>`;
+  });
+
+  s += `<circle cx="${CX}" cy="${CY}" r="3" fill="#a78bfa"/>`;
+  s += '</svg>';
+  return s;
+}
+
+function renderChartWheel() {
+  if (!gChartData) return;
+  document.getElementById('western-wheel').innerHTML = buildWheelSVG(gChartData.planets, gChartData.ascLon, 'wBg');
+}
+
+// ─────────────────────────────────────────────
+// COMPATIBILITY
+// ─────────────────────────────────────────────
+
+function setCompatType(type, btn) {
+  gCompatType = type;
+  document.querySelectorAll('.compat-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+const COMPAT_ASPECTS = [
+  { name:'Conjunction', angle:0,   orb:8, score:2,  nature:'powerful union' },
+  { name:'Trine',       angle:120, orb:7, score:3,  nature:'natural harmony' },
+  { name:'Sextile',     angle:60,  orb:5, score:2,  nature:'easy flow' },
+  { name:'Square',      angle:90,  orb:7, score:-2, nature:'dynamic tension' },
+  { name:'Opposition',  angle:180, orb:8, score:-1, nature:'magnetic polarity' },
+];
+
+function aspectBetween(a, b) {
+  const diff = Math.abs(((a - b + 360) % 360));
+  const ang  = diff > 180 ? 360 - diff : diff;
+  for (const asp of COMPAT_ASPECTS) {
+    if (Math.abs(ang - asp.angle) <= asp.orb) return asp;
+  }
+  return null;
+}
+
+const COMPAT_FOCUS = {
+  romance:   ['Sun','Moon','Venus','Mars','Ascendant'],
+  friend:    ['Sun','Moon','Mercury','Jupiter'],
+  colleague: ['Sun','Mercury','Mars','Saturn'],
+};
+
+const COMPAT_INTROS = {
+  romance:   'Looking at romantic chemistry — the dance of hearts, desire, and soul connection.',
+  friend:    'Looking at friendship resonance — shared warmth, communication, and mutual growth.',
+  colleague: 'Looking at professional synergy — drive, communication, and complementary strengths.',
+};
+
+function calculateCompatibility() {
+  if (!gChartData) { alert('Please reveal Person A\'s chart first.'); return; }
+  const dateVal = document.getElementById('compatDate').value;
+  if (!dateVal) { alert('Please enter Person B\'s date of birth.'); return; }
+
+  const [y,m,d] = dateVal.split('-').map(Number);
+  const timeVal = document.getElementById('compatTime').value || '12:00';
+  const [h,mi]  = timeVal.split(':').map(Number);
+  const utcOff  = parseFloat(document.getElementById('compatUtc').value) || 0;
+  const utcHour = h + mi/60 - utcOff;
+  const JD2     = jdn(y,m,d) + (utcHour - 12)/24;
+
+  const city2    = document.getElementById('compatCity').value || '';
+  const country2 = document.getElementById('compatCountry').value || '';
+  const [lat2, lon2] = getCityCoords(city2, country2);
+
+  const bPlanets = [
+    { name:'Sun',       lon: sunLongitude(JD2) },
+    { name:'Moon',      lon: moonLongitude(JD2) },
+    { name:'Mercury',   lon: planetLongitude(JD2, PLANET_PARAMS.Mercury) },
+    { name:'Venus',     lon: planetLongitude(JD2, PLANET_PARAMS.Venus)   },
+    { name:'Mars',      lon: planetLongitude(JD2, PLANET_PARAMS.Mars)    },
+    { name:'Jupiter',   lon: planetLongitude(JD2, PLANET_PARAMS.Jupiter) },
+    { name:'Saturn',    lon: planetLongitude(JD2, PLANET_PARAMS.Saturn)  },
+    { name:'Ascendant', lon: ascendant(JD2, lat2, lon2, h+mi/60) },
+  ];
+
+  const focus = COMPAT_FOCUS[gCompatType];
+  const aPlanets = gChartData.planets.filter(p => focus.includes(p.name));
+  const bFocused = bPlanets.filter(p => focus.includes(p.name));
+
+  const hits = [];
+  let totalScore = 0;
+
+  aPlanets.forEach(ap => {
+    bFocused.forEach(bp => {
+      const asp = aspectBetween(ap.lon, bp.lon);
+      if (asp) {
+        hits.push({ a: ap.name, b: bp.name, asp });
+        totalScore += asp.score;
+      }
+    });
+  });
+
+  // Sun sign compatibility bonus
+  const aSunSign = signOf(gChartData.planets.find(p=>p.name==='Sun').lon);
+  const bSunSign = signOf(bPlanets.find(p=>p.name==='Sun').lon);
+  const aElem = aSunSign % 4, bElem = bSunSign % 4;
+  const elemHarmony = aElem === bElem ? 'same element' :
+                      Math.abs(aElem - bElem) === 2 ? 'complementary elements' : 'different elements';
+  if (aElem === bElem) totalScore += 2;
+
+  const maxScore = focus.length * focus.length * 3;
+  const pct = Math.max(0, Math.min(100, Math.round((totalScore / maxScore) * 100 + 50)));
+
+  const typeLabels = { romance:'Romantic', friend:'Friendship', colleague:'Colleague' };
+  const label = typeLabels[gCompatType];
+
+  const icons   = { romance:'💕', friend:'🤝', colleague:'💼' };
+  const icon    = icons[gCompatType];
+
+  let html = makeCard(icon, `${label} Compatibility`,
+    `${pct}% resonance · ${SIGNS[aSunSign]} meets ${SIGNS[bSunSign]}`,
+    COMPAT_INTROS[gCompatType],
+    `Your Sun signs share ${elemHarmony}. ${hits.length} significant aspect${hits.length !== 1 ? 's' : ''} found between your key planets. ${totalScore >= 4 ? 'There is a strong natural alignment here.' : totalScore >= 0 ? 'There is real potential with some areas to navigate.' : 'The dynamic energy between you invites growth and awareness.'}`,
+    false);
+
+  if (hits.length > 0) {
+    hits.forEach(h => {
+      const emoji = h.asp.score > 0 ? '✨' : h.asp.score < 0 ? '⚡' : '🔄';
+      html += makeCard(emoji, `${h.a} ${h.asp.name} ${h.b}`,
+        h.asp.nature,
+        `A ${h.asp.name.toLowerCase()} between Person A's ${h.a} and Person B's ${h.b} — ${h.asp.nature}.`,
+        `In ${gCompatType} synastry, a ${h.asp.name.toLowerCase()} between these two planets is ${h.asp.score > 1 ? 'one of the most harmonious connections you can have' : h.asp.score < 0 ? 'a source of dynamic friction that, when understood, becomes a catalyst for growth' : 'a gentle, flowing support between your energies'}. Person A leads with their ${h.a} energy; Person B responds with their ${h.b} — and this particular meeting carries the quality of ${h.asp.nature}.`,
+        false);
+    });
+  } else {
+    html += makeCard('🌙', 'Subtle Connection', 'No major aspects in key planets',
+      'The most important connections between you may be felt rather than seen in the chart.',
+      'Sometimes the deepest compatibility isn\'t written in major aspects but in the quieter resonances — shared values, timing, and the indefinable feeling of ease. This chart suggests a relationship that unfolds slowly and reveals its gifts over time.',
+      false);
+  }
+
+  document.getElementById('compat-placements').innerHTML = html;
+}
+
+// ─────────────────────────────────────────────
+// COMPOSITE CHART
+// ─────────────────────────────────────────────
+
+function midpointLon(a, b) {
+  const diff = ((b - a + 360) % 360);
+  return (a + (diff <= 180 ? diff : diff - 360) / 2 + 360) % 360;
+}
+
+function renderCompositeChart() {
+  if (!gChartData) { alert('Please reveal Person A\'s chart first.'); return; }
+  const dateVal = document.getElementById('compatDate').value;
+  if (!dateVal) { alert('Please enter Person B\'s date of birth.'); return; }
+
+  const [y,m,d] = dateVal.split('-').map(Number);
+  const timeVal = document.getElementById('compatTime').value || '12:00';
+  const [h,mi]  = timeVal.split(':').map(Number);
+  const utcOff  = parseFloat(document.getElementById('compatUtc').value) || 0;
+  const utcHour = h + mi/60 - utcOff;
+  const JD2     = jdn(y,m,d) + (utcHour-12)/24;
+  const city2   = document.getElementById('compatCity').value || '';
+  const ctry2   = document.getElementById('compatCountry').value || '';
+  const [lat2, lon2] = getCityCoords(city2, ctry2);
+
+  const bPlanets = [
+    { name:'Sun',     glyph:'☉', lon: sunLongitude(JD2) },
+    { name:'Moon',    glyph:'☽', lon: moonLongitude(JD2) },
+    { name:'Mercury', glyph:'☿', lon: planetLongitude(JD2, PLANET_PARAMS.Mercury) },
+    { name:'Venus',   glyph:'♀', lon: planetLongitude(JD2, PLANET_PARAMS.Venus)   },
+    { name:'Mars',    glyph:'♂', lon: planetLongitude(JD2, PLANET_PARAMS.Mars)    },
+    { name:'Jupiter', glyph:'♃', lon: planetLongitude(JD2, PLANET_PARAMS.Jupiter) },
+    { name:'Saturn',  glyph:'♄', lon: planetLongitude(JD2, PLANET_PARAMS.Saturn)  },
+    { name:'Uranus',  glyph:'⛢', lon: planetLongitude(JD2, PLANET_PARAMS.Uranus)  },
+    { name:'Neptune', glyph:'♆', lon: planetLongitude(JD2, PLANET_PARAMS.Neptune) },
+    { name:'Pluto',   glyph:'♇', lon: planetLongitude(JD2, { L0c:238.929, L0d:144.960, Mc:14.882, Md:144.960, e:0.2488, a:39.482 }) },
+    { name:'N.Node',  glyph:'☊', lon: northNodeLongitude(JD2) },
+  ];
+
+  const compPlanets = gChartData.planets.map((ap, i) => ({
+    name:  ap.name,
+    glyph: ap.glyph,
+    lon:   midpointLon(ap.lon, bPlanets[i].lon),
+  }));
+
+  const bAsc    = ascendant(JD2, lat2, lon2, h+mi/60);
+  const compAsc = midpointLon(gChartData.ascLon, bAsc);
+
+  const section = document.getElementById('composite-section');
+  section.style.display = 'block';
+  document.getElementById('composite-wheel').innerHTML = buildWheelSVG(compPlanets, compAsc, 'cBg');
+  section.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ─────────────────────────────────────────────
+// PARTNER PROFILES
+// ─────────────────────────────────────────────
+
+function getPartners() {
+  try { return JSON.parse(localStorage.getItem('astrosphere_partners') || '[]'); } catch(e) { return []; }
+}
+function setPartners(arr) { localStorage.setItem('astrosphere_partners', JSON.stringify(arr)); }
+
+function refreshPartnerSelect() {
+  const sel = document.getElementById('partnerSelect');
+  const partners = getPartners();
+  sel.innerHTML = '<option value="">— Saved partners —</option>';
+  partners.forEach((p, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = p.name;
+    sel.appendChild(opt);
+  });
+}
+
+function savePartner() {
+  const name = document.getElementById('partnerName').value.trim();
+  if (!name) { alert('Please enter a name for this partner.'); return; }
+  const dateVal = document.getElementById('compatDate').value;
+  if (!dateVal) { alert('Please enter this partner\'s birth details first.'); return; }
+  const partners = getPartners();
+  const existing = partners.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
+  const data = {
+    name,
+    date:    document.getElementById('compatDate').value,
+    time:    document.getElementById('compatTime').value,
+    city:    document.getElementById('compatCity').value,
+    country: document.getElementById('compatCountry').value,
+    utc:     document.getElementById('compatUtc').value,
+  };
+  if (existing >= 0) { partners[existing] = data; } else { partners.push(data); }
+  setPartners(partners);
+  refreshPartnerSelect();
+  document.getElementById('partnerName').value = '';
+  alert(`✓ ${name} saved!`);
+}
+
+function loadPartner() {
+  const sel = document.getElementById('partnerSelect');
+  if (!sel.value && sel.value !== 0) return;
+  const partners = getPartners();
+  const p = partners[parseInt(sel.value)];
+  if (!p) return;
+  document.getElementById('compatDate').value    = p.date    || '';
+  document.getElementById('compatTime').value    = p.time    || '';
+  document.getElementById('compatCity').value    = p.city    || '';
+  document.getElementById('compatCountry').value = p.country || '';
+  document.getElementById('compatUtc').value     = p.utc     || '';
+  document.getElementById('partnerName').value   = p.name;
+}
+
+function deletePartner() {
+  const sel = document.getElementById('partnerSelect');
+  if (!sel.value && sel.value !== 0) { alert('Select a partner to delete.'); return; }
+  const partners = getPartners();
+  const p = partners[parseInt(sel.value)];
+  if (!confirm(`Delete ${p.name}?`)) return;
+  partners.splice(parseInt(sel.value), 1);
+  setPartners(partners);
+  refreshPartnerSelect();
+}
+
+// ─────────────────────────────────────────────
+// SAVE / LOAD (localStorage)
+// ─────────────────────────────────────────────
+
+function saveChart() {
+  const data = {
+    birthDate:    document.getElementById('birthDate').value,
+    birthTime:    document.getElementById('birthTime').value,
+    birthCity:    document.getElementById('birthCity').value,
+    birthCountry: document.getElementById('birthCountry').value,
+    utcOffset:    document.getElementById('utcOffset').value,
+    birthName:    document.getElementById('birthName').value,
+  };
+  if (!data.birthDate) { alert('Nothing to save — please enter your birth details first.'); return; }
+  localStorage.setItem('astrosphere_chart', JSON.stringify(data));
+  alert('✓ Chart saved to this device!');
+}
+
+function loadChart() {
+  const raw = localStorage.getItem('astrosphere_chart');
+  if (!raw) { alert('No saved chart found on this device.'); return; }
+  const data = JSON.parse(raw);
+  document.getElementById('birthDate').value    = data.birthDate    || '';
+  document.getElementById('birthTime').value    = data.birthTime    || '';
+  document.getElementById('birthCity').value    = data.birthCity    || '';
+  document.getElementById('birthCountry').value = data.birthCountry || '';
+  document.getElementById('utcOffset').value    = data.utcOffset    || '';
+  document.getElementById('birthName').value    = data.birthName    || '';
+  alert('✓ Saved chart loaded! Press Reveal My Chart to see your reading.');
+}
+
+window.addEventListener('load', () => {
+  const raw = localStorage.getItem('astrosphere_chart');
+  if (raw) {
+    try {
+      const data = JSON.parse(raw);
+      if (data.birthDate) {
+        document.getElementById('birthDate').value    = data.birthDate    || '';
+        document.getElementById('birthTime').value    = data.birthTime    || '';
+        document.getElementById('birthCity').value    = data.birthCity    || '';
+        document.getElementById('birthCountry').value = data.birthCountry || '';
+        document.getElementById('utcOffset').value    = data.utcOffset    || '';
+        document.getElementById('birthName').value    = data.birthName    || '';
+      }
+    } catch(e) {}
+  }
+  refreshPartnerSelect();
+});
 
 // ─────────────────────────────────────────────
 // TAB SWITCHING

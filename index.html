@@ -402,6 +402,64 @@
     border-top: 1px solid rgba(255,255,255,0.06);
     margin-top: 2rem;
   }
+
+  /* ── MOBILE ── */
+  @media (max-width: 600px) {
+    .container { padding: 1rem 0.75rem 3rem; }
+
+    /* Header */
+    header { padding: 2rem 0 1.25rem; }
+    header h1 { font-size: clamp(2rem, 10vw, 2.6rem); }
+    header p  { font-size: 0.9rem; }
+
+    /* Form */
+    .form-card { padding: 1.25rem; }
+    .form-grid { grid-template-columns: 1fr; gap: 0.9rem; }
+    .btn-primary { font-size: 0.95rem; padding: 0.9rem 1rem; min-height: 48px; }
+    .save-bar { flex-direction: column; align-items: stretch; }
+    .btn-save { text-align: center; padding: 0.6rem; min-height: 44px; }
+
+    /* Tabs — scroll horizontally instead of wrapping */
+    .tabs {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 0.4rem;
+      gap: 0.4rem;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab-btn { flex: 0 0 auto; min-width: unset; font-size: 0.78rem; padding: 0.55rem 0.75rem; }
+
+    /* System header */
+    .system-header { padding: 1rem; }
+    .system-header h2 { font-size: 1.4rem; }
+    .view-btns { gap: 0.35rem; }
+    .view-btn  { font-size: 0.75rem; padding: 0.3rem 0.65rem; }
+
+    /* Cards */
+    .placements-grid { grid-template-columns: 1fr; gap: 0.9rem; }
+
+    /* Note bar */
+    .note-bar { font-size: 0.78rem; padding: 0.6rem 0.75rem; }
+
+    /* Compatibility */
+    .compat-type-btns { gap: 0.4rem; }
+    .compat-type-btn  { font-size: 0.8rem; padding: 0.4rem 0.8rem; min-height: 44px; }
+    .partner-bar { flex-direction: column; }
+    .partner-bar select,
+    .partner-bar input  { width: 100%; }
+    .btn-partner { min-height: 44px; }
+
+    /* Partner action buttons row */
+    #panel-compat .form-card > div:last-of-type { flex-direction: column; }
+
+    /* Chart wheel — already responsive, just ensure padding */
+    #western-wheel, #composite-wheel { padding: 0.5rem 0; }
+
+    /* Footer */
+    footer { font-size: 0.72rem; }
+  }
 </style>
 </head>
 <body>

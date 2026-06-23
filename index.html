@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>AstroSphere — Multi-System Astrology</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Danfo&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Danfo&family=Yatra+One&display=swap" rel="stylesheet">
 <style>
   /* ── RESET & BASE ── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -392,6 +392,305 @@
     margin-bottom: 1.5rem;
   }
 
+  /* ── LIGHTBOX ── */
+  .lightbox {
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.92); cursor: zoom-out;
+    justify-content: center; align-items: center; padding: 1rem;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox #lightbox-content { width: 95vw; max-height: 95vh; }
+  .lightbox svg { width: 100%; height: auto; display: block; }
+  .lightbox-hint {
+    position: absolute; top: 0.75rem; right: 1rem;
+    font-family: var(--sans); font-size: 0.8rem; color: #ffffff80;
+    pointer-events: none;
+  }
+
+  /* ── NAV BAR ── */
+  .site-nav {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 0 0;
+    margin-bottom: -0.5rem;
+  }
+  .nav-btn {
+    padding: 0.6rem 1.8rem;
+    border-radius: 2rem;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .nav-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .nav-btn.active {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 2px 16px rgba(124,58,237,0.35);
+  }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── SOCIAL SPHERE TITLE ── */
+  .social-title {
+    font-family: 'Danfo', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .social-title-text {
+    background: linear-gradient(135deg, #e879f9, #a78bfa, #67e8f9);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .sparkle-wrap { position: relative; }
+  .sparkle {
+    display: inline-block;
+    font-size: 0.5em;
+    vertical-align: middle;
+    -webkit-text-fill-color: initial;
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    animation: glitter 2s ease-in-out infinite;
+  }
+  .s1 { color: #e879f9; animation-delay: 0s;    margin-right: 0.15em; }
+  .s2 { color: #a78bfa; animation-delay: 0.4s;  margin-right: 0.1em;  font-size: 0.35em; }
+  .s3 { color: #67e8f9; animation-delay: 0.8s;  margin-right: 0.05em; font-size: 0.4em; }
+  .s4 { color: #67e8f9; animation-delay: 1.2s;  margin-left: 0.05em;  font-size: 0.4em; }
+  .s5 { color: #a78bfa; animation-delay: 1.6s;  margin-left: 0.1em;   font-size: 0.35em; }
+  .s6 { color: #e879f9; animation-delay: 0.2s;  margin-left: 0.15em; }
+  @keyframes glitter {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50%      { opacity: 1;   transform: scale(1.3); }
+  }
+
+  /* ── INSIGHTS BUTTON ── */
+  .btn-insights {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0.6rem 1.2rem;
+    border-radius: 2rem;
+    border: 1px solid #fbbf2466;
+    background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.1));
+    color: #fbbf24;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.25s;
+    writing-mode: horizontal-tb;
+  }
+  .btn-insights:hover {
+    background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.2));
+    border-color: #fbbf24;
+    box-shadow: 0 0 16px rgba(251,191,36,0.2);
+  }
+
+  /* ── AVATAR TITLE ── */
+  .avatar-title {
+    font-family: 'Danfo', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    background: linear-gradient(135deg, #67e8f9, #a78bfa, #e879f9);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── AVATAR BUILDER ── */
+  .avatar-section { margin-bottom: 1.1rem; }
+  .avatar-label {
+    display: block; font-family: var(--sans); font-size: 0.75rem;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.45rem;
+  }
+  .avatar-options { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .avatar-opt {
+    padding: 0.35rem 0.75rem; border-radius: 2rem; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); font-family: var(--sans); font-size: 0.78rem;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .avatar-opt:hover { border-color: var(--accent); color: var(--accent); }
+  .avatar-opt.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .avatar-swatch {
+    width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border);
+    cursor: pointer; transition: all 0.2s; display: inline-block;
+  }
+  .avatar-swatch:hover { transform: scale(1.15); }
+  .avatar-swatch.active { border-color: #fff; box-shadow: 0 0 8px rgba(255,255,255,0.4); }
+  .suggestion-card {
+    background: rgba(103,232,249,0.08); border: 1px solid rgba(103,232,249,0.2);
+    border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 0.5rem;
+    font-family: var(--sans); font-size: 0.85rem; color: var(--text);
+    display: flex; align-items: center; gap: 0.6rem; cursor: pointer; transition: all 0.2s;
+  }
+  .suggestion-card:hover { background: rgba(103,232,249,0.14); }
+
+  /* ── EMPORIUM ── */
+  .shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .product-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 28px var(--glow);
+  }
+  .product-icon { font-size: 2.5rem; margin-bottom: 0.6rem; }
+  .product-name {
+    font-size: 1rem; font-weight: bold; color: var(--accent);
+    margin-bottom: 0.3rem;
+  }
+  .product-cat {
+    font-family: var(--sans); font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.5rem;
+  }
+  .product-desc {
+    font-family: var(--sans); font-size: 0.82rem; color: var(--text);
+    line-height: 1.5; margin-bottom: 0.75rem;
+  }
+  .product-signs {
+    font-size: 0.72rem; font-family: var(--sans); color: var(--muted);
+    margin-bottom: 0.6rem; font-style: italic;
+  }
+  .product-price {
+    font-size: 1.1rem; font-weight: bold; color: #fbbf24;
+    margin-bottom: 0.6rem;
+  }
+  .btn-cart {
+    display: inline-block;
+    padding: 0.45rem 1.2rem;
+    border-radius: 2rem;
+    border: 1px solid #fbbf2466;
+    background: transparent;
+    color: #fbbf24;
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-cart:hover { background: #fbbf2420; border-color: #fbbf24; }
+  .filter-btn {
+    padding: 0.35rem 0.9rem;
+    border-radius: 2rem;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn.active { background: #fbbf2420; border-color: #fbbf24; color: #fbbf24; }
+  .filter-btn:hover  { border-color: #fbbf24; color: #fbbf24; }
+
+  /* ── EMPORIUM TITLE ── */
+  .emporium-title {
+    font-family: 'Danfo', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    background: linear-gradient(135deg, #fbbf24, #f59e0b, #e879f9);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── SOCIAL SPHERE CARDS ── */
+  .social-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 24px var(--glow);
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .social-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 28px var(--glow);
+  }
+  .social-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+  .social-avatar.friend    { background: rgba(167,139,250,0.2); }
+  .social-avatar.family    { background: rgba(251,113,133,0.2); }
+  .social-avatar.colleague { background: rgba(251,191,36,0.2);  }
+  .social-avatar.partner   { background: rgba(232,121,249,0.2); }
+  .social-avatar.other     { background: rgba(103,232,249,0.2); }
+  .social-info { flex: 1; min-width: 0; }
+  .social-info h3 {
+    font-size: 1.15rem;
+    color: var(--accent);
+    margin-bottom: 0.2rem;
+  }
+  .social-relation {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 0.6rem;
+  }
+  .social-details {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .social-details span { color: var(--muted); }
+  .social-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-shrink: 0;
+  }
+  .social-actions button {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 0.4rem;
+    color: var(--muted);
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    font-family: var(--sans);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .social-actions button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .social-actions button.delete-btn:hover {
+    border-color: #f87171;
+    color: #f87171;
+  }
+
   /* ── FOOTER ── */
   footer {
     text-align: center;
@@ -406,6 +705,10 @@
   /* ── MOBILE ── */
   @media (max-width: 600px) {
     .container { padding: 1rem 0.75rem 3rem; }
+
+    /* Nav */
+    .site-nav { gap: 0.35rem; }
+    .nav-btn { font-size: 0.8rem; padding: 0.5rem 1.2rem; }
 
     /* Header */
     header { padding: 2rem 0 1.25rem; }
@@ -458,6 +761,10 @@
     #western-wheel, #composite-wheel { padding: 0.5rem 0; }
 
     /* Footer */
+    /* Social cards */
+    .social-card { flex-direction: column; gap: 0.75rem; }
+    .social-actions { align-self: flex-end; }
+
     footer { font-size: 0.72rem; }
   }
 </style>
@@ -467,6 +774,17 @@
 <div id="stars"></div>
 
 <div class="container">
+
+  <!-- NAV BAR -->
+  <nav class="site-nav">
+    <button class="nav-btn active" onclick="switchPage('astrosphere')">✦ AstroSphere</button>
+    <button class="nav-btn" onclick="switchPage('social')">✦ SocialSphere</button>
+    <button class="nav-btn" onclick="switchPage('emporium')">✦ Astro Emporium</button>
+    <button class="nav-btn" onclick="switchPage('avatar')">✦ AstroAvatar</button>
+  </nav>
+
+  <!-- PAGE: ASTROSPHERE -->
+  <div class="page active" id="page-astrosphere">
 
   <!-- HEADER -->
   <header>
@@ -555,16 +873,18 @@
         <div class="view-btns">
           <button class="view-btn active" onclick="setWesternView('placements',this)">📋 Placements</button>
           <button class="view-btn"        onclick="setWesternView('wheel',this)">🔮 Chart Wheel</button>
+          <button class="view-btn"        onclick="setWesternView('astrocarto',this)">🌍 Astrocartography</button>
         </div>
       </div>
       <div class="placements-grid" id="western-placements"></div>
       <div id="western-wheel"></div>
+      <div id="western-astrocarto" style="display:none; padding:0.5rem 0;"></div>
     </div>
 
     <!-- VEDIC -->
     <div class="system-panel" data-system="vedic" id="panel-vedic">
       <div class="system-header">
-        <h2>🪔 Vedic Astrology</h2>
+        <h2 style="font-family:'Yatra One',cursive !important;">🪔 Vedic Astrology</h2>
         <p>Sidereal zodiac · Jyotish · Nakshatras · Lagna</p>
       </div>
       <div class="placements-grid" id="vedic-placements"></div>
@@ -655,11 +975,173 @@
 
   </div><!-- /#results -->
 
+  </div><!-- /#page-astrosphere -->
+
+  <!-- PAGE: SOCIAL SPHERE -->
+  <div class="page" id="page-social">
+    <header>
+      <div class="title-wrapper">
+        <h1 class="social-title">
+          <span class="sparkle-wrap">
+            <span class="sparkle s1">✦</span>
+            <span class="sparkle s2">✧</span>
+            <span class="sparkle s3">⋆</span>
+            <span class="social-title-text">SocialSphere</span>
+            <span class="sparkle s4">⋆</span>
+            <span class="sparkle s5">✧</span>
+            <span class="sparkle s6">✦</span>
+          </span>
+        </h1>
+      </div>
+      <p>Your personal constellation of friends, family &amp; cosmic connections</p>
+    </header>
+
+    <!-- ADD PERSON FORM -->
+    <div class="form-card" id="social-form">
+      <h2>✧ Add a Person ✧</h2>
+      <div class="form-grid">
+        <div class="field">
+          <label>Name</label>
+          <input type="text" id="socialName" placeholder="e.g. Sarah" />
+        </div>
+        <div class="field">
+          <label>Relationship</label>
+          <select id="socialRelation" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:0.6rem;padding:0.65rem 0.9rem;color:var(--text);font-size:0.95rem;font-family:var(--sans);">
+            <option value="friend">Friend</option>
+            <option value="family">Family</option>
+            <option value="colleague">Colleague</option>
+            <option value="partner">Partner</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Date of Birth</label>
+          <input type="date" id="socialDOB" />
+        </div>
+        <div class="field">
+          <label>Time of Birth</label>
+          <input type="time" id="socialTime" />
+        </div>
+        <div class="field">
+          <label>City of Birth</label>
+          <input type="text" id="socialCity" placeholder="e.g. London" />
+        </div>
+        <div class="field">
+          <label>Country</label>
+          <input type="text" id="socialCountry" placeholder="e.g. United Kingdom" />
+        </div>
+        <div class="field">
+          <label>UTC Offset</label>
+          <input type="number" id="socialUtc" placeholder="e.g. 0" step="0.5" min="-12" max="14" />
+        </div>
+      </div>
+      <button class="btn-primary" id="social-submit-btn" onclick="addSocialPerson()">✦ Add to My Circle ✦</button>
+      <button class="btn-primary" id="social-cancel-btn" onclick="cancelSocialEdit()" style="display:none;background:transparent;border:1px solid var(--border);color:var(--muted);box-shadow:none;margin-top:0.5rem;">Cancel Editing</button>
+      <p id="social-limit" style="text-align:center;font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-top:0.75rem;"></p>
+    </div>
+
+    <!-- SAVED PEOPLE -->
+    <div id="social-list"></div>
+
+    <!-- SOLAR SYSTEM VIEW -->
+    <div id="solar-system"></div>
+
+  </div><!-- /#page-social -->
+
+  <!-- PAGE: ASTRO EMPORIUM -->
+  <div class="page" id="page-emporium">
+    <header>
+      <div class="title-wrapper">
+        <h1 class="emporium-title">Astro Emporium</h1>
+      </div>
+      <p>Curated cosmic treasures for your spiritual journey</p>
+    </header>
+
+    <!-- SEARCH BAR -->
+    <div class="form-card" style="padding:1.25rem;">
+      <div style="position:relative;">
+        <input type="text" id="emporiumSearch" placeholder="Search crystals, books, tarot, candles…" oninput="renderEmporium()" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:2rem;padding:0.75rem 1.2rem 0.75rem 2.8rem;color:var(--text);font-size:0.95rem;font-family:var(--sans);" />
+        <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1.1rem;opacity:0.5;">🔍</span>
+      </div>
+      <!-- Category filters -->
+      <div id="emporium-filters" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.75rem;justify-content:center;"></div>
+    </div>
+
+    <!-- PERSONALISED RECOMMENDATIONS -->
+    <div id="emporium-recs"></div>
+
+    <!-- FULL SHOP -->
+    <div id="emporium-shop"></div>
+
+  </div><!-- /#page-emporium -->
+
+  <!-- PAGE: ASTRO AVATAR -->
+  <div class="page" id="page-avatar">
+    <header>
+      <div class="title-wrapper">
+        <h1 class="avatar-title">AstroAvatar</h1>
+      </div>
+      <p>Create your cosmic alter ego based on your birth chart</p>
+    </header>
+
+    <!-- CHART SUGGESTIONS -->
+    <div id="avatar-suggestions"></div>
+
+    <!-- AVATAR DISPLAY + CONTROLS -->
+    <div style="display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;align-items:flex-start;">
+      <!-- AVATAR PREVIEW -->
+      <div class="form-card" style="flex:0 0 auto;padding:1.5rem;text-align:center;">
+        <div id="avatar-display" style="width:220px;height:440px;margin:0 auto;"></div>
+        <button class="btn-primary" onclick="saveAvatar()" style="margin-top:1rem;font-size:0.85rem;padding:0.6rem 1.2rem;">💾 Save Avatar</button>
+      </div>
+
+      <!-- CUSTOMISATION PANEL -->
+      <div class="form-card" style="flex:1;min-width:280px;max-width:500px;">
+        <h2 style="font-size:1rem;margin-bottom:1rem;">✧ Customise ✧</h2>
+
+        <div class="avatar-section">
+          <label class="avatar-label">Skin Tone</label>
+          <div class="avatar-options" id="opt-skin"></div>
+        </div>
+
+        <div class="avatar-section">
+          <label class="avatar-label">Hair Style</label>
+          <div class="avatar-options" id="opt-hair"></div>
+        </div>
+
+        <div class="avatar-section">
+          <label class="avatar-label">Hair Colour</label>
+          <div class="avatar-options" id="opt-haircolor"></div>
+        </div>
+
+        <div class="avatar-section">
+          <label class="avatar-label">Zodiac Outfit</label>
+          <div class="avatar-options" id="opt-outfit"></div>
+        </div>
+
+        <div class="avatar-section">
+          <label class="avatar-label">Accessory</label>
+          <div class="avatar-options" id="opt-accessory"></div>
+        </div>
+
+        <div class="avatar-section">
+          <label class="avatar-label">Aura</label>
+          <div class="avatar-options" id="opt-aura"></div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /#page-avatar -->
+
   <footer>
-    AstroSphere &copy; 2025 &nbsp;·&nbsp; For entertainment &amp; reflection &nbsp;·&nbsp; Not a substitute for professional counsel
+    AstroSphere &copy; 2025 &nbsp;·&nbsp; All Rights Reserved &nbsp;·&nbsp; For entertainment &amp; reflection &nbsp;·&nbsp; Not a substitute for professional counsel
   </footer>
 
 </div><!-- /.container -->
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <div id="lightbox-content" onclick="event.stopPropagation()"></div>
+  <span class="lightbox-hint">✕ Click anywhere to close</span>
+</div>
 
 <script>
 // ─────────────────────────────────────────────
@@ -688,9 +1170,129 @@ const SIGNS = [
 ];
 const SIGN_ICONS = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
 
+function getMoonPhase(sunLon, moonLon) {
+  const diff = normalise(moonLon - sunLon);
+  const phase = Math.floor(diff / 45);
+  const PHASES = [
+    { name:'New Moon',           icon:'🌑', brief:'Born in darkness and pure potential. You are a seed-planter, an initiator who thrives on fresh starts and instinctive action.',
+      deep:'The New Moon soul arrived at a moment of pure beginning. You carry a deep, almost unconscious drive to start things — projects, relationships, movements — often without a clear plan, trusting that the impulse itself is the map. You may feel most alive in the first spark of an idea, before the world has weighed in. Your challenge is follow-through; your gift is the courage to begin what has never existed before.' },
+    { name:'Waxing Crescent',    icon:'🌒', brief:'Born under the first sliver of light. You are a builder of momentum, determined to push past resistance and grow.',
+      deep:'The Waxing Crescent soul was born into the struggle between old and new. You carry a fierce determination to break away from the past — family patterns, inherited beliefs, outdated ways of being — and forge something original. There is a pioneering quality to your spirit, but also a vulnerability: the new light is fragile and easily overwhelmed. Your gift is tenacity; your work is learning to trust that the light you carry will grow.' },
+    { name:'First Quarter',      icon:'🌓', brief:'Born at the moment of creative tension. You are a problem-solver who thrives on challenge and decisive action.',
+      deep:'The First Quarter soul was born at a crisis point — the Moon at 90° to the Sun, a square that demands action. You are wired for challenge. Where others see obstacles, you see the exact leverage point that will break things open. You may have grown up in an environment that required you to fight for what you wanted. Your gift is extraordinary decisiveness and the willingness to act when others hesitate. Your work is learning that not every situation requires a battle.' },
+    { name:'Waxing Gibbous',     icon:'🌔', brief:'Born on the edge of fullness. You are a refiner and perfectionist, driven to improve and analyse everything.',
+      deep:'The Waxing Gibbous soul was born just before the light reaches completion — and carries the restless energy of "almost there." You are a natural editor, analyst, and improver. You see what is missing, what could be better, what needs adjusting before something is truly ready. This is a tremendous gift in craft, work, and relationships — but the shadow is the feeling that nothing (including yourself) is ever quite good enough. Your work is learning when to stop refining and let the light arrive.' },
+    { name:'Full Moon',          icon:'🌕', brief:'Born under maximum illumination. You are magnetic, visible, and here to bring things to fruition and share your light.',
+      deep:'The Full Moon soul arrived at the peak of the lunar cycle — everything illuminated, nothing hidden. You are naturally visible. People notice you, are drawn to you, react to you. Relationships are the central arena of your life: you understand yourself most clearly through the mirror of others. You may swing between extremes — objectivity and subjectivity, self and other, giving and receiving. Your gift is the capacity to hold opposites in balance. Your work is integrating what the full light reveals about your own shadow.' },
+    { name:'Waning Gibbous',     icon:'🌖', brief:'Born in the phase of sharing wisdom. You are a natural teacher, mentor, and communicator of meaning.',
+      deep:'The Waning Gibbous soul (also called the Disseminating Moon) was born after the peak — carrying light that is meant to be shared. You are a natural teacher, writer, or mentor. Knowledge is not something you hoard; it burns in you until you have given it away. You may feel a deep sense of purpose connected to spreading ideas, wisdom, or healing. Your gift is the ability to make complex things accessible. Your work is ensuring you continue to learn, not just teach.' },
+    { name:'Last Quarter',       icon:'🌗', brief:'Born at the turning point. You are a revolutionary thinker who questions established systems and forges new values.',
+      deep:'The Last Quarter soul was born at another crisis point — but this one faces backward, dismantling what no longer serves. You are a natural revolutionary, not necessarily in a political sense, but in the way you question assumptions that everyone else takes for granted. You may feel out of step with mainstream culture, and that is by design. Your gift is the courage to tear down outdated structures — in your own life and in the world. Your work is building something meaningful in the space you clear.' },
+    { name:'Waning Crescent',    icon:'🌘', brief:'Born in the final surrender before rebirth. You are an old soul, deeply intuitive, drawn to closure and spiritual depth.',
+      deep:'The Waning Crescent soul (also called the Balsamic Moon) was born in the last breath of the lunar cycle — the dark before the new beginning. You carry the feeling of having lived before, of knowing things you were never taught. You are drawn to endings, to letting go, to the spiritual dimensions of existence. Solitude nourishes you. You may feel that your purpose is not about building something visible but about completing something invisible — a karmic cycle, a spiritual task. Your gift is profound intuitive wisdom. Your work is trusting that the darkness you inhabit is not emptiness but gestation.' },
+  ];
+  return PHASES[phase];
+}
+
 function normalise(deg) { return ((deg % 360) + 360) % 360; }
 function signOf(deg)    { return Math.floor(normalise(deg) / 30); }
 function degInSign(deg) { return normalise(deg) % 30; }
+function midheaven(jd, lonDeg) {
+  const T = (jd - 2451545.0) / 36525;
+  const GMST = normalise(280.46061837 + 360.98564736629 * (jd - 2451545.0)
+               + 0.000387933 * T * T - T * T * T / 38710000);
+  const RAMC = normalise(GMST + lonDeg) * Math.PI / 180;
+  const eps = (23.439291111 - 0.013004167 * T) * Math.PI / 180;
+  return normalise(Math.atan2(Math.sin(RAMC), Math.cos(RAMC) * Math.cos(eps)) * 180 / Math.PI);
+}
+
+function placidusCusps(ascLon, mcLon, jd, latDeg, lonDeg) {
+  const T = (jd - 2451545.0) / 36525;
+  const eps = (23.439291111 - 0.013004167 * T) * Math.PI / 180;
+  const phi = latDeg * Math.PI / 180;
+  const GMST = normalise(280.46061837 + 360.98564736629 * (jd - 2451545.0)
+               + 0.000387933 * T * T - T * T * T / 38710000);
+  const RAMC = normalise(GMST + lonDeg);
+
+  function eclRA(lon) {
+    const l = lon * Math.PI / 180;
+    return normalise(Math.atan2(Math.sin(l) * Math.cos(eps), Math.cos(l)) * 180 / Math.PI);
+  }
+  function eclDec(lon) {
+    return Math.asin(Math.sin(eps) * Math.sin(lon * Math.PI / 180));
+  }
+  function raToEcl(ra) {
+    const r = ra * Math.PI / 180;
+    return normalise(Math.atan2(Math.sin(r), Math.cos(r) * Math.cos(eps)) * 180 / Math.PI);
+  }
+  function getDSA(dec) {
+    const x = -Math.tan(phi) * Math.tan(dec);
+    if (x >= 1) return 0;
+    if (x <= -1) return 180;
+    return Math.acos(x) * 180 / Math.PI;
+  }
+
+  function findCusp(dsaK, nsaK) {
+    let lam = raToEcl(normalise(RAMC + dsaK * 90 + nsaK * 90));
+    for (let i = 0; i < 30; i++) {
+      const d = getDSA(eclDec(lam));
+      const target = normalise(RAMC + dsaK * d + nsaK * (180 - d));
+      const ra = eclRA(lam);
+      let diff = target - ra;
+      if (diff > 180) diff -= 360;
+      if (diff < -180) diff += 360;
+      if (Math.abs(diff) < 0.01) break;
+      lam = normalise(lam + diff);
+    }
+    return normalise(lam);
+  }
+
+  const c = [];
+  c[10] = mcLon;
+  c[1]  = ascLon;
+  c[4]  = normalise(mcLon + 180);
+  c[7]  = normalise(ascLon + 180);
+  c[11] = findCusp(1/3, 0);
+  c[12] = findCusp(2/3, 0);
+  c[2]  = findCusp(1, 1/3);
+  c[3]  = findCusp(1, 2/3);
+  c[5]  = findCusp(-1, -2/3);
+  c[6]  = findCusp(-1, -1/3);
+  c[8]  = findCusp(-2/3, 0);
+  c[9]  = findCusp(-1/3, 0);
+  return c;
+}
+
+function houseOf(lon, cusps) {
+  const p = normalise(lon);
+  for (let h = 1; h <= 12; h++) {
+    const start = cusps[h];
+    const end = cusps[h < 12 ? h + 1 : 1];
+    const a = ((end - start + 360) % 360);
+    if (((p - start + 360) % 360) < a) return h;
+  }
+  return 1;
+}
+
+const HOUSE_NAMES = [
+  '','1st House','2nd House','3rd House','4th House','5th House','6th House',
+  '7th House','8th House','9th House','10th House','11th House','12th House'
+];
+
+const HOUSE_BRIEF = {
+  1:  'Self, identity, physical appearance, and first impressions.',
+  2:  'Values, possessions, self-worth, and personal resources.',
+  3:  'Communication, siblings, short journeys, and local community.',
+  4:  'Home, family, roots, ancestry, and emotional foundations.',
+  5:  'Creativity, romance, children, play, and self-expression.',
+  6:  'Health, daily routines, work, service, and personal refinement.',
+  7:  'Partnerships, marriage, one-to-one relationships, and open rivals.',
+  8:  'Transformation, shared resources, intimacy, death and rebirth.',
+  9:  'Philosophy, higher education, long-distance travel, and beliefs.',
+  10: 'Career, public reputation, ambition, and life direction.',
+  11: 'Friendships, groups, hopes, social causes, and collective vision.',
+  12: 'Spirituality, the unconscious, solitude, hidden strengths, and surrender.',
+};
 
 function sunLongitude(jd) {
   const T  = (jd - 2451545.0) / 36525;
@@ -1724,9 +2326,16 @@ function calculate() {
   const pluLon  = planetLongitude(JD, { L0c:238.929, L0d:144.9600, Mc:14.882, Md:144.960, e:0.2488, a:39.482 });
   const nnLon   = northNodeLongitude(JD);
   const ascLon  = ascendant(JD, lat, lon, hour);
+  const mcLon   = midheaven(JD, lon);
+  const cusps   = placidusCusps(ascLon, mcLon, JD, lat, lon);
 
   gChartData = {
+    jd: JD,
+    lat,
+    lon,
     ascLon,
+    mcLon,
+    cusps,
     planets: [
       { name:'Sun',     glyph:'☉', lon: sunLon  },
       { name:'Moon',    glyph:'☽', lon: moonLon },
@@ -1771,9 +2380,19 @@ function calculate() {
   let wHtml = '';
   W.forEach((p, i) => {
     const s = signOf(p.lon);
-    const brief = W_BRIEF[p.label] ? W_BRIEF[p.label][s] : '';
-    const deep  = W_DEEP[p.label]  ? W_DEEP[p.label][s]  : brief;
-    wHtml += makeCard(p.icon, p.label, degStr(p.lon), brief, deep, i > 1);
+    const h = houseOf(p.lon, cusps);
+    const signBrief = W_BRIEF[p.label] ? W_BRIEF[p.label][s] : '';
+    const signDeep  = W_DEEP[p.label]  ? W_DEEP[p.label][s]  : signBrief;
+    const houseBrief = HOUSE_BRIEF[h] || '';
+    const value = p.label === 'Ascendant' ? degStr(p.lon) : `${degStr(p.lon)} · ${HOUSE_NAMES[h]}`;
+    const brief = p.label === 'Ascendant' ? signBrief : `${signBrief} This energy expresses through your ${HOUSE_NAMES[h]}: ${houseBrief.toLowerCase()}`;
+    const deep  = p.label === 'Ascendant' ? signDeep : `${signDeep}\n\nIn the ${HOUSE_NAMES[h]}: ${houseBrief} With ${p.label} here, the qualities of ${SIGNS[s]} are channelled into this life area — shaping how you approach ${houseBrief.split(',')[0].toLowerCase()}.`;
+    wHtml += makeCard(p.icon, p.label, value, brief, deep, i > 1);
+
+    if (p.label === 'Moon') {
+      const phase = getMoonPhase(sunLon, moonLon);
+      wHtml += makeCard(phase.icon, 'Moon Phase', phase.name, phase.brief, phase.deep, false);
+    }
   });
   document.getElementById('western-placements').innerHTML = wHtml;
 
@@ -2008,6 +2627,7 @@ function calculate() {
 
   buildNumerology(y, m, d);
   renderChartWheel();
+  renderAstrocartography();
 
   // Show results
   document.getElementById('results').classList.add('visible');
@@ -2154,8 +2774,8 @@ function setWesternView(view, btn) {
   document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('western-placements').style.display = view === 'placements' ? '' : 'none';
-  const wheel = document.getElementById('western-wheel');
-  wheel.style.display = view === 'wheel' ? 'block' : 'none';
+  document.getElementById('western-wheel').style.display = view === 'wheel' ? 'block' : 'none';
+  document.getElementById('western-astrocarto').style.display = view === 'astrocarto' ? 'block' : 'none';
 }
 
 function buildWheelSVG(planets, ascLon, gradId) {
@@ -2256,6 +2876,294 @@ function renderChartWheel() {
   if (!gChartData) return;
   document.getElementById('western-wheel').innerHTML = buildWheelSVG(gChartData.planets, gChartData.ascLon, 'wBg');
 }
+
+// ─────────────────────────────────────────────
+// ASTROCARTOGRAPHY
+// ─────────────────────────────────────────────
+
+function buildAstrocartographyMap(planets, jd, birthLat, birthLon) {
+  const W = 720, H = 360;
+  const T = (jd - 2451545.0) / 36525;
+  const GMST = normalise(280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T * T - T * T * T / 38710000);
+  const eps = (23.439291111 - 0.013004167 * T) * Math.PI / 180;
+
+  function eclToEquat(lonDeg) {
+    const l = lonDeg * Math.PI / 180;
+    const ra = Math.atan2(Math.sin(l) * Math.cos(eps), Math.cos(l)) * 180 / Math.PI;
+    const dec = Math.asin(Math.sin(eps) * Math.sin(l)) * 180 / Math.PI;
+    return { ra: normalise(ra), dec };
+  }
+
+  function normLon(d) { return ((d + 180) % 360 + 360) % 360 - 180; }
+  function toX(lon)   { return (normLon(lon) + 180) / 360 * W; }
+  function toY(lat)   { return (90 - lat) / 180 * H; }
+
+  function buildPath(pts) {
+    if (pts.length < 2) return '';
+    const segs = []; let cur = [pts[0]];
+    for (let i = 1; i < pts.length; i++) {
+      if (Math.abs(pts[i].x - pts[i-1].x) > W * 0.35) { if (cur.length > 1) segs.push(cur); cur = [pts[i]]; }
+      else cur.push(pts[i]);
+    }
+    if (cur.length > 1) segs.push(cur);
+    return segs.map(s => 'M' + s.map(p => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join('L')).join(' ');
+  }
+
+  const PCOLS = { Sun:'#f5d060', Moon:'#b0c4e8', Mercury:'#70c870', Venus:'#f090b0',
+    Mars:'#e06050', Jupiter:'#e0a050', Saturn:'#c0a870', Uranus:'#8B6914', Neptune:'#6a0dad', Pluto:'#a070b0' };
+
+  // Simplified continent paths — equirectangular 720×360 (x = (lon+180)*2, y = (90-lat)*2)
+  const CONTINENTS = [
+    "M24,38 L56,38 L78,40 L130,38 L190,36 L176,54 L188,70 L204,60 L236,64 L254,84 L240,92 L220,94 L212,100 L208,110 L198,120 L200,128 L196,130 L190,122 L180,122 L166,128 L166,136 L168,142 L180,138 L186,138 L186,146 L194,158 L200,162 L176,152 L160,146 L140,134 L126,114 L116,104 L112,84 L100,72 L80,62 L50,64 Z", // North America
+    "M272,60 L276,54 L284,50 L300,44 L316,36 L324,28 L300,14 L250,16 L244,24 L250,30 L254,40 L256,46 L260,52 L268,58 Z", // Greenland
+    "M206,164 L216,156 L226,158 L236,160 L244,166 L256,170 L264,180 L290,190 L290,196 L284,206 L280,220 L274,226 L266,230 L264,236 L258,240 L250,248 L244,250 L236,258 L230,266 L226,276 L220,286 L224,292 L210,284 L214,264 L216,246 L220,226 L218,214 L206,204 L200,184 L204,172 Z", // South America
+    "M412,38 L436,42 L448,50 L470,44 L500,42 L516,36 L540,34 L560,28 L576,26 L596,32 L616,34 L650,40 L680,48 L680,60 L674,76 L656,80 L644,86 L624,94 L618,100 L618,110 L612,112 L612,106 L604,104 L596,102 L604,118 L600,128 L588,136 L580,140 L576,148 L572,160 L566,176 L556,160 L544,140 L536,136 L526,146 L520,154 L518,162 L514,164 L512,160 L508,150 L506,142 L500,136 L494,130 L474,128 L470,144 L450,154 L436,136 L426,120 L430,116 L422,106 L414,102 L408,104 L404,106 L400,100 L396,100 L392,104 L386,98 L378,92 L370,94 L360,102 L350,108 L340,102 L344,92 L356,86 L352,84 L364,78 L370,76 L380,70 L380,66 L372,62 L370,54 L380,46 L396,42 Z", // Eurasia
+    "M349,80 L358,78 L363,78 L364,75 L361,74 L357,70 L354,68 L356,65 L353,63 L349,64 L348,68 L353,72 L349,76 L350,78 Z", // Great Britain
+    "M348,73 L349,70 L344,69 L340,72 L340,76 L344,77 L348,76 Z",                      // Ireland
+    "M316,52 L332,52 L334,48 L316,48 Z",                                                // Iceland
+    "M622,118 L630,112 L640,108 L642,100 L646,94 L650,90 L650,94 L644,102 L642,110 L630,116 Z", // Japan
+    "M520,166 L524,166 L524,160 L520,160 Z",                                            // Sri Lanka
+    "M348,108 L334,124 L326,138 L326,152 L330,158 L344,170 L364,168 L380,172 L378,180 L384,192 L386,212 L392,236 L396,250 L412,248 L422,240 L430,224 L440,202 L440,182 L452,170 L462,156 L446,156 L440,148 L432,138 L426,120 L424,118 L406,116 L380,106 L366,106 L356,108 Z", // Africa
+    "M448,206 L460,212 L456,230 L446,224 Z",                                           // Madagascar
+    "M646,202 L652,214 L658,222 L666,234 L662,248 L658,256 L650,256 L636,250 L626,246 L618,244 L604,248 L596,250 L590,248 L590,236 L586,232 L588,224 L596,220 L604,216 L616,210 L622,204 L632,204 L632,212 L638,214 L642,212 L644,204 Z", // Australia
+    "M650,262 L658,262 L658,268 L650,268 Z",                                           // Tasmania
+  ];
+
+  const CITIES = [
+    {n:'London',    lon:0,    lat:51.5}, {n:'Paris',    lon:2,   lat:49  },
+    {n:'Berlin',    lon:13,   lat:52.5}, {n:'Moscow',   lon:37,  lat:56  },
+    {n:'NYC',       lon:-74,  lat:41  }, {n:'LA',       lon:-118,lat:34  },
+    {n:'Chicago',   lon:-87,  lat:42  }, {n:'São Paulo', lon:-46, lat:-23},
+    {n:'Cairo',     lon:31,   lat:30  }, {n:'Cape Town', lon:18,  lat:-34},
+    {n:'Mumbai',    lon:73,   lat:19  }, {n:'Dubai',    lon:55,  lat:25  },
+    {n:'Tokyo',     lon:140,  lat:36  }, {n:'Sydney',   lon:151, lat:-34 },
+    {n:'Singapore', lon:104,  lat:1   }, {n:'Beijing',  lon:116, lat:40  },
+  ];
+
+  let out = '';
+
+  // Grid lines
+  for (let glon = -150; glon <= 180; glon += 30) {
+    const x = toX(glon);
+    out += `<line x1="${x|0}" y1="0" x2="${x|0}" y2="${H}" stroke="#ffffff09" stroke-width="0.5"/>`;
+    out += `<text x="${x|0}" y="${H-2}" text-anchor="middle" font-size="5.5" fill="#ffffff20" font-family="'Times New Roman',serif">${glon >= 0 ? glon+'°' : Math.abs(glon)+'W'}</text>`;
+  }
+  for (let glat = -60; glat <= 60; glat += 30) {
+    const y = toY(glat);
+    out += `<line x1="0" y1="${y|0}" x2="${W}" y2="${y|0}" stroke="#ffffff09" stroke-width="0.5"/>`;
+    out += `<text x="2" y="${y|0}" font-size="5.5" fill="#ffffff20" font-family="'Times New Roman',serif" dominant-baseline="central">${glat > 0 ? glat+'N' : glat < 0 ? Math.abs(glat)+'S' : 'EQ'}</text>`;
+  }
+
+  // Continents
+  CONTINENTS.forEach(p => { out += `<path d="${p}" fill="#c4b8da" stroke="#a89cc0" stroke-width="0.8"/>`; });
+
+  // African country borders (endpoints matched to coastline vertices)
+  const AF_BORDERS = [
+    // Sahara line (24°N) — coast (-15.5,24) to Chad/Sudan (24,24)
+    [[-15.5,24],[24,24]],
+    // Morocco/Algeria — coast (-2,36) south to Sahara
+    [[-2,36],[-8,24]],
+    // Tunisia/Libya — coast (10,37) south to Sahara
+    [[10,37],[12,24]],
+    // Libya/Egypt — coast (25,31.5) south to Egypt/Sudan line
+    [[25,31.5],[25,22]],
+    // Sahara N-S dividers to Niger/Nigeria line (14°N)
+    [[-5,24],[-5,14]],    // Mauritania/Mali
+    [[4,24],[4,14]],      // Mali/Niger
+    [[15,24],[15,14]],    // Niger/Chad
+    // Chad/Sudan — Sahara to Sudan/S.Sudan line
+    [[24,24],[24,10]],
+    // Niger/Nigeria E-W (14°N)
+    [[-5,14],[15,14]],
+    // Nigeria/Cameroon — down to coast (10,4)
+    [[14,14],[10,4]],
+    // Egypt/Sudan (22°N) — Libya/Egypt to Red Sea coast
+    [[25,22],[36,22]],
+    // Sudan/South Sudan (10°N)
+    [[24,10],[36,10]],
+    // S.Sudan to DRC connection
+    [[24,10],[30,4]],
+    // Ethiopia/Kenya (4°N) — to Somali coast
+    [[30,4],[46,5]],
+    // Uganda/Kenya
+    [[35,4],[35,-1]],
+    // DRC east border
+    [[30,4],[30,-10]],
+    // Kenya/Tanzania (4°S) — to coast (40,-4)
+    [[30,-4],[40,-4]],
+    // Tanzania/Mozambique — to coast (40,-11)
+    [[35,-10],[40,-11]],
+    // DRC/Angola — coast (12,-6) to Angola/Namibia
+    [[12,-6],[13.5,-17]],
+    // Angola/Namibia (17°S) — coast to interior
+    [[13.5,-17],[24,-17]],
+    // Zambia west border
+    [[24,-10],[24,-17]],
+    // DRC/Zambia
+    [[30,-10],[24,-15]],
+    // Zambia/Zimbabwe (15°S)
+    [[24,-15],[33,-15]],
+    // Namibia/Botswana (21°E)
+    [[21,-18],[21,-25]],
+    // Namibia/SA — coast (16.5,-29) to Botswana border
+    [[16.5,-29],[21,-29]],
+    // Botswana connector
+    [[21,-25],[21,-29]],
+    // Botswana/SA (25°S)
+    [[21,-25],[33,-25]],
+    // Zimbabwe/SA — to coast (35,-22)
+    [[28,-22],[35,-22]],
+    // Mozambique/Zimbabwe (33°E)
+    [[33,-15],[33,-25]],
+  ];
+  AF_BORDERS.forEach(([a,b]) => {
+    out += `<line x1="${toX(a[0])|0}" y1="${toY(a[1])|0}" x2="${toX(b[0])|0}" y2="${toY(b[1])|0}" stroke="#9888b0" stroke-width="0.4" opacity="0.5"/>`;
+  });
+
+  // Australian state labels
+  const AU_STATES = [
+    {n:'Western Australia', lon:122, lat:-26},
+    {n:'Northern Territory', lon:134, lat:-20},
+    {n:'South Australia', lon:136, lat:-30},
+    {n:'Queensland', lon:145, lat:-23},
+    {n:'New South Wales', lon:147, lat:-32},
+    {n:'Victoria', lon:145, lat:-37},
+    {n:'Tasmania', lon:147, lat:-42},
+    {n:'ACT', lon:149.1, lat:-35.3},
+  ];
+  AU_STATES.forEach(s => {
+    const sx = toX(s.lon), sy = toY(s.lat);
+    out += `<text x="${sx|0}" y="${sy|0}" text-anchor="middle" dominant-baseline="central" font-size="3.5" fill="#7a6b96" font-family="'Times New Roman',serif" font-weight="bold">${s.n}</text>`;
+  });
+
+  // Australian state/territory borders
+  const AU_BORDERS = [
+    [[129,-14.5],[129,-32]],    // WA|NT|SA at 129°E (N coast to S coast)
+    [[129,-26],[141,-26]],      // NT-SA / SA-QLD at -26°S
+    [[138,-17],[138,-26]],      // NT|QLD at 138°E (Gulf coast to -26°S)
+    [[141,-26],[141,-36.5]],    // SA|QLD then SA|NSW at 141°E
+    [[141,-29],[152.5,-29]],    // QLD|NSW at -29°S (to E coast)
+    [[141,-36],[149.5,-37.5]],  // NSW|VIC (to SE coast)
+  ];
+  AU_BORDERS.forEach(([a,b]) => {
+    out += `<line x1="${toX(a[0])|0}" y1="${toY(a[1])|0}" x2="${toX(b[0])|0}" y2="${toY(b[1])|0}" stroke="#9888b0" stroke-width="0.4" opacity="0.5"/>`;
+  });
+
+  // City reference dots
+  CITIES.forEach(c => {
+    const cx = toX(c.lon), cy = toY(c.lat);
+    out += `<circle cx="${cx|0}" cy="${cy|0}" r="1.5" fill="#444"/>`;
+    out += `<text x="${(cx+3)|0}" y="${cy|0}" font-size="5" fill="#333" font-family="'Times New Roman',serif" dominant-baseline="central">${c.n}</text>`;
+  });
+
+  // Planet lines (skip N.Node for clarity)
+  planets.filter(p => p.name !== 'N.Node').forEach(planet => {
+    const { ra, dec } = eclToEquat(planet.lon);
+    const col  = PCOLS[planet.name] || '#fff';
+    const outer = ['Uranus','Neptune','Pluto'].includes(planet.name);
+    const lw = outer ? 0.6 : 1.1;
+    const op = outer ? 0.4 : 0.88;
+    const dr = dec * Math.PI / 180;
+
+    // MC line — dashed vertical (planet on Midheaven)
+    const mcLon = normLon(ra - GMST);
+    const icLon = normLon(mcLon + 180);
+    const mcX = toX(mcLon), icX = toX(icLon);
+    out += `<line x1="${mcX|0}" y1="0" x2="${mcX|0}" y2="${H}" stroke="${col}" stroke-width="${lw}" opacity="${op}" stroke-dasharray="5,3"/>`;
+    out += `<line x1="${icX|0}" y1="0" x2="${icX|0}" y2="${H}" stroke="${col}" stroke-width="${lw*0.8}" opacity="${op*0.6}" stroke-dasharray="3,4"/>`;
+
+    // AC/DC curves — planet on Ascendant / Descendant
+    const acP = [], dcP = [];
+    for (let lat2 = -78; lat2 <= 78; lat2 += 1.5) {
+      const phi = lat2 * Math.PI / 180;
+      const cosH = -Math.tan(phi) * Math.tan(dr);
+      if (Math.abs(cosH) > 1) continue;
+      const Hd = Math.acos(cosH) * 180 / Math.PI;
+      acP.push({ x: toX(normLon(ra - Hd - GMST)), y: toY(lat2) });
+      dcP.push({ x: toX(normLon(ra + Hd - GMST)), y: toY(lat2) });
+    }
+
+    const ap = buildPath(acP), dp = buildPath(dcP);
+    if (ap) out += `<path d="${ap}" stroke="${col}" stroke-width="${lw * 1.5}" fill="none" opacity="${op}"/>`;
+    if (dp) out += `<path d="${dp}" stroke="${col}" stroke-width="${lw * 0.8}" fill="none" opacity="${op * 0.5}" stroke-dasharray="6,3"/>`;
+
+    // Labels — glyph + line type at top and bottom of MC/IC, midpoint of AC/DC
+    const fs = outer ? 6 : 7;
+    out += `<text x="${(mcX+2)|0}" y="${fs+2}" font-size="${fs}" fill="${col}" font-family="'Times New Roman',serif" opacity="${op}">${planet.glyph} MC</text>`;
+    out += `<text x="${(mcX+2)|0}" y="${H-3}" font-size="${fs}" fill="${col}" font-family="'Times New Roman',serif" opacity="${op}">${planet.glyph} MC</text>`;
+    out += `<text x="${(icX+2)|0}" y="${fs+2}" font-size="${fs-1}" fill="${col}" font-family="'Times New Roman',serif" opacity="${op*0.5}">${planet.glyph} IC</text>`;
+    out += `<text x="${(icX+2)|0}" y="${H-3}" font-size="${fs-1}" fill="${col}" font-family="'Times New Roman',serif" opacity="${op*0.5}">${planet.glyph} IC</text>`;
+    if (acP.length > 2) {
+      const am = acP[Math.floor(acP.length/2)];
+      out += `<text x="${(am.x+3)|0}" y="${(am.y-3)|0}" font-size="${fs}" fill="${col}" font-family="'Times New Roman',serif" opacity="${op}">${planet.glyph} AC</text>`;
+    }
+    if (dcP.length > 2) {
+      const dm = dcP[Math.floor(dcP.length/2)];
+      out += `<text x="${(dm.x+3)|0}" y="${(dm.y-3)|0}" font-size="${fs}" fill="${col}" font-family="'Times New Roman',serif" opacity="${op*0.6}">${planet.glyph} DC</text>`;
+    }
+  });
+
+
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;border-radius:0.6rem;border:1px solid #a78bfa22"><rect width="${W}" height="${H}" fill="#6BA3BE"/>${out}</svg>`;
+}
+
+function renderAstrocartography() {
+  if (!gChartData) return;
+  const el = document.getElementById('western-astrocarto');
+  if (!el) return;
+
+  const mapSVG = buildAstrocartographyMap(gChartData.planets, gChartData.jd, gChartData.lat || 0, gChartData.lon || 0);
+
+  const PINFO = [
+    { g:'☉', n:'Sun',     col:'#f5d060', m:'Radiance, identity, life purpose — you shine most brightly near these lines.' },
+    { g:'☽', n:'Moon',    col:'#b0c4e8', m:'Emotional comfort, intuition, and a deep sense of home and belonging.' },
+    { g:'☿', n:'Mercury', col:'#70c870', m:'Communication, intellect, learning, and creative expression.' },
+    { g:'♀', n:'Venus',   col:'#f090b0', m:'Love, beauty, pleasure, artistic inspiration, and attraction.' },
+    { g:'♂', n:'Mars',    col:'#e06050', m:'Energy, passion, ambition, courage, and physical vitality.' },
+    { g:'♃', n:'Jupiter', col:'#e0a050', m:'Expansion, good fortune, abundance, and spiritual growth.' },
+    { g:'♄', n:'Saturn',  col:'#c0a870', m:'Discipline, structure, karmic lessons, and hard-won achievement.' },
+    { g:'⛢', n:'Uranus',  col:'#8B6914', m:'Change, freedom, innovation — sudden breakthroughs (generational line).' },
+    { g:'♆', n:'Neptune', col:'#6a0dad', m:'Spirituality, creativity, dreams — dissolution and inspiration (generational line).' },
+    { g:'♇', n:'Pluto',   col:'#a070b0', m:'Transformation, power, deep psychological change (generational line).' },
+  ];
+
+  let legend = `<div style="margin-top:0.9rem;">
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.75rem;font-family:var(--sans);font-size:0.74rem;color:var(--muted);align-items:center;">
+      <span style="display:flex;align-items:center;gap:0.35rem;"><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="#aaa" stroke-width="1.5" stroke-dasharray="5,3"/></svg>MC (Midheaven)</span>
+      <span style="display:flex;align-items:center;gap:0.35rem;"><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="#aaa" stroke-width="1.2" stroke-dasharray="3,4"/></svg>IC (Imum Coeli)</span>
+      <span style="display:flex;align-items:center;gap:0.35rem;"><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="#aaa" stroke-width="1.5"/></svg>AC (Ascendant / rising)</span>
+      <span style="display:flex;align-items:center;gap:0.35rem;"><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="#aaa" stroke-width="1" stroke-dasharray="6,3"/></svg>DC (Descendant / setting)</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:0.45rem;margin-bottom:0.75rem;">`;
+
+  PINFO.forEach(p => {
+    legend += `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:0.4rem;padding:0.45rem 0.6rem;font-family:var(--sans);font-size:0.76rem;display:flex;gap:0.4rem;align-items:flex-start;">
+      <span style="color:${p.col};font-size:1rem;font-family:serif;line-height:1.2;flex-shrink:0">${p.g}</span>
+      <div><strong style="color:${p.col}">${p.n}:</strong> <span style="color:var(--muted)">${p.m}</span></div>
+    </div>`;
+  });
+
+  legend += `</div>
+    <p style="font-family:var(--sans);font-size:0.74rem;color:var(--muted);font-style:italic;text-align:center;">
+      ✦ The AC line most powerfully affects personal identity and energy. The MC line shapes career and public life. The IC line influences home, roots, and inner emotional life. The DC line shapes partnerships and relationships. Travelling to or living near a line activates that planet's qualities in your day-to-day experience.
+    </p>
+  </div>`;
+
+  el.innerHTML = `<div style="cursor:zoom-in" onclick="openLightbox()">${mapSVG}</div>` + legend;
+}
+
+function openLightbox() {
+  const src = document.querySelector('#western-astrocarto svg');
+  if (!src) return;
+  document.getElementById('lightbox-content').innerHTML = src.outerHTML;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLightbox(); });
 
 // ─────────────────────────────────────────────
 // COMPATIBILITY
@@ -2561,6 +3469,962 @@ function switchTab(system) {
   document.querySelectorAll('.system-panel').forEach(p => p.classList.remove('active'));
   document.querySelector(`.tab-btn[data-system="${system}"]`).classList.add('active');
   document.getElementById(`panel-${system}`).classList.add('active');
+}
+
+// ─────────────────────────────────────────────
+// SOCIAL SPHERE
+// ─────────────────────────────────────────────
+
+const SOCIAL_MAX = 5;
+const SOCIAL_KEY = 'astrosphere_social';
+let gEditingPersonId = null;
+
+const RELATION_ICONS = {
+  friend: '👋', family: '❤️', colleague: '💼', partner: '💜', other: '✦'
+};
+
+function getSocialPeople() {
+  try { return JSON.parse(localStorage.getItem(SOCIAL_KEY) || '[]'); } catch(e) { return []; }
+}
+function setSocialPeople(arr) { localStorage.setItem(SOCIAL_KEY, JSON.stringify(arr)); }
+
+function addSocialPerson() {
+  const people = getSocialPeople();
+
+  const name = (document.getElementById('socialName').value || '').trim();
+  if (!name) { alert('Please enter a name.'); return; }
+
+  const dob = document.getElementById('socialDOB').value;
+  if (!dob) { alert('Please enter a date of birth.'); return; }
+
+  const data = {
+    name,
+    relation: document.getElementById('socialRelation').value,
+    dob,
+    time:    document.getElementById('socialTime').value || '',
+    city:    document.getElementById('socialCity').value || '',
+    country: document.getElementById('socialCountry').value || '',
+    utc:     document.getElementById('socialUtc').value || '',
+  };
+
+  if (gEditingPersonId) {
+    const idx = people.findIndex(p => p.id === gEditingPersonId);
+    if (idx >= 0) {
+      people[idx] = { ...people[idx], ...data };
+      setSocialPeople(people);
+      alert(`✓ ${name} updated!`);
+    }
+    cancelSocialEdit();
+  } else {
+    if (people.length >= SOCIAL_MAX) {
+      alert(`You can save up to ${SOCIAL_MAX} people. Please remove someone to add a new person.`);
+      return;
+    }
+    data.id = Date.now();
+    people.push(data);
+    setSocialPeople(people);
+    clearSocialForm();
+    alert(`✓ ${name} added to your circle!`);
+  }
+  renderSocialList();
+}
+
+function clearSocialForm() {
+  document.getElementById('socialName').value = '';
+  document.getElementById('socialRelation').value = 'friend';
+  document.getElementById('socialDOB').value = '';
+  document.getElementById('socialTime').value = '';
+  document.getElementById('socialCity').value = '';
+  document.getElementById('socialCountry').value = '';
+  document.getElementById('socialUtc').value = '';
+}
+
+function deleteSocialPerson(id) {
+  let people = getSocialPeople();
+  const person = people.find(p => p.id === id);
+  if (!person) return;
+  if (!confirm(`Remove ${person.name} from your circle?`)) return;
+  people = people.filter(p => p.id !== id);
+  setSocialPeople(people);
+  renderSocialList();
+}
+
+function editSocialPerson(id) {
+  const people = getSocialPeople();
+  const person = people.find(p => p.id === id);
+  if (!person) return;
+  gEditingPersonId = id;
+  document.getElementById('socialName').value = person.name;
+  document.getElementById('socialRelation').value = person.relation;
+  document.getElementById('socialDOB').value = person.dob;
+  document.getElementById('socialTime').value = person.time;
+  document.getElementById('socialCity').value = person.city;
+  document.getElementById('socialCountry').value = person.country;
+  document.getElementById('socialUtc').value = person.utc;
+  document.getElementById('social-submit-btn').textContent = '✦ Save Changes ✦';
+  document.getElementById('social-cancel-btn').style.display = 'block';
+  document.getElementById('social-form').scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelSocialEdit() {
+  gEditingPersonId = null;
+  clearSocialForm();
+  document.getElementById('social-submit-btn').textContent = '✦ Add to My Circle ✦';
+  document.getElementById('social-cancel-btn').style.display = 'none';
+}
+
+function formatDOB(dob) {
+  if (!dob) return '';
+  const [y, m, d] = dob.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${parseInt(d)} ${months[parseInt(m)-1]} ${y}`;
+}
+
+function computeSocialChart(person) {
+  const [y, m, d] = person.dob.split('-').map(Number);
+  const [h, mi] = person.time ? person.time.split(':').map(Number) : [12, 0];
+  const hour = h + mi / 60;
+  const utcOff = parseFloat(person.utc) || 0;
+  const utcHour = hour - utcOff;
+  const JD = jdn(y, m, d) + (utcHour - 12) / 24;
+  const [lat, lon] = getCityCoords(person.city || '', person.country || '');
+
+  const sunLon  = sunLongitude(JD);
+  const moonLon = moonLongitude(JD);
+  const mercLon = planetLongitude(JD, PLANET_PARAMS.Mercury);
+  const venLon  = planetLongitude(JD, PLANET_PARAMS.Venus);
+  const marLon  = planetLongitude(JD, PLANET_PARAMS.Mars);
+  const jupLon  = planetLongitude(JD, PLANET_PARAMS.Jupiter);
+  const satLon  = planetLongitude(JD, PLANET_PARAMS.Saturn);
+  const uraLon  = planetLongitude(JD, PLANET_PARAMS.Uranus);
+  const nepLon  = planetLongitude(JD, PLANET_PARAMS.Neptune);
+  const pluLon  = planetLongitude(JD, { L0c:238.929, L0d:144.9600, Mc:14.882, Md:144.960, e:0.2488, a:39.482 });
+  const nnLon   = northNodeLongitude(JD);
+  const ascLon  = ascendant(JD, lat, lon, hour);
+
+  const signStr = (l) => `${SIGN_ICONS[signOf(l)]} ${SIGNS[signOf(l)]}`;
+
+  const moonPhase = getMoonPhase(sunLon, moonLon);
+
+  return {
+    sun: signStr(sunLon), moon: signStr(moonLon), rising: signStr(ascLon),
+    mercury: signStr(mercLon), venus: signStr(venLon), mars: signStr(marLon),
+    moonPhase,
+    ascLon,
+    planets: [
+      { name:'Sun',     glyph:'☉', lon: sunLon  },
+      { name:'Moon',    glyph:'☽', lon: moonLon },
+      { name:'Mercury', glyph:'☿', lon: mercLon },
+      { name:'Venus',   glyph:'♀', lon: venLon  },
+      { name:'Mars',    glyph:'♂', lon: marLon  },
+      { name:'Jupiter', glyph:'♃', lon: jupLon  },
+      { name:'Saturn',  glyph:'♄', lon: satLon  },
+      { name:'Uranus',  glyph:'⛢', lon: uraLon  },
+      { name:'Neptune', glyph:'♆', lon: nepLon  },
+      { name:'Pluto',   glyph:'♇', lon: pluLon  },
+      { name:'N.Node',  glyph:'☊', lon: nnLon   },
+    ]
+  };
+}
+
+function viewMyChart() {
+  if (!gChartData) {
+    alert('Please reveal your chart on the AstroSphere page first.');
+    return;
+  }
+  const svg = buildWheelSVG(gChartData.planets, gChartData.ascLon, 'myChart');
+  const sunSign = SIGN_ICONS[signOf(gChartData.planets[0].lon)] + ' ' + SIGNS[signOf(gChartData.planets[0].lon)];
+  const moonSign = SIGN_ICONS[signOf(gChartData.planets[1].lon)] + ' ' + SIGNS[signOf(gChartData.planets[1].lon)];
+  const risingSign = SIGN_ICONS[signOf(gChartData.ascLon)] + ' ' + SIGNS[signOf(gChartData.ascLon)];
+  const title = `<div style="text-align:center;padding:1rem 0 0.5rem;">
+    <h2 style="font-size:1.4rem;color:#fbbf24;font-family:'Danfo',serif;margin-bottom:0.3rem;">Your Birth Chart</h2>
+    <p style="color:#94a3b8;font-size:0.85rem;font-family:var(--sans);">
+      ☉ ${sunSign} &nbsp;·&nbsp; ☽ ${moonSign} &nbsp;·&nbsp; ↑ ${risingSign}
+    </p>
+  </div>`;
+  document.getElementById('lightbox-content').innerHTML = title + svg;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function viewSocialChart(id) {
+  const people = getSocialPeople();
+  const person = people.find(p => p.id === id);
+  if (!person) return;
+  const chart = computeSocialChart(person);
+  const svg = buildWheelSVG(chart.planets, chart.ascLon, 'social_' + id);
+  const title = `<div style="text-align:center;padding:1rem 0 0.5rem;">
+    <h2 style="font-size:1.4rem;color:#e879f9;font-family:'Danfo',serif;margin-bottom:0.3rem;">${person.name}'s Birth Chart</h2>
+    <p style="color:#94a3b8;font-size:0.85rem;font-family:var(--sans);">
+      ☉ ${chart.sun} &nbsp;·&nbsp; ☽ ${chart.moon} &nbsp;·&nbsp; ↑ ${chart.rising}
+    </p>
+    <p style="color:#c0c0e0;font-size:0.82rem;font-family:var(--sans);margin-top:0.25rem;">
+      ${chart.moonPhase.icon} Born under a ${chart.moonPhase.name}
+    </p>
+  </div>`;
+  document.getElementById('lightbox-content').innerHTML = title + svg;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function renderSocialList() {
+  const people = getSocialPeople();
+  const el = document.getElementById('social-list');
+  const limitEl = document.getElementById('social-limit');
+
+  limitEl.textContent = `${people.length} / ${SOCIAL_MAX} people in your circle`;
+
+  if (people.length === 0) {
+    el.innerHTML = `<div class="form-card" style="text-align:center;">
+      <p style="color:var(--muted);font-family:var(--sans);font-size:0.95rem;">
+        Your circle is empty — add someone above to get started.
+      </p>
+    </div>`;
+    return;
+  }
+
+  let html = '';
+  people.forEach(p => {
+    const icon = RELATION_ICONS[p.relation] || '✦';
+    const chart = computeSocialChart(p);
+    html += `<div class="social-card" style="cursor:pointer" onclick="viewSocialChart(${p.id})">
+      <div class="social-avatar ${p.relation}">${icon}</div>
+      <div class="social-info">
+        <h3>${p.name}</h3>
+        <div class="social-relation">${p.relation}</div>
+        <div class="social-details">
+          <span>Born:</span> ${formatDOB(p.dob)}${p.time ? ' at ' + p.time : ''}<br>
+          ${p.city || p.country ? '<span>Place:</span> ' + [p.city, p.country].filter(Boolean).join(', ') + '<br>' : ''}
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.6rem;font-family:var(--sans);font-size:0.8rem;">
+          <span style="color:#f5d060">☉ ${chart.sun}</span>
+          <span style="color:#b0c4e8">☽ ${chart.moon}</span>
+          <span style="color:#e879f9">↑ ${chart.rising}</span>
+          <span style="color:#c0c0e0">${chart.moonPhase.icon} ${chart.moonPhase.name}</span>
+        </div>
+        <div style="font-family:var(--sans);font-size:0.7rem;color:var(--muted);margin-top:0.5rem;font-style:italic;">Tap to view full birth chart</div>
+      </div>
+      <div class="social-actions" onclick="event.stopPropagation()">
+        <button onclick="editSocialPerson(${p.id})">✏️ Edit</button>
+        <button class="delete-btn" onclick="deleteSocialPerson(${p.id})">🗑</button>
+      </div>
+    </div>`;
+  });
+
+  el.innerHTML = html;
+  renderSolarSystem(people);
+}
+
+function renderSolarSystem(people) {
+  const el = document.getElementById('solar-system');
+  if (!people || people.length === 0) { el.innerHTML = ''; return; }
+
+  const CX = 250, CY = 250;
+  const ORBIT_R = { partner: 65, family: 100, friend: 140, colleague: 175, other: 205 };
+  const ORBIT_ORDER = ['partner','family','friend','colleague','other'];
+  const RELATION_COLS = {
+    partner: '#e879f9', family: '#fb7185', friend: '#a78bfa', colleague: '#fbbf24', other: '#67e8f9'
+  };
+
+  const usedOrbits = new Set(people.map(p => p.relation));
+
+  let svg = `<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:500px;display:block;margin:0 auto">`;
+
+  svg += `<defs>
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="60%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </radialGradient>
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>`;
+
+  svg += `<circle cx="${CX}" cy="${CY}" r="240" fill="#0a0a1a"/>`;
+
+  ORBIT_ORDER.forEach(rel => {
+    if (!usedOrbits.has(rel)) return;
+    const r = ORBIT_R[rel];
+    const col = RELATION_COLS[rel];
+    svg += `<circle cx="${CX}" cy="${CY}" r="${r}" fill="none" stroke="${col}" stroke-width="0.5" opacity="0.3" stroke-dasharray="4,4"/>`;
+    svg += `<text x="${CX}" y="${CY - r - 4}" text-anchor="middle" font-size="7" fill="${col}" opacity="0.5" font-family="'Times New Roman',serif">${rel}</text>`;
+  });
+
+  svg += `<g style="cursor:pointer" onclick="viewMyChart()">`;
+  svg += `<circle cx="${CX}" cy="${CY}" r="28" fill="url(#sunGlow)" filter="url(#softGlow)"/>`;
+  svg += `<circle cx="${CX}" cy="${CY}" r="18" fill="#fde68a" opacity="0.9"/>`;
+  svg += `<text x="${CX}" y="${CY + 1}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#78350f" font-family="'Times New Roman',serif" font-weight="bold">You</text>`;
+  svg += `</g>`;
+
+  const byOrbit = {};
+  people.forEach(p => {
+    if (!byOrbit[p.relation]) byOrbit[p.relation] = [];
+    byOrbit[p.relation].push(p);
+  });
+
+  Object.keys(byOrbit).forEach(rel => {
+    const group = byOrbit[rel];
+    const r = ORBIT_R[rel];
+    const col = RELATION_COLS[rel];
+    const startAngle = -Math.PI / 2;
+
+    group.forEach((p, i) => {
+      const angle = startAngle + (i / group.length) * 2 * Math.PI;
+      const px = CX + r * Math.cos(angle);
+      const py = CY + r * Math.sin(angle);
+
+      const chart = computeSocialChart(p);
+      const sunIdx = signOf(sunLongitude(jdn(...p.dob.split('-').map(Number))));
+      const glyph = SIGN_ICONS[sunIdx];
+
+      svg += `<g style="cursor:pointer" onclick="viewSocialChart(${p.id})">`;
+      svg += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="20" fill="${col}22" stroke="${col}" stroke-width="1.2"/>`;
+      svg += `<text x="${px.toFixed(1)}" y="${(py - 3).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="14" fill="${col}" font-family="serif">${glyph}</text>`;
+      svg += `<text x="${px.toFixed(1)}" y="${(py + 11).toFixed(1)}" text-anchor="middle" font-size="7" fill="${col}" font-family="'Times New Roman',serif" font-weight="bold">${p.name}</text>`;
+      svg += `</g>`;
+
+      svg += `<line x1="${CX}" y1="${CY}" x2="${px.toFixed(1)}" y2="${py.toFixed(1)}" stroke="${col}" stroke-width="0.4" opacity="0.15"/>`;
+    });
+  });
+
+  svg += `</svg>`;
+
+  const legend = ORBIT_ORDER.filter(r => usedOrbits.has(r)).map(r =>
+    `<span style="color:${RELATION_COLS[r]}">● ${r.charAt(0).toUpperCase() + r.slice(1)}</span>`
+  ).join('&nbsp;&nbsp;');
+
+  el.innerHTML = `<div style="margin-top:2rem;">
+    <div style="text-align:center;margin-bottom:1rem;">
+      <h2 style="font-size:1.4rem;background:linear-gradient(135deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:'Danfo',serif;letter-spacing:0.05em;">Your Solar System</h2>
+      <p style="color:var(--muted);font-size:0.85rem;font-style:italic;font-family:var(--sans);">Tap a planet to view their birth chart</p>
+    </div>
+    <div style="position:relative;">
+      ${svg}
+      <button class="btn-insights" onclick="showInsights()">✦ Insights</button>
+    </div>
+    <div style="text-align:center;font-family:var(--sans);font-size:0.78rem;margin-top:0.75rem;">${legend}</div>
+  </div>`;
+}
+
+function showInsights() {
+  const people = getSocialPeople();
+  if (people.length < 2) { alert('Add at least 2 people to see insights.'); return; }
+
+  const charts = people.map(p => ({ ...p, chart: computeSocialChart(p) }));
+  const total = charts.length;
+  const ELEMENTS = { Aries:'Fire',Taurus:'Earth',Gemini:'Air',Cancer:'Water',Leo:'Fire',Virgo:'Earth',Libra:'Air',Scorpio:'Water',Sagittarius:'Fire',Capricorn:'Earth',Aquarius:'Air',Pisces:'Water' };
+  const MODALITIES = { Aries:'Cardinal',Taurus:'Fixed',Gemini:'Mutable',Cancer:'Cardinal',Leo:'Fixed',Virgo:'Mutable',Libra:'Cardinal',Scorpio:'Fixed',Sagittarius:'Mutable',Capricorn:'Cardinal',Aquarius:'Fixed',Pisces:'Mutable' };
+
+  function signName(chartStr) { return chartStr.split(' ').slice(1).join(' '); }
+  function pct(n) { return Math.round((n / total) * 100); }
+
+  const sunSigns = charts.map(c => signName(c.chart.sun));
+  const moonSigns = charts.map(c => signName(c.chart.moon));
+  const risingSigns = charts.map(c => signName(c.chart.rising));
+
+  function countMap(arr) {
+    const m = {};
+    arr.forEach(v => { m[v] = (m[v] || 0) + 1; });
+    return m;
+  }
+  function topEntry(m) {
+    let top = '', max = 0;
+    for (const k in m) { if (m[k] > max) { max = m[k]; top = k; } }
+    return { sign: top, count: max };
+  }
+
+  const sunMap = countMap(sunSigns);
+  const moonMap = countMap(moonSigns);
+  const risingMap = countMap(risingSigns);
+  const topSun = topEntry(sunMap);
+  const topMoon = topEntry(moonMap);
+  const topRising = topEntry(risingMap);
+
+  const sunElements = countMap(sunSigns.map(s => ELEMENTS[s]));
+  const topElement = topEntry(sunElements);
+  const moonElements = countMap(moonSigns.map(s => ELEMENTS[s]));
+  const topMoonElement = topEntry(moonElements);
+  const sunModalities = countMap(sunSigns.map(s => MODALITIES[s]));
+  const topModality = topEntry(sunModalities);
+
+  const allSigns = [...sunSigns, ...moonSigns, ...risingSigns];
+  const allMap = countMap(allSigns);
+  const topOverall = topEntry(allMap);
+
+  const relationMap = countMap(charts.map(c => c.relation));
+
+  const insights = [];
+
+  if (topSun.count > 1)
+    insights.push(`☉ ${pct(topSun.count)}% of your circle are <strong>${topSun.sign}</strong> Suns — that's ${topSun.count} out of ${total} people!`);
+
+  if (topMoon.count > 1)
+    insights.push(`☽ ${pct(topMoon.count)}% of your circle have a <strong>${topMoon.sign}</strong> Moon — you're drawn to that emotional wavelength.`);
+
+  if (topRising.count > 1)
+    insights.push(`↑ ${pct(topRising.count)}% have a <strong>${topRising.sign}</strong> Rising — you clearly vibe with that energy.`);
+
+  insights.push(`🔥 The dominant element in your circle is <strong>${topElement.sign}</strong> — ${pct(topElement.count)}% of Sun signs are ${topElement.sign} signs.`);
+
+  if (topMoonElement.sign !== topElement.sign)
+    insights.push(`💧 Emotionally, your circle leans <strong>${topMoonElement.sign}</strong> — ${pct(topMoonElement.count)}% of Moon signs are ${topMoonElement.sign} signs.`);
+
+  insights.push(`⚡ The dominant modality is <strong>${topModality.sign}</strong> — your circle tends to be ${topModality.sign === 'Cardinal' ? 'initiators and leaders' : topModality.sign === 'Fixed' ? 'steady and determined' : 'adaptable and flexible'}.`);
+
+  insights.push(`✦ The most common sign across ALL placements is <strong>${topOverall.sign}</strong> — appearing ${topOverall.count} times in Sun, Moon & Rising combined.`);
+
+  const uniqueSuns = Object.keys(sunMap).length;
+  if (uniqueSuns === total)
+    insights.push(`🌈 Every person in your circle has a <strong>different</strong> Sun sign — you attract variety!`);
+
+  if (gChartData) {
+    const userSun = SIGNS[signOf(gChartData.planets[0].lon)];
+    const userElement = ELEMENTS[userSun];
+    const sameElement = sunSigns.filter(s => ELEMENTS[s] === userElement).length;
+    if (sameElement > 0)
+      insights.push(`🤝 ${pct(sameElement)}% of your circle share your <strong>${userElement}</strong> element — a natural kinship.`);
+
+    const sameSun = sunSigns.filter(s => s === userSun).length;
+    if (sameSun > 0)
+      insights.push(`👯 ${sameSun} of your ${total} people ${sameSun === 1 ? 'is' : 'are'} also a <strong>${userSun}</strong> Sun — just like you!`);
+    else
+      insights.push(`🦄 None of your circle share your <strong>${userSun}</strong> Sun sign — you bring something unique to the group.`);
+  }
+
+  for (const rel in relationMap) {
+    const relPeople = charts.filter(c => c.relation === rel);
+    const relSuns = countMap(relPeople.map(c => signName(c.chart.sun)));
+    const relTop = topEntry(relSuns);
+    if (relPeople.length >= 2 && relTop.count >= 2)
+      insights.push(`${RELATION_ICONS[rel]} ${pct(relTop.count)}% of your <strong>${rel}s</strong> are <strong>${relTop.sign}</strong> Suns.`);
+  }
+
+  const shuffled = insights.sort(() => Math.random() - 0.5);
+  const display = shuffled.slice(0, 6);
+
+  let html = `<div style="text-align:center;padding:1.5rem 0 1rem;">
+    <h2 style="font-size:1.4rem;background:linear-gradient(135deg,#fbbf24,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:'Danfo',serif;margin-bottom:0.3rem;">✦ Circle Insights ✦</h2>
+    <p style="color:#94a3b8;font-size:0.82rem;font-family:var(--sans);font-style:italic;">Patterns and connections in your cosmic circle</p>
+  </div>
+  <div style="max-width:480px;margin:0 auto;">`;
+
+  display.forEach(insight => {
+    html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:0.75rem;padding:1rem 1.25rem;margin-bottom:0.6rem;font-family:var(--sans);font-size:0.88rem;color:var(--text);line-height:1.6;">${insight}</div>`;
+  });
+
+  html += `<div style="text-align:center;margin-top:0.75rem;">
+    <button class="btn-cart" onclick="event.stopPropagation();showInsights()" style="font-size:0.78rem;">🔄 Shuffle Insights</button>
+  </div></div>`;
+
+  document.getElementById('lightbox-content').innerHTML = html;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+window.addEventListener('load', function() {
+  renderSocialList();
+});
+
+// ─────────────────────────────────────────────
+// ASTRO EMPORIUM
+// ─────────────────────────────────────────────
+
+const PRODUCTS = [
+  { name:'Amethyst Cluster',        icon:'🔮', cat:'Crystals',    price:'£18.00', signs:['Pisces','Aquarius','Virgo'],       desc:'Calming intuition stone. Opens the third eye and deepens meditation.' },
+  { name:'Rose Quartz Heart',       icon:'💗', cat:'Crystals',    price:'£12.00', signs:['Taurus','Libra','Cancer'],         desc:'The stone of unconditional love. Attracts romance and heals the heart chakra.' },
+  { name:'Citrine Point',           icon:'✨', cat:'Crystals',    price:'£15.00', signs:['Leo','Aries','Gemini'],            desc:'Manifestation powerhouse. Attracts abundance, confidence, and solar energy.' },
+  { name:'Black Tourmaline Tower',  icon:'🖤', cat:'Crystals',    price:'£14.00', signs:['Scorpio','Capricorn','Sagittarius'], desc:'Ultimate protection stone. Shields against negative energy and grounds you deeply.' },
+  { name:'Moonstone Palm Stone',    icon:'🌙', cat:'Crystals',    price:'£16.00', signs:['Cancer','Pisces','Libra'],         desc:'Channels lunar energy. Enhances intuition, emotional balance, and feminine power.' },
+  { name:'Lapis Lazuli Sphere',     icon:'🔵', cat:'Crystals',    price:'£22.00', signs:['Sagittarius','Aquarius','Pisces'], desc:'Stone of wisdom and truth. Stimulates intellectual insight and spiritual awakening.' },
+  { name:'Carnelian Tumble Set',    icon:'🔶', cat:'Crystals',    price:'£10.00', signs:['Aries','Leo','Virgo'],             desc:'Fires up creativity and courage. Energises the sacral chakra and boosts vitality.' },
+  { name:'Selenite Charging Plate', icon:'🤍', cat:'Crystals',    price:'£20.00', signs:['Gemini','Taurus','Cancer'],        desc:'Purifies other crystals and spaces. A self-cleansing, high-vibration essential.' },
+
+  { name:'The Only Astrology Book You\'ll Ever Need', icon:'📖', cat:'Books', price:'£14.99', signs:['Gemini','Virgo','Aquarius'],     desc:'The classic comprehensive guide to understanding your entire birth chart.' },
+  { name:'Lunar Abundance',          icon:'📘', cat:'Books', price:'£12.99', signs:['Cancer','Pisces','Taurus'],           desc:'Harness the power of the Moon\'s cycles to manifest your intentions.' },
+  { name:'Astrology for the Soul',   icon:'📗', cat:'Books', price:'£13.99', signs:['Scorpio','Pisces','Cancer'],          desc:'North Node astrology — discover your soul\'s purpose and karmic path.' },
+  { name:'The Stars Within You',     icon:'📕', cat:'Books', price:'£16.99', signs:['Leo','Libra','Sagittarius'],          desc:'A modern guide to astrology with stunning illustrations and clear wisdom.' },
+  { name:'Chani Nicholas: You Were Born for This', icon:'📙', cat:'Books', price:'£11.99', signs:['Aries','Capricorn','Aquarius'], desc:'A radical guide to finding your purpose through your Sun, Moon, and Rising.' },
+
+  { name:'Rider-Waite Tarot Deck',  icon:'🃏', cat:'Tarot & Oracle', price:'£19.99', signs:['Scorpio','Pisces','Aquarius'],    desc:'The timeless classic tarot deck. Essential for beginners and seasoned readers alike.' },
+  { name:'Moonology Oracle Cards',   icon:'🌕', cat:'Tarot & Oracle', price:'£15.99', signs:['Cancer','Pisces','Libra'],        desc:'Work with the Moon\'s phases for guidance, clarity, and manifestation.' },
+  { name:'The Starseed Oracle',      icon:'⭐', cat:'Tarot & Oracle', price:'£18.99', signs:['Aquarius','Sagittarius','Pisces'], desc:'53 cards channelling cosmic wisdom for lightworkers and starseeds.' },
+  { name:'Work Your Light Oracle',   icon:'💫', cat:'Tarot & Oracle', price:'£16.99', signs:['Leo','Gemini','Libra'],           desc:'Intuitive oracle deck for connecting with your higher self and spirit guides.' },
+
+  { name:'Zodiac Soy Candle',       icon:'🕯️', cat:'Candles & Incense', price:'£9.99',  signs:['Taurus','Cancer','Libra'],        desc:'Hand-poured soy candle infused with essential oils matched to your sign.' },
+  { name:'Palo Santo Sticks (6pk)', icon:'🪵', cat:'Candles & Incense', price:'£8.99',  signs:['Sagittarius','Aries','Leo'],      desc:'Sacred wood for cleansing your space. Burns with a warm, grounding fragrance.' },
+  { name:'White Sage Smudge Bundle',icon:'🌿', cat:'Candles & Incense', price:'£7.99',  signs:['Virgo','Scorpio','Capricorn'],    desc:'Traditional purification herb. Clears stagnant energy from any space.' },
+  { name:'Incense Variety Box',     icon:'💨', cat:'Candles & Incense', price:'£11.99', signs:['Pisces','Libra','Taurus'],        desc:'Nag champa, sandalwood, lavender & frankincense. 40 sticks for every mood.' },
+
+  { name:'Astrology Birth Chart Journal', icon:'📓', cat:'Journals', price:'£14.99', signs:['Virgo','Gemini','Capricorn'],    desc:'Guided journal for recording your placements, transits, and cosmic reflections.' },
+  { name:'Lunar Phases Planner',     icon:'🌗', cat:'Journals', price:'£16.99', signs:['Cancer','Pisces','Taurus'],          desc:'12-month planner aligned with New and Full Moon cycles for intentional living.' },
+  { name:'Shadow Work Journal',      icon:'📔', cat:'Journals', price:'£13.99', signs:['Scorpio','Capricorn','Pisces'],      desc:'Deep-dive prompts for exploring your unconscious patterns and healing.' },
+  { name:'Gratitude & Manifestation Diary', icon:'📒', cat:'Journals', price:'£11.99', signs:['Leo','Sagittarius','Libra'],  desc:'Daily gratitude practice combined with New Moon intention-setting pages.' },
+
+  { name:'Luna Rose — Tarot Reader',         icon:'🔮', cat:'Creators', subcat:'Tarot Readers',   price:'From £25', signs:['Pisces','Scorpio','Cancer'],        desc:'Intuitive tarot readings with 15 years experience. Celtic Cross, love, and career spreads available.' },
+  { name:'Star Map Studio — Birth Chart Art', icon:'🎨', cat:'Creators', subcat:'Artists',         price:'From £35', signs:['Leo','Libra','Taurus'],            desc:'Custom birth chart prints on archival paper. A beautiful keepsake of your cosmic blueprint.' },
+  { name:'Cosmic Claire — Astrologer',        icon:'⭐', cat:'Creators', subcat:'Astrologers',     price:'From £40', signs:['Sagittarius','Aquarius','Gemini'],  desc:'Professional natal chart readings, transit forecasts, and relationship synastry consultations.' },
+  { name:'The Mystic Garden — Herbalist',     icon:'🌿', cat:'Creators', subcat:'Healers',         price:'From £15', signs:['Virgo','Taurus','Cancer'],          desc:'Handcrafted herbal blends and tinctures aligned with planetary hours and Moon phases.' },
+  { name:'Nadia Starlight — Medium',          icon:'🕯️', cat:'Creators', subcat:'Mediums',         price:'From £30', signs:['Pisces','Scorpio','Aquarius'],      desc:'Spiritual mediumship and channelling sessions. Connect with guides, ancestors, and loved ones.' },
+  { name:'Sacred Sound — Sound Healer',       icon:'🎵', cat:'Creators', subcat:'Healers',         price:'From £20', signs:['Libra','Pisces','Taurus'],          desc:'Crystal singing bowl and gong bath sessions. Tune your chakras to their natural frequency.' },
+  { name:'Alchemy & Ink — Astro Tattoo',      icon:'✒️', cat:'Creators', subcat:'Artists',         price:'From £50', signs:['Scorpio','Aries','Capricorn'],      desc:'Bespoke astrological tattoo designs based on your birth chart. Consultations via video call.' },
+  { name:'Zenith Coaching — Life Coach',      icon:'🧭', cat:'Creators', subcat:'Coaches',         price:'From £45', signs:['Capricorn','Sagittarius','Leo'],    desc:'Astrology-informed life coaching. Align your career, purpose, and relationships with your chart.' },
+];
+
+let gEmporiumFilter = 'All';
+let gCreatorSubFilter = 'All';
+
+function renderEmporium() {
+  const search = (document.getElementById('emporiumSearch').value || '').toLowerCase();
+  const filtersEl = document.getElementById('emporium-filters');
+  const recsEl = document.getElementById('emporium-recs');
+  const shopEl = document.getElementById('emporium-shop');
+
+  const categories = ['All', ...new Set(PRODUCTS.map(p => p.cat))];
+  let filterHtml = categories.map(c =>
+    `<button class="filter-btn${gEmporiumFilter === c ? ' active' : ''}" onclick="gEmporiumFilter='${c}';gCreatorSubFilter='All';renderEmporium()">${c}</button>`
+  ).join('');
+
+  if (gEmporiumFilter === 'Creators') {
+    const subcats = ['All', ...new Set(PRODUCTS.filter(p => p.cat === 'Creators').map(p => p.subcat))];
+    filterHtml += `<div style="width:100%;display:flex;gap:0.35rem;flex-wrap:wrap;justify-content:center;margin-top:0.5rem;">` +
+      subcats.map(s =>
+        `<button class="filter-btn${gCreatorSubFilter === s ? ' active' : ''}" style="font-size:0.72rem;padding:0.28rem 0.7rem;" onclick="gCreatorSubFilter='${s}';renderEmporium()">${s}</button>`
+      ).join('') + `</div>`;
+  }
+  filtersEl.innerHTML = filterHtml;
+
+  let filtered = PRODUCTS;
+  if (gEmporiumFilter !== 'All') filtered = filtered.filter(p => p.cat === gEmporiumFilter);
+  if (gEmporiumFilter === 'Creators' && gCreatorSubFilter !== 'All') filtered = filtered.filter(p => p.subcat === gCreatorSubFilter);
+  if (search) filtered = filtered.filter(p =>
+    p.name.toLowerCase().includes(search) ||
+    p.cat.toLowerCase().includes(search) ||
+    p.desc.toLowerCase().includes(search) ||
+    p.signs.some(s => s.toLowerCase().includes(search))
+  );
+
+  function productCard(p, recommended) {
+    return `<div class="product-card"${recommended ? ' style="border-color:#fbbf2444;box-shadow:0 0 20px rgba(251,191,36,0.1)"' : ''}>
+      ${recommended ? '<div style="font-size:0.7rem;color:#fbbf24;font-family:var(--sans);margin-bottom:0.4rem;">⭐ Recommended for your chart</div>' : ''}
+      <div class="product-icon">${p.icon}</div>
+      <div class="product-name">${p.name}</div>
+      <div class="product-cat">${p.cat}</div>
+      <div class="product-desc">${p.desc}</div>
+      <div class="product-signs">✦ ${p.signs.join(' · ')}</div>
+      <div class="product-price">${p.price}</div>
+      <button class="btn-cart" onclick="event.stopPropagation();alert('${p.cat === 'Creators' ? '✨' : '🛒'} ${p.name} — coming soon!')">${p.cat === 'Creators' ? 'Book Now' : 'Add to Cart'}</button>
+    </div>`;
+  }
+
+  if (gChartData && !search && gEmporiumFilter === 'All') {
+    const userSigns = new Set();
+    const sunS = SIGNS[signOf(gChartData.planets[0].lon)];
+    const moonS = SIGNS[signOf(gChartData.planets[1].lon)];
+    const risingS = SIGNS[signOf(gChartData.ascLon)];
+    userSigns.add(sunS); userSigns.add(moonS); userSigns.add(risingS);
+
+    const recs = PRODUCTS.filter(p => p.signs.some(s => userSigns.has(s)));
+    const top = recs.slice(0, 4);
+
+    if (top.length > 0) {
+      recsEl.innerHTML = `<div style="margin-bottom:2rem;">
+        <h2 style="text-align:center;font-size:1.2rem;color:#fbbf24;font-family:'Danfo',serif;letter-spacing:0.05em;margin-bottom:0.3rem;">✦ Picked for You ✦</h2>
+        <p style="text-align:center;font-family:var(--sans);font-size:0.82rem;color:var(--muted);margin-bottom:1rem;font-style:italic;">Based on your ${sunS} Sun, ${moonS} Moon & ${risingS} Rising</p>
+        <div class="shop-grid">${top.map(p => productCard(p, true)).join('')}</div>
+      </div>`;
+    } else {
+      recsEl.innerHTML = '';
+    }
+  } else {
+    recsEl.innerHTML = '';
+  }
+
+  const heading = search ? `Results for "${search}"` :
+    gEmporiumFilter !== 'All' ? gEmporiumFilter : 'All Products';
+  const count = filtered.length;
+
+  shopEl.innerHTML = `<div>
+    <h2 style="text-align:center;font-size:1.2rem;color:var(--accent);font-family:'Danfo',serif;letter-spacing:0.05em;margin-bottom:0.3rem;">${heading}</h2>
+    <p style="text-align:center;font-family:var(--sans);font-size:0.8rem;color:var(--muted);margin-bottom:1rem;">${count} item${count !== 1 ? 's' : ''}</p>
+    ${count > 0 ? `<div class="shop-grid">${filtered.map(p => productCard(p, false)).join('')}</div>` :
+    '<p style="text-align:center;color:var(--muted);font-family:var(--sans);font-size:0.9rem;">No products found — try a different search.</p>'}
+  </div>`;
+}
+
+// ─────────────────────────────────────────────
+// ASTRO AVATAR
+// ─────────────────────────────────────────────
+
+const AVATAR_STATE = {
+  skin: '#D2A077',
+  hair: 'long',
+  hairColor: '#2C1810',
+  outfit: 'Aquarius',
+  accessory: 'none',
+  aura: 'none',
+};
+
+const AVATAR_SKINS = [
+  { name:'Light',   color:'#FADCBC' },
+  { name:'Medium',  color:'#D2A077' },
+  { name:'Tan',     color:'#B07744' },
+  { name:'Brown',   color:'#8B5E3B' },
+  { name:'Cocoa',   color:'#6A4028' },
+  { name:'Deep',    color:'#4A2C17' },
+  { name:'Ebony',   color:'#2C1A0E' },
+];
+
+const AVATAR_HAIRS = ['short','medium','long','curly','updo','shaved','none'];
+const AVATAR_HAIR_COLORS = [
+  { name:'Black',    color:'#1a1a1a' },
+  { name:'Brown',    color:'#2C1810' },
+  { name:'Auburn',   color:'#8B3A1A' },
+  { name:'Blonde',   color:'#D4A843' },
+  { name:'Red',      color:'#C0392B' },
+  { name:'Silver',   color:'#A0A0B0' },
+  { name:'Pink',     color:'#E879F9' },
+  { name:'Blue',     color:'#67E8F9' },
+  { name:'Purple',   color:'#A78BFA' },
+];
+
+const ZODIAC_OUTFITS = {
+  Aries:       { color:'#E05040', color2:'#FF7860', accent:'#FFD700', label:'♈ Aries — Warrior Flame' },
+  Taurus:      { color:'#4A8060', color2:'#6DB88A', accent:'#F5E0C0', label:'♉ Taurus — Earth Garden' },
+  Gemini:      { color:'#F0C040', color2:'#FFE080', accent:'#4A90D0', label:'♊ Gemini — Twin Breeze' },
+  Cancer:      { color:'#C0C8E0', color2:'#E0E4F0', accent:'#B8D0F0', label:'♋ Cancer — Moonlit Pearl' },
+  Leo:         { color:'#D4920A', color2:'#FFB830', accent:'#FFF4C0', label:'♌ Leo — Golden Royale' },
+  Virgo:       { color:'#7A9A6A', color2:'#A0C090', accent:'#E8DCC0', label:'♍ Virgo — Sage Harvest' },
+  Libra:       { color:'#E0A0B8', color2:'#F0C0D0', accent:'#FFF0F4', label:'♎ Libra — Rose Harmony' },
+  Scorpio:     { color:'#5A1020', color2:'#8A2040', accent:'#FF4060', label:'♏ Scorpio — Dark Phoenix' },
+  Sagittarius: { color:'#7040B0', color2:'#9060D0', accent:'#E0C0FF', label:'♐ Sagittarius — Cosmic Archer' },
+  Capricorn:   { color:'#4A4A50', color2:'#6A6A70', accent:'#B0B0C0', label:'♑ Capricorn — Mountain Stone' },
+  Aquarius:    { color:'#2070C0', color2:'#40A0F0', accent:'#C0E8FF', label:'♒ Aquarius — Electric Star' },
+  Pisces:      { color:'#60B0A0', color2:'#80D0C0', accent:'#C0FFF0', label:'♓ Pisces — Ocean Dream' },
+};
+
+const ZODIAC_ACCESSORIES = {
+  none:        { label:'None' },
+  Aries:       { label:'♈ Ram Horns' },
+  Taurus:      { label:'♉ Flower Crown' },
+  Gemini:      { label:'♊ Wing Clips' },
+  Cancer:      { label:'♋ Pearl Necklace' },
+  Leo:         { label:'♌ Golden Crown' },
+  Virgo:       { label:'♍ Wheat Wreath' },
+  Libra:       { label:'♎ Scales Pendant' },
+  Scorpio:     { label:'♏ Dark Circlet' },
+  Sagittarius: { label:'♐ Archer Band' },
+  Capricorn:   { label:'♑ Mountain Tiara' },
+  Aquarius:    { label:'♒ Star Circlet' },
+  Pisces:      { label:'♓ Sea Crown' },
+};
+
+const AVATAR_AURAS = [
+  { name:'none',  label:'None',  colors:null },
+  { name:'fire',  label:'🔥 Fire',  colors:['#FF6040','#FF9060','#FFD08040'] },
+  { name:'earth', label:'🌿 Earth', colors:['#4A8060','#6DB88A','#A0D0A040'] },
+  { name:'air',   label:'💨 Air',   colors:['#90C0F0','#C0E0FF','#E0F0FF40'] },
+  { name:'water', label:'💧 Water', colors:['#4080C0','#60B0E0','#A0D0FF40'] },
+  { name:'cosmic',label:'✨ Cosmic',colors:['#A78BFA','#E879F9','#67E8F940'] },
+];
+
+function buildAvatarSVG() {
+  const S = AVATAR_STATE;
+  const outfit = ZODIAC_OUTFITS[S.outfit];
+  const W = 220, H = 440, CX = 110;
+  const hc = S.hairColor;
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">`;
+
+  // Aura background
+  const aura = AVATAR_AURAS.find(a => a.name === S.aura);
+  if (aura && aura.colors) {
+    svg += `<defs><radialGradient id="auraG" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="${aura.colors[0]}" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="${aura.colors[1]}" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="${aura.colors[2]}" stop-opacity="0"/>
+    </radialGradient></defs>`;
+    svg += `<ellipse cx="${CX}" cy="200" rx="108" ry="200" fill="url(#auraG)"/>`;
+  }
+
+  // Legs — slim, stylised, behind body
+  // Left leg
+  svg += `<path d="M${CX-18},295 L${CX-20},385 Q${CX-20},395 ${CX-28},395 L${CX-32},395 Q${CX-36},395 ${CX-36},390 L${CX-36},388 Q${CX-36},385 ${CX-32},385 L${CX-14},385 Z" fill="${S.skin}"/>`;
+  // Right leg
+  svg += `<path d="M${CX+18},295 L${CX+20},385 Q${CX+20},395 ${CX+28},395 L${CX+32},395 Q${CX+36},395 ${CX+36},390 L${CX+36},388 Q${CX+36},385 ${CX+32},385 L${CX+14},385 Z" fill="${S.skin}"/>`;
+  // Shoes
+  svg += `<path d="M${CX-36},385 Q${CX-38},398 ${CX-28},398 L${CX-14},398 Q${CX-10},398 ${CX-12},385 Z" fill="${outfit.color}" stroke="${outfit.accent}" stroke-width="0.8"/>`;
+  svg += `<path d="M${CX+12},385 Q${CX+10},398 ${CX+14},398 L${CX+28},398 Q${CX+38},398 ${CX+36},385 Z" fill="${outfit.color}" stroke="${outfit.accent}" stroke-width="0.8"/>`;
+
+  // Arms — behind body, skin tone with hands
+  // Left arm
+  svg += `<path d="M${CX-38},170 Q${CX-58},195 ${CX-55},230 Q${CX-54},250 ${CX-48},260" fill="none" stroke="${S.skin}" stroke-width="10" stroke-linecap="round"/>`;
+  // Left hand
+  svg += `<circle cx="${CX-47}" cy="263" r="7" fill="${S.skin}"/>`;
+  // Right arm
+  svg += `<path d="M${CX+38},170 Q${CX+58},195 ${CX+55},230 Q${CX+54},250 ${CX+48},260" fill="none" stroke="${S.skin}" stroke-width="10" stroke-linecap="round"/>`;
+  // Right hand
+  svg += `<circle cx="${CX+47}" cy="263" r="7" fill="${S.skin}"/>`;
+
+  // Body / outfit — slimmer, more stylised
+  svg += `<path d="M${CX-38},185 Q${CX-42},162 ${CX-22},152 Q${CX},145 ${CX+22},152 Q${CX+42},162 ${CX+38},185 L${CX+32},295 Q${CX+32},305 ${CX},305 Q${CX-32},305 ${CX-32},295 Z" fill="${outfit.color}"/>`;
+  svg += `<path d="M${CX-22},152 Q${CX},145 ${CX+22},152 L${CX+14},180 Q${CX},185 ${CX-14},180 Z" fill="${outfit.color2}" opacity="0.7"/>`;
+  svg += `<path d="M${CX-16},155 Q${CX},162 ${CX+16},155" fill="none" stroke="${outfit.accent}" stroke-width="1.5" opacity="0.8"/>`;
+  svg += `<line x1="${CX}" y1="180" x2="${CX}" y2="285" stroke="${outfit.accent}" stroke-width="1" opacity="0.25"/>`;
+  // Outfit hem detail
+  svg += `<path d="M${CX-32},295 Q${CX},310 ${CX+32},295" fill="none" stroke="${outfit.accent}" stroke-width="1" opacity="0.4"/>`;
+
+  // Neck — slim and elegant
+  svg += `<rect x="${CX-7}" y="130" width="14" height="24" rx="5" fill="${S.skin}"/>`;
+
+  // Head — larger, more oval for doll proportions
+  svg += `<ellipse cx="${CX}" cy="90" rx="48" ry="54" fill="${S.skin}"/>`;
+
+  // Eyeshadow — dramatic, outfit-coloured
+  svg += `<ellipse cx="${CX-18}" cy="86" rx="14" ry="8" fill="${outfit.color}" opacity="0.2"/>`;
+  svg += `<ellipse cx="${CX+18}" cy="86" rx="14" ry="8" fill="${outfit.color}" opacity="0.2"/>`;
+
+  // Eyes — large, almond-shaped, dramatic
+  // White
+  svg += `<ellipse cx="${CX-18}" cy="90" rx="11" ry="8" fill="#fff"/>`;
+  svg += `<ellipse cx="${CX+18}" cy="90" rx="11" ry="8" fill="#fff"/>`;
+  // Iris
+  svg += `<ellipse cx="${CX-17}" cy="91" rx="7" ry="7.5" fill="#5A3820"/>`;
+  svg += `<ellipse cx="${CX+17}" cy="91" rx="7" ry="7.5" fill="#5A3820"/>`;
+  // Pupil
+  svg += `<ellipse cx="${CX-17}" cy="91" rx="3.5" ry="4" fill="#1a1a1a"/>`;
+  svg += `<ellipse cx="${CX+17}" cy="91" rx="3.5" ry="4" fill="#1a1a1a"/>`;
+  // Eye sparkle
+  svg += `<ellipse cx="${CX-15}" cy="88" rx="2.5" ry="2" fill="#fff"/>`;
+  svg += `<ellipse cx="${CX+19}" cy="88" rx="2.5" ry="2" fill="#fff"/>`;
+  svg += `<circle cx="${CX-19}" cy="93" r="1" fill="#fff" opacity="0.6"/>`;
+  svg += `<circle cx="${CX+15}" cy="93" r="1" fill="#fff" opacity="0.6"/>`;
+  // Upper eyeliner — thick, dramatic
+  svg += `<path d="M${CX-29},87 Q${CX-18},80 ${CX-7},88" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round"/>`;
+  svg += `<path d="M${CX+7},88 Q${CX+18},80 ${CX+29},87" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round"/>`;
+  // Lashes — upper, fanned out
+  svg += `<line x1="${CX-28}" y1="86" x2="${CX-33}" y2="80" stroke="#1a1a1a" stroke-width="1.3" stroke-linecap="round"/>`;
+  svg += `<line x1="${CX-24}" y1="84" x2="${CX-27}" y2="77" stroke="#1a1a1a" stroke-width="1.3" stroke-linecap="round"/>`;
+  svg += `<line x1="${CX-19}" y1="83" x2="${CX-20}" y2="76" stroke="#1a1a1a" stroke-width="1.2" stroke-linecap="round"/>`;
+  svg += `<line x1="${CX+28}" y1="86" x2="${CX+33}" y2="80" stroke="#1a1a1a" stroke-width="1.3" stroke-linecap="round"/>`;
+  svg += `<line x1="${CX+24}" y1="84" x2="${CX+27}" y2="77" stroke="#1a1a1a" stroke-width="1.3" stroke-linecap="round"/>`;
+  svg += `<line x1="${CX+19}" y1="83" x2="${CX+20}" y2="76" stroke="#1a1a1a" stroke-width="1.2" stroke-linecap="round"/>`;
+  // Lower lash line — subtle
+  svg += `<path d="M${CX-27},93 Q${CX-18},98 ${CX-8},93" fill="none" stroke="#1a1a1a" stroke-width="0.8" opacity="0.5"/>`;
+  svg += `<path d="M${CX+8},93 Q${CX+18},98 ${CX+27},93" fill="none" stroke="#1a1a1a" stroke-width="0.8" opacity="0.5"/>`;
+
+  // Eyebrows — arched, defined
+  svg += `<path d="M${CX-28},76 Q${CX-18},70 ${CX-7},77" fill="none" stroke="${hc}" stroke-width="2.2" stroke-linecap="round"/>`;
+  svg += `<path d="M${CX+7},77 Q${CX+18},70 ${CX+28},76" fill="none" stroke="${hc}" stroke-width="2.2" stroke-linecap="round"/>`;
+
+  // Nose — tiny, delicate
+  svg += `<path d="M${CX},100 Q${CX+2},105 ${CX},106" fill="none" stroke="${S.skin}" stroke-width="1.2" opacity="0.4"/>`;
+  svg += `<circle cx="${CX}" cy="106" r="1.5" fill="${S.skin}" stroke="#00000015" stroke-width="0.5"/>`;
+
+  // Lips — full, glossy, Bratz-inspired
+  svg += `<path d="M${CX-11},114 Q${CX-6},110 ${CX},112 Q${CX+6},110 ${CX+11},114" fill="#D05060" stroke="#B04050" stroke-width="0.5"/>`;
+  svg += `<path d="M${CX-11},114 Q${CX},121 ${CX+11},114" fill="#C04858" stroke="#B04050" stroke-width="0.5"/>`;
+  // Lip gloss highlight
+  svg += `<ellipse cx="${CX}" cy="113" rx="4" ry="1.5" fill="#FF8090" opacity="0.5"/>`;
+  svg += `<ellipse cx="${CX+2}" cy="117" rx="3" ry="1.2" fill="#E06070" opacity="0.3"/>`;
+
+  // Blush — soft, glowy
+  svg += `<ellipse cx="${CX-28}" cy="104" rx="10" ry="6" fill="#F0A0A0" opacity="0.2"/>`;
+  svg += `<ellipse cx="${CX+28}" cy="104" rx="10" ry="6" fill="#F0A0A0" opacity="0.2"/>`;
+
+  // Hair — fuller, more dramatic for doll style
+  if (S.hair === 'short') {
+    svg += `<ellipse cx="${CX}" cy="65" rx="50" ry="36" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX}" cy="55" rx="46" ry="28" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-40}" cy="78" rx="14" ry="18" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+40}" cy="78" rx="14" ry="18" fill="${hc}"/>`;
+  } else if (S.hair === 'medium') {
+    svg += `<ellipse cx="${CX}" cy="62" rx="52" ry="38" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-42}" cy="95" rx="16" ry="35" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+42}" cy="95" rx="16" ry="35" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-36}" cy="65" rx="20" ry="30" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+36}" cy="65" rx="20" ry="30" fill="${hc}"/>`;
+  } else if (S.hair === 'long') {
+    svg += `<ellipse cx="${CX}" cy="60" rx="52" ry="38" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-44}" cy="115" rx="18" ry="60" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+44}" cy="115" rx="18" ry="60" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-38}" cy="60" rx="22" ry="32" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+38}" cy="60" rx="22" ry="32" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-40}" cy="160" rx="14" ry="25" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+40}" cy="160" rx="14" ry="25" fill="${hc}"/>`;
+  } else if (S.hair === 'curly') {
+    for (let a = -4; a <= 4; a++) {
+      svg += `<circle cx="${CX+a*11}" cy="${52+Math.abs(a)*4}" r="${16-Math.abs(a)}" fill="${hc}"/>`;
+    }
+    svg += `<ellipse cx="${CX-46}" cy="95" rx="18" ry="30" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+46}" cy="95" rx="18" ry="30" fill="${hc}"/>`;
+    for (let a = -3; a <= 3; a++) {
+      svg += `<circle cx="${CX-46+a*6}" cy="${125+Math.abs(a)*4}" r="10" fill="${hc}"/>`;
+      svg += `<circle cx="${CX+46+a*6}" cy="${125+Math.abs(a)*4}" r="10" fill="${hc}"/>`;
+    }
+    svg += `<ellipse cx="${CX-42}" cy="155" rx="16" ry="20" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+42}" cy="155" rx="16" ry="20" fill="${hc}"/>`;
+  } else if (S.hair === 'updo') {
+    svg += `<ellipse cx="${CX}" cy="62" rx="50" ry="34" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX}" cy="36" rx="28" ry="26" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX}" cy="18" rx="18" ry="16" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-12}" cy="28" rx="8" ry="10" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+12}" cy="28" rx="8" ry="10" fill="${hc}"/>`;
+  } else if (S.hair === 'shaved') {
+    svg += `<ellipse cx="${CX}" cy="68" rx="49" ry="32" fill="${hc}" opacity="0.35"/>`;
+  }
+
+  // Accessories (adjusted positions for larger head)
+  if (S.accessory === 'Leo') {
+    svg += `<path d="M${CX-30},48 L${CX-22},32 L${CX-10},44 L${CX},26 L${CX+10},44 L${CX+22},32 L${CX+30},48" fill="#FFD700" stroke="#DAA520" stroke-width="1.2"/>`;
+    svg += `<circle cx="${CX}" cy="36" r="5" fill="#FF4040"/>`;
+  } else if (S.accessory === 'Aries') {
+    svg += `<path d="M${CX-40},60 Q${CX-52},32 ${CX-34},26 Q${CX-22},24 ${CX-28},50" fill="none" stroke="${outfit.accent}" stroke-width="3.5"/>`;
+    svg += `<path d="M${CX+40},60 Q${CX+52},32 ${CX+34},26 Q${CX+22},24 ${CX+28},50" fill="none" stroke="${outfit.accent}" stroke-width="3.5"/>`;
+  } else if (S.accessory === 'Taurus') {
+    svg += `<ellipse cx="${CX}" cy="44" rx="38" ry="9" fill="none" stroke="#4A8060" stroke-width="2.2"/>`;
+    for (let i = -3; i <= 3; i++) { svg += `<circle cx="${CX+i*11}" cy="${42+Math.abs(i)*2}" r="4.5" fill="${['#FF9090','#FFD090','#FF90C0','#C090FF','#90D0FF','#90FF90','#FFB090'][i+3]}"/>`; }
+  } else if (S.accessory === 'Gemini') {
+    svg += `<path d="M${CX-44},54 Q${CX-52},38 ${CX-44},30 L${CX-34},40" fill="${outfit.accent}" opacity="0.7"/>`;
+    svg += `<path d="M${CX+44},54 Q${CX+52},38 ${CX+44},30 L${CX+34},40" fill="${outfit.accent}" opacity="0.7"/>`;
+  } else if (S.accessory === 'Cancer') {
+    svg += `<ellipse cx="${CX}" cy="152" rx="20" ry="3.5" fill="none" stroke="#E0E4F0" stroke-width="1.8"/>`;
+    svg += `<circle cx="${CX}" cy="160" r="6" fill="#E8E8F0" stroke="#C0C0D0" stroke-width="1"/>`;
+  } else if (S.accessory === 'Virgo') {
+    svg += `<ellipse cx="${CX}" cy="44" rx="36" ry="8" fill="none" stroke="#C0A060" stroke-width="1.8"/>`;
+    for (let i = -2; i <= 2; i++) { svg += `<line x1="${CX+i*14}" y1="40" x2="${CX+i*14+3}" y2="32" stroke="#C0A060" stroke-width="1.5"/>`; }
+  } else if (S.accessory === 'Libra') {
+    svg += `<line x1="${CX}" y1="150" x2="${CX}" y2="165" stroke="#E0A0B8" stroke-width="1.5"/>`;
+    svg += `<circle cx="${CX}" cy="168" r="7" fill="none" stroke="#E0A0B8" stroke-width="1.5"/>`;
+    svg += `<line x1="${CX-5}" y1="168" x2="${CX+5}" y2="168" stroke="#E0A0B8" stroke-width="1.2"/>`;
+  } else if (S.accessory === 'Scorpio') {
+    svg += `<ellipse cx="${CX}" cy="44" rx="40" ry="6" fill="none" stroke="#5A1020" stroke-width="2.2"/>`;
+    svg += `<circle cx="${CX}" cy="40" r="5" fill="#FF2040"/>`;
+  } else if (S.accessory === 'Sagittarius') {
+    svg += `<ellipse cx="${CX}" cy="46" rx="42" ry="5" fill="none" stroke="#9060D0" stroke-width="2"/>`;
+    svg += `<circle cx="${CX}" cy="42" r="4" fill="#E0C0FF"/>`;
+  } else if (S.accessory === 'Capricorn') {
+    svg += `<path d="M${CX-28},46 L${CX-18},28 L${CX-6},40 L${CX},32 L${CX+6},40 L${CX+18},28 L${CX+28},46" fill="#6A6A70" stroke="#B0B0C0" stroke-width="1.2"/>`;
+  } else if (S.accessory === 'Aquarius') {
+    svg += `<ellipse cx="${CX}" cy="44" rx="38" ry="6" fill="none" stroke="#40A0F0" stroke-width="1.8"/>`;
+    for (let i = -2; i <= 2; i++) { svg += `<circle cx="${CX+i*16}" cy="40" r="4" fill="#C0E8FF" stroke="#40A0F0" stroke-width="1"/>`; }
+  } else if (S.accessory === 'Pisces') {
+    svg += `<ellipse cx="${CX}" cy="44" rx="40" ry="9" fill="none" stroke="#60B0A0" stroke-width="1.8"/>`;
+    svg += `<path d="M${CX-10},38 Q${CX},28 ${CX+10},38" fill="#80D0C0" opacity="0.6"/>`;
+    svg += `<circle cx="${CX-14}" cy="42" r="4" fill="#C0FFF0"/>`;
+    svg += `<circle cx="${CX+14}" cy="42" r="4" fill="#C0FFF0"/>`;
+  }
+
+  svg += `</svg>`;
+  return svg;
+}
+
+function renderAvatar() {
+  document.getElementById('avatar-display').innerHTML = buildAvatarSVG();
+}
+
+function setAvatarOption(key, value) {
+  AVATAR_STATE[key] = value;
+  renderAvatar();
+  renderAvatarControls();
+}
+
+function renderAvatarControls() {
+  const S = AVATAR_STATE;
+
+  document.getElementById('opt-skin').innerHTML = AVATAR_SKINS.map(s =>
+    `<div class="avatar-swatch${S.skin===s.color?' active':''}" style="background:${s.color}" title="${s.name}" onclick="setAvatarOption('skin','${s.color}')"></div>`
+  ).join('');
+
+  document.getElementById('opt-hair').innerHTML = AVATAR_HAIRS.map(h =>
+    `<button class="avatar-opt${S.hair===h?' active':''}" onclick="setAvatarOption('hair','${h}')">${h === 'none' ? 'No Hair' : h.charAt(0).toUpperCase()+h.slice(1)}</button>`
+  ).join('');
+
+  document.getElementById('opt-haircolor').innerHTML = AVATAR_HAIR_COLORS.map(c =>
+    `<div class="avatar-swatch${S.hairColor===c.color?' active':''}" style="background:${c.color}" title="${c.name}" onclick="setAvatarOption('hairColor','${c.color}')"></div>`
+  ).join('');
+
+  document.getElementById('opt-outfit').innerHTML = SIGNS.map(s =>
+    `<button class="avatar-opt${S.outfit===s?' active':''}" onclick="setAvatarOption('outfit','${s}')">${ZODIAC_OUTFITS[s].label}</button>`
+  ).join('');
+
+  document.getElementById('opt-accessory').innerHTML = Object.keys(ZODIAC_ACCESSORIES).map(k =>
+    `<button class="avatar-opt${S.accessory===k?' active':''}" onclick="setAvatarOption('accessory','${k}')">${ZODIAC_ACCESSORIES[k].label}</button>`
+  ).join('');
+
+  document.getElementById('opt-aura').innerHTML = AVATAR_AURAS.map(a =>
+    `<button class="avatar-opt${S.aura===a.name?' active':''}" onclick="setAvatarOption('aura','${a.name}')">${a.label}</button>`
+  ).join('');
+}
+
+function renderAvatarSuggestions() {
+  const el = document.getElementById('avatar-suggestions');
+  if (!gChartData) {
+    el.innerHTML = `<div class="form-card" style="text-align:center;margin-bottom:1.5rem;">
+      <p style="color:var(--muted);font-family:var(--sans);font-size:0.88rem;">Reveal your chart on the AstroSphere page to get personalised wardrobe suggestions!</p>
+    </div>`;
+    return;
+  }
+
+  const sunSign = SIGNS[signOf(gChartData.planets[0].lon)];
+  const moonSign = SIGNS[signOf(gChartData.planets[1].lon)];
+  const venusSign = SIGNS[signOf(gChartData.planets[3].lon)];
+  const risingSign = SIGNS[signOf(gChartData.ascLon)];
+  const ELEMENTS_MAP = {Aries:'fire',Taurus:'earth',Gemini:'air',Cancer:'water',Leo:'fire',Virgo:'earth',Libra:'air',Scorpio:'water',Sagittarius:'fire',Capricorn:'earth',Aquarius:'air',Pisces:'water'};
+
+  const suggestions = [
+    { icon:'↑', text:`Your <strong>${risingSign} Rising</strong> is how the world sees you — try the ${ZODIAC_OUTFITS[risingSign].label} outfit`, outfit:risingSign, acc:risingSign },
+    { icon:'♀', text:`Your <strong>${venusSign} Venus</strong> rules your style and beauty — dress in ${ZODIAC_OUTFITS[venusSign].label}`, outfit:venusSign, acc:venusSign },
+    { icon:'☉', text:`Your <strong>${sunSign} Sun</strong> is your core identity — match it with the ${ZODIAC_ACCESSORIES[sunSign].label} accessory`, outfit:sunSign, acc:sunSign },
+    { icon:'☽', text:`Your <strong>${moonSign} Moon</strong> is your inner world — try a ${ELEMENTS_MAP[moonSign]} aura to match`, outfit:moonSign, acc:null, aura:ELEMENTS_MAP[moonSign] },
+  ];
+
+  let html = `<div style="margin-bottom:1.5rem;">
+    <h3 style="text-align:center;font-family:var(--sans);font-size:0.9rem;color:#67e8f9;margin-bottom:0.6rem;letter-spacing:0.05em;">✦ Styled by Your Stars ✦</h3>`;
+  suggestions.forEach(s => {
+    const onclick = `setAvatarOption('outfit','${s.outfit}');${s.acc?`setAvatarOption('accessory','${s.acc}');`:''}${s.aura?`setAvatarOption('aura','${s.aura}');`:''}`;
+    html += `<div class="suggestion-card" onclick="${onclick}">
+      <span style="font-size:1.2rem;flex-shrink:0;">${s.icon}</span>
+      <span>${s.text}</span>
+      <span style="margin-left:auto;font-size:0.72rem;color:var(--muted);">Tap to try</span>
+    </div>`;
+  });
+  html += `</div>`;
+  el.innerHTML = html;
+}
+
+function saveAvatar() {
+  localStorage.setItem('astrosphere_avatar', JSON.stringify(AVATAR_STATE));
+  alert('✓ Avatar saved!');
+}
+
+function loadAvatar() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('astrosphere_avatar'));
+    if (saved) Object.assign(AVATAR_STATE, saved);
+  } catch(e) {}
+}
+
+function initAvatar() {
+  loadAvatar();
+  renderAvatar();
+  renderAvatarControls();
+  renderAvatarSuggestions();
+}
+
+// ─────────────────────────────────────────────
+// PAGE NAVIGATION
+// ─────────────────────────────────────────────
+
+function switchPage(page) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.nav-btn[onclick*="${page}"]`).classList.add('active');
+  document.getElementById(`page-${page}`).classList.add('active');
+  if (page === 'emporium') renderEmporium();
+  if (page === 'avatar') initAvatar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
 </body>

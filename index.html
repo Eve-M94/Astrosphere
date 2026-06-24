@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#a78bfa"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="AstroSphere"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon-192.svg"/>
 <title>AstroSphere — Multi-System Astrology</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Danfo&family=Yatra+One&display=swap" rel="stylesheet">
@@ -200,6 +206,7 @@
   .tab-btn[data-system="mayan"].active    { --tab-bg: rgba(251,191,36,0.15);  --tab-border: #fbbf24; --tab-color: #fbbf24; }
   .tab-btn[data-system="hd"].active          { --tab-bg: rgba(6,182,212,0.15);    --tab-border: #06b6d4; --tab-color: #06b6d4; }
   .tab-btn[data-system="numerology"].active  { --tab-bg: rgba(232,121,249,0.15);  --tab-border: #e879f9; --tab-color: #e879f9; }
+  .tab-btn[data-system="tarot"].active       { --tab-bg: rgba(168,130,255,0.15);  --tab-border: #a882ff; --tab-color: #a882ff; }
   .tab-btn[data-system="compat"].active      { --tab-bg: rgba(251,113,133,0.15);  --tab-border: #fb7185; --tab-color: #fb7185; }
 
   /* ── RESULTS PANEL ── */
@@ -258,6 +265,13 @@
     --s-border: rgba(232,121,249,0.25);
     --s-glow: rgba(232,121,249,0.1);
     --s-heading: linear-gradient(135deg, #e879f9, #a78bfa, #67e8f9);
+  }
+  .system-panel[data-system="tarot"] {
+    --s-accent: #a882ff; --s-accent2: #7c5ce0;
+    --s-bg: rgba(168,130,255,0.07);
+    --s-border: rgba(168,130,255,0.25);
+    --s-glow: rgba(168,130,255,0.1);
+    --s-heading: linear-gradient(135deg, #a882ff, #7c5ce0, #e879f9);
   }
   .system-panel[data-system="compat"] {
     --s-accent: #fb7185; --s-accent2: #f43f5e;
@@ -453,6 +467,8 @@
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+  .social-orbit { left: 50%; width: 200px; height: 90px; }
+  .social-orbit2 { left: 50%; width: 200px; height: 90px; }
   .sparkle-wrap { position: relative; }
   .sparkle {
     display: inline-block;
@@ -464,12 +480,12 @@
     background-clip: initial;
     animation: glitter 2s ease-in-out infinite;
   }
-  .s1 { color: #e879f9; animation-delay: 0s;    margin-right: 0.15em; }
-  .s2 { color: #a78bfa; animation-delay: 0.4s;  margin-right: 0.1em;  font-size: 0.35em; }
-  .s3 { color: #67e8f9; animation-delay: 0.8s;  margin-right: 0.05em; font-size: 0.4em; }
-  .s4 { color: #67e8f9; animation-delay: 1.2s;  margin-left: 0.05em;  font-size: 0.4em; }
-  .s5 { color: #a78bfa; animation-delay: 1.6s;  margin-left: 0.1em;   font-size: 0.35em; }
-  .s6 { color: #e879f9; animation-delay: 0.2s;  margin-left: 0.15em; }
+  .s1 { color: #ffffff; animation-delay: 0s;    margin-right: 0.15em; }
+  .s2 { color: #f0f0ff; animation-delay: 0.4s;  margin-right: 0.1em;  font-size: 0.35em; }
+  .s3 { color: #ffffff; animation-delay: 0.8s;  margin-right: 0.05em; font-size: 0.4em; }
+  .s4 { color: #ffffff; animation-delay: 1.2s;  margin-left: 0.05em;  font-size: 0.4em; }
+  .s5 { color: #f0f0ff; animation-delay: 1.6s;  margin-left: 0.1em;   font-size: 0.35em; }
+  .s6 { color: #ffffff; animation-delay: 0.2s;  margin-left: 0.15em; }
   @keyframes glitter {
     0%, 100% { opacity: 0.3; transform: scale(0.8); }
     50%      { opacity: 1;   transform: scale(1.3); }
@@ -862,6 +878,7 @@
       <button class="tab-btn" data-system="mayan"   onclick="switchTab('mayan')">🌀 Mayan</button>
       <button class="tab-btn" data-system="hd"      onclick="switchTab('hd')">⬡ Human Design</button>
       <button class="tab-btn" data-system="numerology" onclick="switchTab('numerology')">🔢 Numerology</button>
+      <button class="tab-btn" data-system="tarot" onclick="switchTab('tarot')">🃏 Tarot</button>
       <button class="tab-btn" data-system="compat"     onclick="switchTab('compat')">💞 Compatibility</button>
     </div>
 
@@ -891,7 +908,52 @@
     </div>
 
     <!-- CELTIC -->
-    <div class="system-panel" data-system="celtic" id="panel-celtic">
+    <div class="system-panel" data-system="celtic" id="panel-celtic" style="position:relative;overflow:hidden;">
+      <!-- Celtic Tree Background -->
+      <svg class="celtic-tree-bg" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:380px;height:600px;pointer-events:none;opacity:0.06;">
+        <!-- Trunk -->
+        <path d="M195,580 Q190,500 185,420 Q180,360 182,300 Q184,260 190,220 Q195,190 200,170 Q205,190 210,220 Q216,260 218,300 Q220,360 215,420 Q210,500 205,580 Z" fill="#4ade80"/>
+        <!-- Roots spreading -->
+        <path d="M185,420 Q150,460 110,500 Q90,520 70,540" fill="none" stroke="#4ade80" stroke-width="4" stroke-linecap="round"/>
+        <path d="M180,440 Q160,470 130,510 Q115,530 100,560" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round"/>
+        <path d="M190,450 Q175,480 160,530 Q150,555 145,580" fill="none" stroke="#4ade80" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M215,420 Q250,460 290,500 Q310,520 330,540" fill="none" stroke="#4ade80" stroke-width="4" stroke-linecap="round"/>
+        <path d="M220,440 Q240,470 270,510 Q285,530 300,560" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round"/>
+        <path d="M210,450 Q225,480 240,530 Q250,555 255,580" fill="none" stroke="#4ade80" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- Root tendrils -->
+        <path d="M70,540 Q55,555 40,570" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round"/>
+        <path d="M110,500 Q95,515 80,520" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round"/>
+        <path d="M330,540 Q345,555 360,570" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round"/>
+        <path d="M290,500 Q305,515 320,520" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round"/>
+        <!-- Main branches -->
+        <path d="M195,200 Q160,160 120,120 Q95,95 70,80" fill="none" stroke="#4ade80" stroke-width="5" stroke-linecap="round"/>
+        <path d="M205,200 Q240,160 280,120 Q305,95 330,80" fill="none" stroke="#4ade80" stroke-width="5" stroke-linecap="round"/>
+        <path d="M190,220 Q145,190 100,170 Q70,158 45,150" fill="none" stroke="#4ade80" stroke-width="4" stroke-linecap="round"/>
+        <path d="M210,220 Q255,190 300,170 Q330,158 355,150" fill="none" stroke="#4ade80" stroke-width="4" stroke-linecap="round"/>
+        <path d="M192,240 Q160,225 120,210 Q85,200 55,200" fill="none" stroke="#4ade80" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M208,240 Q240,225 280,210 Q315,200 345,200" fill="none" stroke="#4ade80" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- Upper branches -->
+        <path d="M197,180 Q180,140 165,100 Q155,70 150,40" fill="none" stroke="#4ade80" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M203,180 Q220,140 235,100 Q245,70 250,40" fill="none" stroke="#4ade80" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M200,170 Q200,130 200,90 Q200,60 200,30" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round"/>
+        <!-- Branch tips / twigs -->
+        <path d="M70,80 Q55,65 40,55" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round"/>
+        <path d="M70,80 Q60,70 55,55" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M330,80 Q345,65 360,55" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round"/>
+        <path d="M330,80 Q340,70 345,55" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M120,120 Q105,105 90,100" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round"/>
+        <path d="M280,120 Q295,105 310,100" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round"/>
+        <path d="M45,150 Q30,145 20,138" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M355,150 Q370,145 380,138" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M150,40 Q140,25 135,10" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M250,40 Q260,25 265,10" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M200,30 Q195,15 192,5" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M200,30 Q205,15 208,5" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Knot circle at center (Celtic knot feel) -->
+        <circle cx="200" cy="280" r="30" fill="none" stroke="#4ade80" stroke-width="2"/>
+        <circle cx="200" cy="280" r="20" fill="none" stroke="#4ade80" stroke-width="1.5"/>
+        <circle cx="200" cy="280" r="10" fill="none" stroke="#4ade80" stroke-width="1"/>
+      </svg>
       <div class="system-header">
         <h2>🌿 Celtic Tree Astrology</h2>
         <p>Druidic lunar calendar · Ogham tree signs</p>
@@ -933,6 +995,15 @@
         <p>The vibrational language of numbers · Life Path · Soul purpose</p>
       </div>
       <div class="placements-grid" id="numerology-placements"></div>
+    </div>
+
+    <!-- TAROT BIRTH CARDS -->
+    <div class="system-panel" data-system="tarot" id="panel-tarot">
+      <div class="system-header">
+        <h2>🃏 Tarot Birth Cards</h2>
+        <p>The Major Arcana cards encoded in your birth date · Your soul's archetypal journey</p>
+      </div>
+      <div class="placements-grid" id="tarot-placements"></div>
     </div>
 
     <!-- COMPATIBILITY -->
@@ -981,17 +1052,33 @@
   <div class="page" id="page-social">
     <header>
       <div class="title-wrapper">
-        <h1 class="social-title">
-          <span class="sparkle-wrap">
-            <span class="sparkle s1">✦</span>
-            <span class="sparkle s2">✧</span>
-            <span class="sparkle s3">⋆</span>
-            <span class="social-title-text">SocialSphere</span>
-            <span class="sparkle s4">⋆</span>
-            <span class="sparkle s5">✧</span>
-            <span class="sparkle s6">✦</span>
-          </span>
-        </h1>
+        <h1 class="social-title"><span class="social-title-text">SocialSphere</span></h1>
+        <svg class="orbit-svg social-orbit" xmlns="http://www.w3.org/2000/svg" viewBox="-90 -40 180 80" aria-hidden="true">
+          <defs>
+            <filter id="socialCometGlow" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <g filter="url(#socialCometGlow)">
+            <animateMotion dur="3s" repeatCount="indefinite" rotate="auto"
+              path="M 66.6,-21.6 A 70,22 -18 1,0 -66.6,21.6 A 70,22 -18 1,0 66.6,-21.6"/>
+            <circle cx="-18" cy="0" r="1"   fill="#ffffff" opacity="0.3"/>
+            <circle cx="-12" cy="0" r="1.5" fill="#ffffff" opacity="0.5"/>
+            <circle cx="-6"  cy="0" r="2"   fill="#f0f0ff" opacity="0.7"/>
+            <circle cx="0"   cy="0" r="3.5" fill="#ffffff"/>
+          </g>
+        </svg>
+        <svg class="orbit-svg social-orbit2" xmlns="http://www.w3.org/2000/svg" viewBox="-90 -40 180 80" aria-hidden="true">
+          <g filter="url(#socialCometGlow)">
+            <animateMotion dur="3s" repeatCount="indefinite" rotate="auto"
+              path="M 66.6,21.6 A 70,22 18 1,0 -66.6,-21.6 A 70,22 18 1,0 66.6,21.6"/>
+            <circle cx="-12" cy="0" r="0.8" fill="#ffffff" opacity="0.3"/>
+            <circle cx="-8"  cy="0" r="1.2" fill="#ffffff" opacity="0.5"/>
+            <circle cx="-4"  cy="0" r="1.6" fill="#f0f0ff" opacity="0.7"/>
+            <circle cx="0"   cy="0" r="2.5" fill="#ffffff"/>
+          </g>
+        </svg>
       </div>
       <p>Your personal constellation of friends, family &amp; cosmic connections</p>
     </header>
@@ -1091,7 +1178,7 @@
     <div style="display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;align-items:flex-start;">
       <!-- AVATAR PREVIEW -->
       <div class="form-card" style="flex:0 0 auto;padding:1.5rem;text-align:center;">
-        <div id="avatar-display" style="width:220px;height:440px;margin:0 auto;"></div>
+        <div id="avatar-display" style="width:220px;height:520px;margin:0 auto;"></div>
         <button class="btn-primary" onclick="saveAvatar()" style="margin-top:1rem;font-size:0.85rem;padding:0.6rem 1.2rem;">💾 Save Avatar</button>
       </div>
 
@@ -1139,7 +1226,7 @@
 </div><!-- /.container -->
 
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <div id="lightbox-content" onclick="event.stopPropagation()"></div>
+  <div id="lightbox-content"></div>
   <span class="lightbox-hint">✕ Click anywhere to close</span>
 </div>
 
@@ -1385,7 +1472,7 @@ function ascendant(jd, latDeg, lonDeg) {
 const CITY_COORDS = {
   sydney: [-33.87, 151.21], melbourne: [-37.81, 144.96], brisbane: [-27.47, 153.02],
   perth: [-31.95, 115.86], adelaide: [-34.93, 138.60], auckland: [-36.85, 174.76],
-  feltham: [51.45, -0.41], heathrow: [51.47, -0.45], hounslow: [51.47, -0.36],
+  feltham: [51.45, -0.41], heathrow: [51.47, -0.45], hounslow: [51.47, -0.36], isleworth: [51.47, -0.32],
   twickenham: [51.45, -0.33], richmond: [51.46, -0.30], kingston: [51.41, -0.30],
   wimbledon: [51.42, -0.21], croydon: [51.37, -0.10], sutton: [51.36, -0.19],
   brixton: [51.46, -0.11], hackney: [51.54, -0.06], islington: [51.54, -0.10],
@@ -1420,14 +1507,38 @@ const CITY_COORDS = {
   johannesburg: [-26.20, 28.04], casablanca: [33.59, -7.62], accra: [5.55, -0.20],
 };
 
+const COUNTRY_FALLBACKS = {
+  'uk':[51.51,-0.13],'united kingdom':[51.51,-0.13],'england':[51.51,-0.13],'scotland':[55.95,-3.19],
+  'wales':[51.48,-3.18],'northern ireland':[54.60,-5.93],'ireland':[53.35,-6.26],
+  'usa':[40.71,-74.01],'us':[40.71,-74.01],'united states':[40.71,-74.01],'america':[40.71,-74.01],
+  'canada':[43.65,-79.38],'australia':[-33.87,151.21],'france':[48.85,2.35],'germany':[52.52,13.40],
+  'spain':[40.42,-3.70],'italy':[41.90,12.50],'india':[28.61,77.21],'japan':[35.69,139.69],
+  'china':[39.91,116.39],'brazil':[-23.55,-46.63],'mexico':[19.43,-99.13],'south africa':[-26.20,28.04],
+  'nigeria':[6.45,3.40],'kenya':[-1.29,36.82],'egypt':[30.06,31.25],'new zealand':[-36.85,174.76],
+  'netherlands':[52.37,4.90],'belgium':[50.85,4.35],'portugal':[38.72,-9.14],'sweden':[59.33,18.07],
+  'norway':[59.91,10.75],'denmark':[55.68,12.57],'switzerland':[47.38,8.54],'austria':[48.21,16.37],
+  'greece':[37.97,23.73],'turkey':[41.01,28.95],'russia':[55.75,37.62],'poland':[52.23,21.01],
+  'singapore':[1.35,103.82],'malaysia':[3.14,101.69],'thailand':[13.75,100.52],
+  'south korea':[37.57,126.98],'korea':[37.57,126.98],'philippines':[14.60,120.98],
+  'pakistan':[24.86,67.01],'bangladesh':[23.72,90.41],'sri lanka':[6.93,79.85],
+  'uae':[25.20,55.27],'saudi arabia':[24.71,46.68],'argentina':[-34.60,-58.38],
+  'colombia':[4.71,-74.07],'chile':[-33.45,-70.67],'peru':[-12.05,-77.04],
+};
+
 function getCityCoords(city, country) {
   const key = city.toLowerCase().trim();
   if (CITY_COORDS[key]) return CITY_COORDS[key];
-  // partial match
   for (const k in CITY_COORDS) {
     if (key.includes(k) || k.includes(key)) return CITY_COORDS[k];
   }
-  return [0, 0]; // UTC / equator fallback
+  if (country) {
+    const ckey = country.toLowerCase().trim();
+    if (COUNTRY_FALLBACKS[ckey]) return COUNTRY_FALLBACKS[ckey];
+    for (const c in COUNTRY_FALLBACKS) {
+      if (ckey.includes(c) || c.includes(ckey)) return COUNTRY_FALLBACKS[c];
+    }
+  }
+  return [0, 0];
 }
 
 // ─────────────────────────────────────────────
@@ -1589,6 +1700,20 @@ const W_BRIEF = {
     'Soul calling: embrace originality, community, and the future.',
     'Soul calling: surrender to spirituality, empathy, and faith.',
   ],
+  'South Node': [
+    'Past-life gifts: independence and courage — now learn to balance with others.',
+    'Past-life gifts: material security and comfort — now learn to embrace transformation.',
+    'Past-life gifts: communication and versatility — now learn to trust deeper wisdom.',
+    'Past-life gifts: emotional nurturing and home — now learn to build your public life.',
+    'Past-life gifts: self-expression and drama — now learn community and collaboration.',
+    'Past-life gifts: analysis and service — now learn to surrender and trust the unseen.',
+    'Past-life gifts: partnership and diplomacy — now learn to stand alone with confidence.',
+    'Past-life gifts: depth and intensity — now learn simplicity, peace, and self-worth.',
+    'Past-life gifts: philosophy and adventure — now learn to listen and stay curious.',
+    'Past-life gifts: ambition and authority — now learn emotional vulnerability and care.',
+    'Past-life gifts: community and innovation — now learn to express your unique heart.',
+    'Past-life gifts: spirituality and empathy — now learn discernment and practical skills.',
+  ],
   Ascendant: [
     'Radiates Aries boldness: direct, energetic, a force of nature.',
     'Radiates Taurus calm: grounded, magnetic, unhurried presence.',
@@ -1717,6 +1842,20 @@ const W_DEEP = {
     "Your North Node in Capricorn calls you from the warmth of emotional dependence toward the dignity of self-mastery, professional achievement, and earned authority.",
     "Your North Node in Aquarius calls you from the spotlight of individual expression toward the wider community — your gifts belong to a movement larger than yourself.",
     "Your North Node in Pisces calls you from the precision of analysis toward the sacred dissolution of ego, toward compassion that asks nothing in return.",
+  ],
+  'South Node': [
+    "Your South Node in Aries carries lifetimes of fierce independence and self-reliance. You know how to fight, how to start from nothing, how to survive alone. These are real gifts — but in this lifetime, you are learning that true strength includes the vulnerability of needing others. The courage you have mastered must now be applied to partnership, compromise, and the terrifying act of letting someone in.",
+    "Your South Node in Taurus carries lifetimes of building, accumulating, and finding security in the material world. You know the value of patience and persistence. But in this lifetime, you are called to release your grip on what feels safe. Transformation — emotional, financial, spiritual — is your growth edge. The comfort zone you have perfected is the exact thing you must now transcend.",
+    "Your South Node in Gemini carries lifetimes of gathering information, communicating, and moving between worlds. You know how to talk, how to charm, how to connect dots. But this lifetime asks you to move from information to wisdom, from cleverness to belief. The restless mind must learn to settle long enough to discover what it actually believes.",
+    "Your South Node in Cancer carries lifetimes of nurturing, protecting, and building emotional fortresses. You know how to care for others with extraordinary tenderness. But this lifetime calls you outward — toward your career, your public role, your ambition. The safe harbour you have built must now launch a ship.",
+    "Your South Node in Leo carries lifetimes of creative self-expression, performance, and the warm glow of being seen. You know how to shine. But this lifetime asks you to distribute that light — to serve the community rather than the individual spotlight. Your drama must become a movement.",
+    "Your South Node in Virgo carries lifetimes of service, analysis, and the pursuit of perfection. You know how to fix things, how to improve systems, how to work harder than anyone. But this lifetime asks you to surrender control, to trust the invisible, to let the ocean of faith carry you where effort alone cannot.",
+    "Your South Node in Libra carries lifetimes of partnership, diplomacy, and the graceful art of keeping everyone happy. You know how to balance, how to mediate, how to disappear into a relationship. But this lifetime demands you find yourself — not through another's eyes but through your own courageous, independent action.",
+    "Your South Node in Scorpio carries lifetimes of intensity, psychological depth, and the power that comes from understanding what is hidden. You know the underworld. But this lifetime calls you toward simplicity, toward the beauty of the surface, toward peace that does not require a crisis to feel alive.",
+    "Your South Node in Sagittarius carries lifetimes of philosophical seeking, teaching, and restless exploration. You know the big picture. But this lifetime asks you to master the small one — to listen before preaching, to gather facts before pronouncing truth, to discover that the most profound journey is sometimes a single, honest conversation.",
+    "Your South Node in Capricorn carries lifetimes of discipline, authority, and the slow construction of worldly achievement. You know how to build empires. But this lifetime calls you home — to family, to vulnerability, to the emotional world you have kept at arm's length while you climbed.",
+    "Your South Node in Aquarius carries lifetimes of visionary thinking, community building, and the exhilarating detachment of seeing humanity from above. You know the collective. But this lifetime demands the personal — your own creative fire, your own heart, your own willingness to be seen not as a cause but as a person.",
+    "Your South Node in Pisces carries lifetimes of spiritual dissolution, empathy, and the oceanic surrender of the self. You know how to merge, how to forgive, how to transcend. But this lifetime asks you to incarnate fully — to develop skills, to serve practically, to build the discerning mind that turns compassion into effective action.",
   ],
   Ascendant: [
     "Your Aries Ascendant means the world meets an initiator first: someone direct, energetic, and unmistakably present. You enter every room ready for what comes next. Over time, you learn that your most powerful quality is not aggression but the purity of your courage.",
@@ -2374,6 +2513,7 @@ function calculate() {
     { icon:'♆',  label:'Neptune',    lon: nepLon  },
     { icon:'♇',  label:'Pluto',      lon: pluLon  },
     { icon:'☊',  label:'North Node', lon: nnLon   },
+    { icon:'☋',  label:'South Node', lon: normalise(nnLon + 180) },
     { icon:'↑',  label:'Ascendant',  lon: ascLon  },
   ];
 
@@ -2626,6 +2766,7 @@ function calculate() {
   document.getElementById('hd-placements').innerHTML = hdHtml;
 
   buildNumerology(y, m, d);
+  buildTarotBirthCards(y, m, d);
   renderChartWheel();
   renderAstrocartography();
 
@@ -2764,6 +2905,180 @@ function buildNumerology(y, m, d) {
   }
 
   document.getElementById('numerology-placements').innerHTML = html;
+}
+
+// ─────────────────────────────────────────────
+// TAROT BIRTH CARDS
+// ─────────────────────────────────────────────
+
+const ROMAN = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI'];
+const TAROT_SYMBOLS = {
+  0:'🌀',1:'✦',2:'☽',3:'♛',4:'♚',5:'⛩',6:'♡',7:'⚡',8:'∞',9:'☆',
+  10:'☸',11:'⚖',12:'⇅',13:'🦋',14:'⚗',15:'⛓',16:'↯',17:'✧',18:'◑',19:'☀',20:'♱',21:'⊕'
+};
+
+function buildTarotCardSVG(num) {
+  const card = MAJOR_ARCANA[num];
+  if (!card) return '';
+  const W = 140, H = 220;
+  const cols = [
+    ['#a882ff','#7c5ce0'],['#f5d060','#c8a030'],['#b0c4e8','#7090b8'],['#e879f9','#b050c8'],
+    ['#e06050','#a83830'],['#c0a870','#908050'],['#f090b0','#c06080'],['#60c0e0','#3090b0'],
+    ['#f5d060','#c8a030'],['#7090b8','#506080'],['#a882ff','#7060c0'],['#e0a050','#b07830'],
+    ['#b0c4e8','#7890a8'],['#2a2a3a','#1a1a2a'],['#60b0a0','#408070'],['#801020','#500818'],
+    ['#e06050','#a83020'],['#f5d060','#d0a830'],['#b0c4e8','#8098b8'],['#f5d060','#e0a010'],
+    ['#a882ff','#7050b0'],['#67e8f9','#40a8b8']
+  ];
+  const c1 = cols[num][0], c2 = cols[num][1];
+  const sym = TAROT_SYMBOLS[num] || '✦';
+  const roman = ROMAN[num];
+
+  let s = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:120px;display:block;margin:0 auto 0.75rem;">`;
+  s += `<defs><linearGradient id="tc${num}" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/>
+  </linearGradient></defs>`;
+  // Card background
+  s += `<rect x="2" y="2" width="${W-4}" height="${H-4}" rx="10" fill="#0e0e20" stroke="url(#tc${num})" stroke-width="2"/>`;
+  // Inner border
+  s += `<rect x="10" y="10" width="${W-20}" height="${H-20}" rx="6" fill="none" stroke="${c1}" stroke-width="0.5" opacity="0.4"/>`;
+  // Corner ornaments
+  s += `<circle cx="18" cy="18" r="3" fill="${c1}" opacity="0.3"/>`;
+  s += `<circle cx="${W-18}" cy="18" r="3" fill="${c1}" opacity="0.3"/>`;
+  s += `<circle cx="18" cy="${H-18}" r="3" fill="${c1}" opacity="0.3"/>`;
+  s += `<circle cx="${W-18}" cy="${H-18}" r="3" fill="${c1}" opacity="0.3"/>`;
+  // Roman numeral at top
+  s += `<text x="${W/2}" y="32" text-anchor="middle" font-size="14" fill="${c1}" font-family="'Times New Roman',serif" letter-spacing="0.15em">${roman}</text>`;
+  // Divider line
+  s += `<line x1="25" y1="40" x2="${W-25}" y2="40" stroke="${c1}" stroke-width="0.5" opacity="0.4"/>`;
+  // Central symbol — large
+  s += `<text x="${W/2}" y="115" text-anchor="middle" dominant-baseline="central" font-size="48" fill="${c1}" opacity="0.9">${sym}</text>`;
+  // Glow behind symbol
+  s += `<circle cx="${W/2}" cy="108" r="28" fill="${c1}" opacity="0.06"/>`;
+  // Divider line bottom
+  s += `<line x1="25" y1="${H-55}" x2="${W-25}" y2="${H-55}" stroke="${c1}" stroke-width="0.5" opacity="0.4"/>`;
+  // Card name
+  const nameLines = card.name.length > 16 ? card.name.split(' ') : [card.name];
+  if (nameLines.length <= 2) {
+    s += `<text x="${W/2}" y="${H-35}" text-anchor="middle" font-size="11" fill="${c1}" font-family="'Times New Roman',serif" font-weight="bold">${card.name}</text>`;
+  } else {
+    const mid = Math.ceil(nameLines.length/2);
+    s += `<text x="${W/2}" y="${H-42}" text-anchor="middle" font-size="10" fill="${c1}" font-family="'Times New Roman',serif" font-weight="bold">${nameLines.slice(0,mid).join(' ')}</text>`;
+    s += `<text x="${W/2}" y="${H-28}" text-anchor="middle" font-size="10" fill="${c1}" font-family="'Times New Roman',serif" font-weight="bold">${nameLines.slice(mid).join(' ')}</text>`;
+  }
+  // Small star ornament at bottom
+  s += `<text x="${W/2}" y="${H-14}" text-anchor="middle" font-size="8" fill="${c1}" opacity="0.4">✦</text>`;
+  s += `</svg>`;
+  return s;
+}
+
+const MAJOR_ARCANA = {
+  0:  { name:'The Fool',            icon:'🃏', brief:'Infinite potential, new beginnings, and the courage to leap into the unknown.',
+        deep:'The Fool is card zero — the empty vessel, the eternal beginner, the one who steps off the cliff trusting that the universe will catch them. As a birth card, the Fool marks you as someone who came into this life to experience everything with fresh eyes. You carry an innocence that is not naivety but a radical openness to possibility. Your journey is not linear; it is a spiral, and each revolution brings you back to the beginning with deeper wisdom. Trust the leap.' },
+  1:  { name:'The Magician',        icon:'🪄', brief:'Manifestation, willpower, and the ability to channel divine energy into earthly creation.',
+        deep:'The Magician stands at the table with all four elements before them — everything they need is already present. As a birth card, the Magician marks you as a natural channeller: someone who bridges the invisible and the visible, turning thought into reality with focused will. You have extraordinary creative power, but it requires discipline and integrity. When you align your intention with your actions, you are genuinely unstoppable. The shadow is manipulation — using your gifts to control rather than create.' },
+  2:  { name:'The High Priestess',  icon:'🌙', brief:'Intuition, mystery, and the deep wisdom that lives beyond the rational mind.',
+        deep:'The High Priestess sits between the pillars of light and dark, guarding the threshold to the unconscious. As a birth card, she marks you as someone with extraordinary intuitive depth. You know things before you can explain them. Dreams, symbols, and synchronicities speak to you in a language the rational mind cannot decode. Your power lies in stillness, in listening, in the patience to let truth reveal itself rather than forcing it into the open. The shadow is withdrawal — hiding behind mystery to avoid vulnerability.' },
+  3:  { name:'The Empress',         icon:'👑', brief:'Abundance, sensuality, creative fertility, and the nurturing power of unconditional love.',
+        deep:'The Empress is the great mother of the tarot — lush, fertile, overflowing with creative and nurturing energy. As a birth card, the Empress marks you as someone whose purpose is deeply connected to creation: art, children, gardens, businesses, beauty in all its forms. You draw abundance to you naturally when you are in your flow. Sensory pleasure is not indulgence for you — it is spiritual practice. The shadow is over-giving: pouring so much into others that your own garden goes untended.' },
+  4:  { name:'The Emperor',         icon:'⚔️', brief:'Structure, authority, leadership, and the power to build lasting foundations.',
+        deep:'The Emperor sits on his throne of stone — stable, commanding, and unwavering. As a birth card, the Emperor marks you as someone who came to build structure in the world. You have a natural authority that others recognise and respect. Systems, organisations, rules, and hierarchies are your native language. Your gift is the ability to create order from chaos and to lead with clarity. The shadow is rigidity — confusing control with leadership, or building walls so strong they become prisons.' },
+  5:  { name:'The Hierophant',      icon:'🔑', brief:'Tradition, spiritual teaching, and the bridge between earthly and divine wisdom.',
+        deep:'The Hierophant is the keeper of sacred knowledge — the teacher, the mentor, the one who transmits wisdom through tradition and ritual. As a birth card, the Hierophant marks you as someone deeply connected to systems of meaning: religion, philosophy, education, or any framework that helps humans understand their place in the cosmos. You are a natural teacher and student simultaneously. The shadow is dogma — mistaking the finger pointing at the moon for the moon itself.' },
+  6:  { name:'The Lovers',          icon:'💕', brief:'Love, choice, union of opposites, and the sacred power of authentic relationship.',
+        deep:'The Lovers stand before the angel of truth, making the choice that will define their journey. As a birth card, the Lovers mark you as someone whose life is fundamentally shaped by relationship and choice. Every significant crossroads in your life asks you to choose between the comfortable and the authentic, between the known and the deeply desired. Love — in all its forms — is your greatest teacher. The shadow is indecision, or the belief that choosing one path means losing everything the other offered.' },
+  7:  { name:'The Chariot',         icon:'🏇', brief:'Willpower, determination, triumph over obstacles through focused direction.',
+        deep:'The Chariot moves forward through sheer force of will — the driver holds no reins, steering only with intention and inner alignment. As a birth card, the Chariot marks you as someone who achieves through determination and directed willpower. You are at your most powerful when you have a clear destination and the discipline to stay the course. Victory for you is not accidental; it is the result of aligning every part of yourself toward a single purpose. The shadow is the inability to rest — confusing movement with progress.' },
+  8:  { name:'Strength',            icon:'🦁', brief:'Inner courage, gentle power, and the ability to tame the wild through compassion.',
+        deep:'Strength shows a figure gently closing the jaws of a lion — not through force but through love and patience. As a birth card, Strength marks you as someone whose true power is internal. You have an extraordinary capacity to face fear, rage, and instinct without being overwhelmed. Your courage is not loud; it is the quiet, steady presence that calms the storm in others and in yourself. The shadow is suppression — forcing the lion shut rather than befriending it.' },
+  9:  { name:'The Hermit',          icon:'🏔️', brief:'Solitude, inner wisdom, and the light that can only be found by going within.',
+        deep:'The Hermit stands alone on the mountain, holding a lantern that lights the path for those who follow. As a birth card, the Hermit marks you as someone whose wisdom comes from solitude and introspection. You need time alone — not as escape but as essential nourishment. The answers you seek are never found in the crowd; they emerge in silence, in contemplation, in the slow patient work of knowing yourself. The shadow is isolation — using wisdom as a wall rather than a bridge.' },
+  10: { name:'Wheel of Fortune',    icon:'🎡', brief:'Cycles, destiny, turning points, and the understanding that change is the only constant.',
+        deep:'The Wheel turns endlessly — what rises must fall, what falls will rise again. As a birth card, the Wheel of Fortune marks you as someone deeply attuned to the cyclical nature of life. You understand — perhaps more than most — that nothing is permanent, and that this impermanence is not a curse but a liberation. Your life may be marked by dramatic turning points that seem to arrive from nowhere. The gift is the ability to ride change rather than resist it. The shadow is passivity — waiting for the wheel to turn rather than engaging with where you are.' },
+  11: { name:'Justice',             icon:'⚖️', brief:'Truth, fairness, karmic balance, and the consequences of every choice.',
+        deep:'Justice holds the scales in perfect balance and the sword of truth without hesitation. As a birth card, Justice marks you as someone with an acute sense of right and wrong, cause and effect. You are here to understand — and to demonstrate — that every action has a consequence, and that true fairness requires seeing clearly rather than sentimentally. Your life teaches you karmic lessons with unusual precision. The shadow is harsh judgement — of yourself and others — that forgets mercy is also a form of justice.' },
+  12: { name:'The Hanged Man',      icon:'🔮', brief:'Surrender, new perspectives, willing sacrifice, and the wisdom of letting go.',
+        deep:'The Hanged Man dangles upside down by choice — not as punishment but as a deliberate shift in perspective. As a birth card, the Hanged Man marks you as someone whose deepest growth comes through surrender, through letting go of control, through seeing the world from an angle no one else occupies. You may often feel out of step with the world, and this is your gift: the ability to see what others cannot because you are willing to hang in the discomfort of not-knowing. The shadow is martyrdom — suffering for its own sake rather than for genuine transformation.' },
+  13: { name:'Death',               icon:'🦋', brief:'Transformation, endings that birth beginnings, and the profound power of release.',
+        deep:'Death is the great transformer — not an ending but a threshold, the composting of the old into the fertile soil of the new. As a birth card, Death marks you as someone who has come to master the art of letting go. Your life will be punctuated by profound endings — relationships, identities, entire chapters — that clear the ground for what could never have grown otherwise. You understand at a cellular level that clinging is the source of suffering. The shadow is the fear of the very transformation you were born to embody.' },
+  14: { name:'Temperance',          icon:'⚗️', brief:'Balance, patience, alchemy, and the art of blending opposites into harmony.',
+        deep:'Temperance pours water between two cups in an endless flow — the alchemist of the tarot, turning lead into gold through patience and balance. As a birth card, Temperance marks you as someone whose purpose is integration. You are here to blend the seemingly incompatible: head and heart, spirit and matter, tradition and innovation. Your gift is moderation that does not diminish but elevates. The shadow is blandness — smoothing out every edge until nothing distinctive remains.' },
+  15: { name:'The Devil',           icon:'⛓️', brief:'Shadow work, attachment, liberation through confronting what binds you.',
+        deep:'The Devil shows two figures chained to a pedestal — but the chains are loose enough to remove. As a birth card, the Devil marks you as someone whose journey is fundamentally about confronting attachment, addiction, and the shadow self. You have a powerful relationship with the material world and with desire. This is not a flaw — it is your arena of mastery. When you face your shadows honestly, you discover a freedom that those who avoid the dark can never access. The shadow is denial — pretending the chains do not exist.' },
+  16: { name:'The Tower',           icon:'⚡', brief:'Sudden awakening, liberation through disruption, and truth that shatters illusion.',
+        deep:'The Tower is struck by lightning — the structures built on false foundations crumble in an instant, and the inhabitants are thrown into the air. As a birth card, the Tower marks you as someone whose life includes dramatic, sudden awakenings that shatter what you thought you knew. These moments are not punishments; they are liberations. You are here to learn that truth, however disruptive, is always preferable to a comfortable lie. The shadow is the addiction to crisis — creating chaos because stability feels suspicious.' },
+  17: { name:'The Star',            icon:'⭐', brief:'Hope, inspiration, healing, and the quiet faith that follows the darkest night.',
+        deep:'The Star kneels naked under the night sky, pouring water onto the earth and into the pool — an act of pure, unguarded giving. As a birth card, the Star marks you as someone who carries hope. You may not always feel it, but others sense it in you — a quiet radiance, a faith that persists even after devastation. You are a healer, not through dramatic intervention but through the steady, patient act of showing up and being real. The shadow is disconnection — floating so far into the ethereal that you lose touch with the ground beneath you.' },
+  18: { name:'The Moon',            icon:'🌕', brief:'Intuition, illusion, the unconscious, and the courage to walk the path without clear sight.',
+        deep:'The Moon illuminates a path that winds between two towers, guarded by creatures of the deep. As a birth card, the Moon marks you as someone whose journey moves through the landscape of the unconscious — dreams, fears, ancestral memory, and the vast territory of what cannot be seen clearly. You have a profound relationship with illusion: the ability to see through it, but also the temptation to create it. Your gift is navigating by feeling when the mind insists on a map. The shadow is self-deception — mistaking the reflection for the thing itself.' },
+  19: { name:'The Sun',             icon:'☀️', brief:'Joy, vitality, success, and the radiant confidence of living in full authenticity.',
+        deep:'The Sun shines with unconditional warmth — a child rides joyfully, arms open, into the golden light. As a birth card, the Sun marks you as someone whose purpose is joy, vitality, and the full expression of the authentic self. You came here to shine, and when you allow yourself to, everything around you blooms. Success comes naturally when you stop dimming your light to make others comfortable. The shadow is the fear that joy itself is naive or undeserved — the belief that you must earn the right to be happy.' },
+  20: { name:'Judgement',           icon:'📯', brief:'Awakening, calling, resurrection, and answering the summons of your highest purpose.',
+        deep:'Judgement sounds the trumpet — the dead rise from their coffins, arms lifted in awakening. As a birth card, Judgement marks you as someone who will experience a profound calling in this lifetime — a moment (or series of moments) when you hear, unmistakably, what you were born to do. This card is about resurrection: the parts of yourself you thought were dead will rise again, transformed. Your gift is the ability to answer the call even when it terrifies you. The shadow is ignoring the trumpet — staying in the coffin because rising requires too much change.' },
+  21: { name:'The World',           icon:'🌍', brief:'Completion, wholeness, integration, and the dance of a fully realised soul.',
+        deep:'The World dancer floats within the wreath of completion — all four elements unified, the journey fulfilled. As a birth card, the World marks you as someone who came to integrate, to complete, to bring things full circle. You carry an old-soul quality: a sense that you have been here before and that this time you are tying up the loose ends of many lifetimes. Your gift is the ability to see the whole picture and to bring disparate parts into unity. The shadow is the restlessness of completion — the fear that once you finish, there will be nothing left to do.' },
+};
+
+function calculateBirthCards(y, m, d) {
+  let sum = m + d + y;
+  while (sum > 9) {
+    sum = String(sum).split('').reduce((a, n) => a + Number(n), 0);
+  }
+  const soul = sum;
+
+  const BIRTH_CARD_PAIRS = {
+    1: [19, 10, 1],
+    2: [20, 2],
+    3: [21, 3],
+    4: [13, 4],
+    5: [14, 5],
+    6: [15, 6],
+    7: [16, 7],
+    8: [17, 8],
+    9: [18, 9],
+  };
+
+  return BIRTH_CARD_PAIRS[soul] || [soul];
+}
+
+function buildTarotBirthCards(y, m, d) {
+  const cardNums = calculateBirthCards(y, m, d);
+  const labels = ['Personality Card', 'Soul Card', 'Hidden Card'];
+
+  let html = '';
+  cardNums.forEach((num, i) => {
+    const card = MAJOR_ARCANA[num];
+    if (!card) return;
+    const label = cardNums.length === 3 ? ['Personality Card', 'Soul Card', 'Hidden Card'][i] :
+                  cardNums.length === 2 ? ['Personality Card', 'Soul Card'][i] : 'Birth Card';
+    const cardSVG = buildTarotCardSVG(num);
+    html += `<div class="placement-card">
+      <div class="planet-row">
+        <span class="planet-icon">${card.icon}</span>
+        <span class="planet-name">${label} — ${num}</span>
+      </div>
+      ${cardSVG}
+      <div class="placement-value">${card.name}</div>
+      <div class="brief-desc">${card.brief}</div>
+      <div class="deep-desc">${card.deep}</div>
+      <button class="dive-btn" onclick="this.parentElement.classList.toggle('expanded');this.textContent=this.parentElement.classList.contains('expanded')?'Close ▴':'Dive Deeper ▾'">Dive Deeper ▾</button>
+    </div>`;
+  });
+
+  if (cardNums.length === 2) {
+    const c1 = MAJOR_ARCANA[cardNums[0]], c2 = MAJOR_ARCANA[cardNums[1]];
+    html += makeCard('✦', 'Your Birth Card Pair', `${c1.name} & ${c2.name}`,
+      `Your two birth cards create a lifelong dialogue: ${c1.name} represents how you move through the world, while ${c2.name} reveals your innermost soul essence.`,
+      `The ${c1.name} (${cardNums[0]}) and ${c2.name} (${cardNums[1]}) form one of the sacred pairings in tarot numerology. ${c1.name} is your Personality Card — the archetype you express outwardly, the energy others see in you, and the lessons you are most visibly working through in this lifetime. ${c2.name} is your Soul Card — the deeper, quieter truth beneath the surface, the essence that drives your Personality Card's expression. Together, they tell the story of your soul's purpose: the ${c2.name} provides the WHY, and the ${c1.name} provides the HOW.`,
+      false);
+  } else if (cardNums.length === 3) {
+    const c1 = MAJOR_ARCANA[19], c2 = MAJOR_ARCANA[10], c3 = MAJOR_ARCANA[1];
+    html += makeCard('✦', 'Your Triple Birth Card', `${c1.name}, ${c2.name} & ${c3.name}`,
+      `The rarest birth card combination: three cards that trace your soul from radiant joy through the cycles of fate to pure creative will.`,
+      `You carry the extraordinary triple of ${c1.name} (19), ${c2.name} (10), and ${c3.name} (1). The Sun is your outward radiance — the joy and authenticity you are here to embody. The Wheel of Fortune is your soul's relationship with change, destiny, and the great turning cycles of life. The Magician is your deepest essence — pure creative will, the power to manifest reality through focused intention. Together, these three cards suggest a soul that has come to master the full spectrum: from willpower to surrender to celebration.`,
+      false);
+  }
+
+  document.getElementById('tarot-placements').innerHTML = html;
 }
 
 // ─────────────────────────────────────────────
@@ -2930,14 +3245,70 @@ function buildAstrocartographyMap(planets, jd, birthLat, birthLon) {
   ];
 
   const CITIES = [
-    {n:'London',    lon:0,    lat:51.5}, {n:'Paris',    lon:2,   lat:49  },
-    {n:'Berlin',    lon:13,   lat:52.5}, {n:'Moscow',   lon:37,  lat:56  },
-    {n:'NYC',       lon:-74,  lat:41  }, {n:'LA',       lon:-118,lat:34  },
-    {n:'Chicago',   lon:-87,  lat:42  }, {n:'São Paulo', lon:-46, lat:-23},
-    {n:'Cairo',     lon:31,   lat:30  }, {n:'Cape Town', lon:18,  lat:-34},
-    {n:'Mumbai',    lon:73,   lat:19  }, {n:'Dubai',    lon:55,  lat:25  },
-    {n:'Tokyo',     lon:140,  lat:36  }, {n:'Sydney',   lon:151, lat:-34 },
-    {n:'Singapore', lon:104,  lat:1   }, {n:'Beijing',  lon:116, lat:40  },
+    // Europe
+    {n:'London',     lon:0,    lat:51.5}, {n:'Paris',     lon:2,    lat:49  },
+    {n:'Berlin',     lon:13,   lat:52.5}, {n:'Moscow',    lon:37,   lat:56  },
+    {n:'Madrid',     lon:-3.7, lat:40.4}, {n:'Rome',      lon:12.5, lat:41.9},
+    {n:'Lisbon',     lon:-9.1, lat:38.7}, {n:'Amsterdam',  lon:4.9, lat:52.4},
+    {n:'Stockholm',  lon:18,   lat:59.3}, {n:'Dublin',    lon:-6.3, lat:53.3},
+    {n:'Athens',     lon:23.7, lat:37.9}, {n:'Warsaw',    lon:21,   lat:52.2},
+    {n:'Vienna',     lon:16.4, lat:48.2}, {n:'Oslo',      lon:10.7, lat:59.9},
+    {n:'Helsinki',   lon:25,   lat:60.2}, {n:'Prague',    lon:14.4, lat:50.1},
+    {n:'Copenhagen', lon:12.6, lat:55.7}, {n:'Bucharest', lon:26.1, lat:44.4},
+    {n:'Istanbul',   lon:29,   lat:41  },
+    // North America
+    {n:'NYC',        lon:-74,  lat:41  }, {n:'LA',        lon:-118, lat:34  },
+    {n:'Chicago',    lon:-87,  lat:42  }, {n:'Toronto',   lon:-79.4,lat:43.7},
+    {n:'Mexico City',lon:-99.1,lat:19.4}, {n:'Washington',lon:-77,  lat:38.9},
+    {n:'Miami',      lon:-80.2,lat:25.8}, {n:'Vancouver', lon:-123, lat:49.3},
+    {n:'Havana',     lon:-82.4,lat:23.1},
+    // South America
+    {n:'São Paulo',  lon:-46,  lat:-23 }, {n:'Buenos Aires',lon:-58.4,lat:-34.6},
+    {n:'Lima',       lon:-77,  lat:-12 }, {n:'Bogotá',    lon:-74.1,lat:4.7 },
+    {n:'Santiago',   lon:-70.7,lat:-33.4}, {n:'Rio',       lon:-43.2,lat:-22.9},
+    // Africa — capitals
+    {n:'Cairo',        lon:31.2, lat:30.1 }, {n:'Cape Town',   lon:18.4, lat:-33.9},
+    {n:'Lagos',        lon:3.4,  lat:6.5  }, {n:'Nairobi',     lon:36.8, lat:-1.3 },
+    {n:'Accra',        lon:-0.2, lat:5.6  }, {n:'Addis Ababa', lon:38.7, lat:9    },
+    {n:'Casablanca',   lon:-7.6, lat:33.6 }, {n:'Johannesburg',lon:28,   lat:-26.2},
+    {n:'Rabat',        lon:-6.8, lat:34   }, {n:'Algiers',     lon:3,    lat:36.8 },
+    {n:'Tunis',        lon:10.2, lat:36.8 }, {n:'Tripoli',     lon:13.2, lat:32.9 },
+    {n:'Khartoum',     lon:32.5, lat:15.6 }, {n:'Juba',        lon:31.6, lat:4.9  },
+    {n:'Mogadishu',    lon:45.3, lat:2    }, {n:'Djibouti',    lon:43.1, lat:11.6 },
+    {n:'Asmara',       lon:38.9, lat:15.3 }, {n:'Kampala',     lon:32.6, lat:0.3  },
+    {n:'Dar es Salaam',lon:39.3, lat:-6.8 }, {n:'Kigali',      lon:29.9, lat:-1.9 },
+    {n:'Bujumbura',    lon:29.4, lat:-3.4 }, {n:'Maputo',      lon:32.6, lat:-25.9},
+    {n:'Lusaka',       lon:28.3, lat:-15.4}, {n:'Harare',      lon:31,   lat:-17.8},
+    {n:'Lilongwe',     lon:33.8, lat:-13.9}, {n:'Antananarivo',lon:47.5, lat:-18.9},
+    {n:'Windhoek',     lon:17.1, lat:-22.6}, {n:'Gaborone',    lon:25.9, lat:-24.7},
+    {n:'Pretoria',     lon:28.2, lat:-25.7}, {n:'Maseru',      lon:27.5, lat:-29.3},
+    {n:'Mbabane',      lon:31.1, lat:-26.3}, {n:'Luanda',      lon:13.2, lat:-8.8 },
+    {n:'Kinshasa',     lon:15.3, lat:-4.3 }, {n:'Brazzaville', lon:15.3, lat:-4.3 },
+    {n:'Yaoundé',      lon:11.5, lat:3.9  }, {n:'Abuja',       lon:7.5,  lat:9.1  },
+    {n:'Niamey',       lon:2.1,  lat:13.5 }, {n:'Ouagadougou', lon:-1.5, lat:12.4 },
+    {n:'Bamako',       lon:-8,   lat:12.6 }, {n:'Dakar',       lon:-17.4,lat:14.7 },
+    {n:'Dakar',        lon:-17.4,lat:14.7 }, {n:'Conakry',     lon:-13.7,lat:9.6  },
+    {n:'Monrovia',     lon:-10.8,lat:6.3  }, {n:'Lomé',        lon:1.2,  lat:6.1  },
+    {n:'Libreville',   lon:9.5,  lat:0.4  },
+    {n:'Bangui',       lon:18.6, lat:4.4  }, {n:'N\'Djamena',  lon:15,   lat:12.1 },
+    {n:'Nouakchott',   lon:-15.9,lat:18.1 }, {n:'Moroni',      lon:43.3, lat:-11.7},
+    {n:'Victoria',     lon:55.5, lat:-4.6 }, {n:'Port Louis',  lon:57.5, lat:-20.2},
+    // Middle East & Central Asia
+    {n:'Dubai',      lon:55,   lat:25  }, {n:'Tel Aviv',  lon:34.8, lat:32.1},
+    {n:'Riyadh',     lon:46.7, lat:24.7}, {n:'Tehran',    lon:51.4, lat:35.7},
+    {n:'Baghdad',    lon:44.4, lat:33.3},
+    // South & East Asia
+    {n:'Mumbai',     lon:73,   lat:19  }, {n:'Delhi',     lon:77.2, lat:28.6},
+    {n:'Kolkata',    lon:88.4, lat:22.6}, {n:'Bangkok',   lon:100.5,lat:13.8},
+    {n:'Tokyo',      lon:140,  lat:36  }, {n:'Beijing',   lon:116,  lat:40  },
+    {n:'Shanghai',   lon:121.5,lat:31.2}, {n:'Seoul',     lon:127,  lat:37.6},
+    {n:'Singapore',  lon:104,  lat:1   }, {n:'Jakarta',   lon:106.8,lat:-6.2},
+    {n:'Manila',     lon:121,  lat:14.6}, {n:'Hanoi',     lon:105.8,lat:21  },
+    {n:'Taipei',     lon:121.5,lat:25  },
+    // Oceania
+    {n:'Sydney',     lon:151,  lat:-34 }, {n:'Melbourne', lon:145,  lat:-37.8},
+    {n:'Auckland',   lon:174.8,lat:-36.9}, {n:'Perth',    lon:115.9,lat:-31.9},
+    {n:'Brisbane',   lon:153,  lat:-27.5},
   ];
 
   let out = '';
@@ -3715,6 +4086,86 @@ function renderSocialList() {
   renderSolarSystem(people);
 }
 
+const SIGN_RULERS = {
+  Aries:'Mars', Taurus:'Venus', Gemini:'Mercury', Cancer:'Moon',
+  Leo:'Sun', Virgo:'Mercury', Libra:'Venus', Scorpio:'Pluto',
+  Sagittarius:'Jupiter', Capricorn:'Saturn', Aquarius:'Uranus', Pisces:'Neptune'
+};
+
+function drawRulingPlanet(cx, cy, r, sunSign, id) {
+  const ruler = SIGN_RULERS[sunSign] || 'Sun';
+  const x = cx.toFixed(1), y = cy.toFixed(1);
+  let s = '';
+
+  if (ruler === 'Mars') {
+    s += `<defs><radialGradient id="g${id}" cx="35%" cy="35%"><stop offset="0%" stop-color="#E08060"/><stop offset="50%" stop-color="#C04030"/><stop offset="100%" stop-color="#801A10"/></radialGradient></defs>`;
+    s += `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g${id})"/>`;
+    s += `<ellipse cx="${cx-4}" cy="${cy+2}" rx="6" ry="4" fill="#A03020" opacity="0.4"/>`;
+    s += `<ellipse cx="${cx+6}" cy="${cy-5}" rx="4" ry="3" fill="#D06050" opacity="0.3"/>`;
+    s += `<circle cx="${cx-3}" cy="${cy-6}" r="2" fill="#901810" opacity="0.3"/>`;
+  } else if (ruler === 'Venus') {
+    s += `<defs><radialGradient id="g${id}" cx="35%" cy="35%"><stop offset="0%" stop-color="#FFF0C0"/><stop offset="40%" stop-color="#F0D080"/><stop offset="100%" stop-color="#C89840"/></radialGradient></defs>`;
+    s += `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g${id})"/>`;
+    s += `<ellipse cx="${x}" cy="${cy-3}" rx="${r*0.8}" ry="3" fill="#E0C060" opacity="0.2" transform="rotate(-15,${x},${y})"/>`;
+    s += `<ellipse cx="${x}" cy="${cy+5}" rx="${r*0.7}" ry="2.5" fill="#D0B050" opacity="0.2" transform="rotate(10,${x},${y})"/>`;
+    s += `<ellipse cx="${x}" cy="${y}" rx="${r*0.6}" ry="2" fill="#F0E0A0" opacity="0.15"/>`;
+  } else if (ruler === 'Mercury') {
+    s += `<defs><radialGradient id="g${id}" cx="35%" cy="35%"><stop offset="0%" stop-color="#C0B8B0"/><stop offset="50%" stop-color="#908880"/><stop offset="100%" stop-color="#605850"/></radialGradient></defs>`;
+    s += `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g${id})"/>`;
+    s += `<circle cx="${cx-5}" cy="${cy-4}" r="3.5" fill="#706860" opacity="0.4"/>`;
+    s += `<circle cx="${cx+6}" cy="${cy+3}" r="4" fill="#605850" opacity="0.3"/>`;
+    s += `<circle cx="${cx+2}" cy="${cy-7}" r="2.5" fill="#807870" opacity="0.3"/>`;
+    s += `<circle cx="${cx-7}" cy="${cy+5}" r="2" fill="#504840" opacity="0.3"/>`;
+  } else if (ruler === 'Moon') {
+    s += `<defs><radialGradient id="g${id}" cx="40%" cy="35%"><stop offset="0%" stop-color="#F0F0F0"/><stop offset="50%" stop-color="#D0D0D8"/><stop offset="100%" stop-color="#A0A0B0"/></radialGradient></defs>`;
+    s += `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g${id})"/>`;
+    s += `<circle cx="${cx-5}" cy="${cy-3}" r="4" fill="#B8B8C8" opacity="0.3"/>`;
+    s += `<circle cx="${cx+7}" cy="${cy+4}" r="3" fill="#C0C0D0" opacity="0.25"/>`;
+    s += `<circle cx="${cx+2}" cy="${cy-8}" r="2.5" fill="#B0B0C0" opacity="0.3"/>`;
+    s += `<circle cx="${cx-8}" cy="${cy+6}" r="2" fill="#A8A8B8" opacity="0.3"/>`;
+  } else if (ruler === 'Sun') {
+    s += `<defs><radialGradient id="g${id}" cx="45%" cy="45%"><stop offset="0%" stop-color="#FFF4C0"/><stop offset="40%" stop-color="#FFD040"/><stop offset="100%" stop-color="#E09010"/></radialGradient>
+      <filter id="gl${id}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur in="SourceGraphic" stdDeviation="2"/></filter></defs>`;
+    s += `<circle cx="${x}" cy="${y}" r="${r+3}" fill="#FFD04030" filter="url(#gl${id})"/>`;
+    s += `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g${id})"/>`;
+    s += `<circle cx="${cx-4}" cy="${cy-4}" r="2" fill="#FFF0A0" opacity="0.5"/>`;
+  } else if (ruler === 'Jupiter') {
+    s += `<defs><radialGradient id="g${id}" cx="35%" cy="35%"><stop offset="0%" stop-color="#F0D0A0"/><stop offset="50%" stop-color="#D0A060"/><stop offset="100%" stop-color="#A07030"/></radialGradient></defs>`;
+    s += `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g${id})"/>`;
+    s += `<ellipse cx="${x}" cy="${cy-7}" rx="${r*0.9}" ry="2" fill="#C09040" opacity="0.4"/>`;
+    s += `<ellipse cx="${x}" cy="${cy-2}" rx="${r*0.95}" ry="2.5" fill="#B08030" opacity="0.35"/>`;
+    s += `<ellipse cx="${x}" cy="${cy+4}" rx="${r*0.85}" ry="2" fill="#D0A050" opacity="0.3"/>`;
+    s += `<ellipse cx="${x}" cy="${cy+9}" rx="${r*0.7}" ry="1.8" fill="#C09040" opacity="0.3"/>`;
+    s += `<ellipse cx="${cx-6}" cy="${cy+2}" rx="4" ry="3.5" fill="#C08040" opacity="0.35"/>`;
+  } else if (ruler === 'Saturn') {
+    s += `<defs><radialGradient id="g${id}" cx="35%" cy="35%"><stop offset="0%" stop-color="#F0E0C0"/><stop offset="50%" stop-color="#D0C090"/><stop offset="100%" stop-color="#A09060"/></radialGradient></defs>`;
+    s += `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g${id})"/>`;
+    s += `<ellipse cx="${x}" cy="${cy-3}" rx="${r*0.85}" ry="1.5" fill="#C0B080" opacity="0.3"/>`;
+    s += `<ellipse cx="${x}" cy="${cy+3}" rx="${r*0.8}" ry="1.5" fill="#B0A070" opacity="0.25"/>`;
+    s += `<ellipse cx="${x}" cy="${y}" rx="${r*1.7}" ry="${r*0.35}" fill="none" stroke="#C0B08080" stroke-width="2.5" transform="rotate(-20,${x},${y})"/>`;
+    s += `<ellipse cx="${x}" cy="${y}" rx="${r*1.5}" ry="${r*0.28}" fill="none" stroke="#D0C09060" stroke-width="1.5" transform="rotate(-20,${x},${y})"/>`;
+  } else if (ruler === 'Uranus') {
+    s += `<defs><radialGradient id="g${id}" cx="40%" cy="35%"><stop offset="0%" stop-color="#C0F0F0"/><stop offset="50%" stop-color="#60C8D0"/><stop offset="100%" stop-color="#308090"/></radialGradient></defs>`;
+    s += `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g${id})"/>`;
+    s += `<ellipse cx="${x}" cy="${y}" rx="${r*0.85}" ry="2" fill="#80D0D0" opacity="0.2"/>`;
+    s += `<ellipse cx="${x}" cy="${y}" rx="${r*1.35}" ry="${r*0.15}" fill="none" stroke="#80D0D860" stroke-width="1.5" transform="rotate(80,${x},${y})"/>`;
+  } else if (ruler === 'Neptune') {
+    s += `<defs><radialGradient id="g${id}" cx="35%" cy="35%"><stop offset="0%" stop-color="#80A0F0"/><stop offset="50%" stop-color="#4060D0"/><stop offset="100%" stop-color="#203090"/></radialGradient></defs>`;
+    s += `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g${id})"/>`;
+    s += `<ellipse cx="${x}" cy="${cy-5}" rx="${r*0.8}" ry="2" fill="#5070E0" opacity="0.3"/>`;
+    s += `<ellipse cx="${x}" cy="${cy+4}" rx="${r*0.7}" ry="1.8" fill="#4060D0" opacity="0.25"/>`;
+    s += `<ellipse cx="${cx+5}" cy="${cy-2}" rx="5" ry="4" fill="#6080E0" opacity="0.2"/>`;
+  } else if (ruler === 'Pluto') {
+    s += `<defs><radialGradient id="g${id}" cx="35%" cy="35%"><stop offset="0%" stop-color="#D0B8A0"/><stop offset="50%" stop-color="#907060"/><stop offset="100%" stop-color="#504030"/></radialGradient></defs>`;
+    s += `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g${id})"/>`;
+    s += `<ellipse cx="${cx-3}" cy="${cy}" rx="7" ry="6" fill="#C0A080" opacity="0.25"/>`;
+    s += `<circle cx="${cx+5}" cy="${cy-5}" r="3" fill="#806050" opacity="0.3"/>`;
+    s += `<circle cx="${cx-6}" cy="${cy+4}" r="2" fill="#706050" opacity="0.3"/>`;
+  }
+
+  return s;
+}
+
 function renderSolarSystem(people) {
   const el = document.getElementById('solar-system');
   if (!people || people.length === 0) { el.innerHTML = ''; return; }
@@ -3775,14 +4226,13 @@ function renderSolarSystem(people) {
       const px = CX + r * Math.cos(angle);
       const py = CY + r * Math.sin(angle);
 
-      const chart = computeSocialChart(p);
       const sunIdx = signOf(sunLongitude(jdn(...p.dob.split('-').map(Number))));
-      const glyph = SIGN_ICONS[sunIdx];
+      const sunSign = SIGNS[sunIdx];
+      const pid = 'sp' + p.id;
 
       svg += `<g style="cursor:pointer" onclick="viewSocialChart(${p.id})">`;
-      svg += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="20" fill="${col}22" stroke="${col}" stroke-width="1.2"/>`;
-      svg += `<text x="${px.toFixed(1)}" y="${(py - 3).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="14" fill="${col}" font-family="serif">${glyph}</text>`;
-      svg += `<text x="${px.toFixed(1)}" y="${(py + 11).toFixed(1)}" text-anchor="middle" font-size="7" fill="${col}" font-family="'Times New Roman',serif" font-weight="bold">${p.name}</text>`;
+      svg += drawRulingPlanet(px, py, 20, sunSign, pid);
+      svg += `<text x="${px.toFixed(1)}" y="${(py + 28).toFixed(1)}" text-anchor="middle" font-size="7" fill="${col}" font-family="'Times New Roman',serif" font-weight="bold">${p.name}</text>`;
       svg += `</g>`;
 
       svg += `<line x1="${CX}" y1="${CY}" x2="${px.toFixed(1)}" y2="${py.toFixed(1)}" stroke="${col}" stroke-width="0.4" opacity="0.15"/>`;
@@ -3904,7 +4354,7 @@ function showInsights() {
   const shuffled = insights.sort(() => Math.random() - 0.5);
   const display = shuffled.slice(0, 6);
 
-  let html = `<div style="text-align:center;padding:1.5rem 0 1rem;">
+  let html = `<div onclick="event.stopPropagation()" style="text-align:center;padding:1.5rem 0 1rem;">
     <h2 style="font-size:1.4rem;background:linear-gradient(135deg,#fbbf24,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:'Danfo',serif;margin-bottom:0.3rem;">✦ Circle Insights ✦</h2>
     <p style="color:#94a3b8;font-size:0.82rem;font-family:var(--sans);font-style:italic;">Patterns and connections in your cosmic circle</p>
   </div>
@@ -4132,188 +4582,212 @@ const AVATAR_AURAS = [
 function buildAvatarSVG() {
   const S = AVATAR_STATE;
   const outfit = ZODIAC_OUTFITS[S.outfit];
-  const W = 220, H = 440, CX = 110;
+  const W = 220, H = 520, CX = 110;
   const hc = S.hairColor;
 
   let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">`;
 
-  // Aura background
+  // Aura
   const aura = AVATAR_AURAS.find(a => a.name === S.aura);
   if (aura && aura.colors) {
-    svg += `<defs><radialGradient id="auraG" cx="50%" cy="40%" r="50%">
+    svg += `<defs><radialGradient id="auraG" cx="50%" cy="35%" r="50%">
       <stop offset="0%" stop-color="${aura.colors[0]}" stop-opacity="0.35"/>
       <stop offset="60%" stop-color="${aura.colors[1]}" stop-opacity="0.15"/>
       <stop offset="100%" stop-color="${aura.colors[2]}" stop-opacity="0"/>
     </radialGradient></defs>`;
-    svg += `<ellipse cx="${CX}" cy="200" rx="108" ry="200" fill="url(#auraG)"/>`;
+    svg += `<ellipse cx="${CX}" cy="240" rx="108" ry="260" fill="url(#auraG)"/>`;
   }
 
-  // Legs — slim, stylised, behind body
+  // ── LEGS — long, slim, Bratz proportions ──
   // Left leg
-  svg += `<path d="M${CX-18},295 L${CX-20},385 Q${CX-20},395 ${CX-28},395 L${CX-32},395 Q${CX-36},395 ${CX-36},390 L${CX-36},388 Q${CX-36},385 ${CX-32},385 L${CX-14},385 Z" fill="${S.skin}"/>`;
+  svg += `<path d="M${CX-14},280 Q${CX-16},340 ${CX-15},400 Q${CX-15},440 ${CX-16},460" fill="none" stroke="${S.skin}" stroke-width="13" stroke-linecap="round"/>`;
   // Right leg
-  svg += `<path d="M${CX+18},295 L${CX+20},385 Q${CX+20},395 ${CX+28},395 L${CX+32},395 Q${CX+36},395 ${CX+36},390 L${CX+36},388 Q${CX+36},385 ${CX+32},385 L${CX+14},385 Z" fill="${S.skin}"/>`;
-  // Shoes
-  svg += `<path d="M${CX-36},385 Q${CX-38},398 ${CX-28},398 L${CX-14},398 Q${CX-10},398 ${CX-12},385 Z" fill="${outfit.color}" stroke="${outfit.accent}" stroke-width="0.8"/>`;
-  svg += `<path d="M${CX+12},385 Q${CX+10},398 ${CX+14},398 L${CX+28},398 Q${CX+38},398 ${CX+36},385 Z" fill="${outfit.color}" stroke="${outfit.accent}" stroke-width="0.8"/>`;
+  svg += `<path d="M${CX+14},280 Q${CX+16},340 ${CX+15},400 Q${CX+15},440 ${CX+16},460" fill="none" stroke="${S.skin}" stroke-width="13" stroke-linecap="round"/>`;
+  // Platform boots/heels
+  svg += `<path d="M${CX-24},456 Q${CX-26},470 ${CX-24},475 L${CX-6},475 Q${CX-2},475 ${CX-4},470 L${CX-8},458 Z" fill="${outfit.color}" stroke="${outfit.accent}" stroke-width="0.8"/>`;
+  svg += `<path d="M${CX+8},458 Q${CX+2},475 ${CX+6},475 L${CX+24},475 Q${CX+26},475 ${CX+24},470 L${CX+24},456 Z" fill="${outfit.color}" stroke="${outfit.accent}" stroke-width="0.8"/>`;
+  // Platform sole
+  svg += `<rect x="${CX-26}" y="472" width="22" height="5" rx="2" fill="${outfit.color2}"/>`;
+  svg += `<rect x="${CX+4}" y="472" width="22" height="5" rx="2" fill="${outfit.color2}"/>`;
+  // Heel
+  svg += `<rect x="${CX-24}" y="460" width="4" height="17" rx="1" fill="${outfit.color2}" opacity="0.7"/>`;
+  svg += `<rect x="${CX+20}" y="460" width="4" height="17" rx="1" fill="${outfit.color2}" opacity="0.7"/>`;
 
-  // Arms — behind body, skin tone with hands
-  // Left arm
-  svg += `<path d="M${CX-38},170 Q${CX-58},195 ${CX-55},230 Q${CX-54},250 ${CX-48},260" fill="none" stroke="${S.skin}" stroke-width="10" stroke-linecap="round"/>`;
-  // Left hand
-  svg += `<circle cx="${CX-47}" cy="263" r="7" fill="${S.skin}"/>`;
-  // Right arm
-  svg += `<path d="M${CX+38},170 Q${CX+58},195 ${CX+55},230 Q${CX+54},250 ${CX+48},260" fill="none" stroke="${S.skin}" stroke-width="10" stroke-linecap="round"/>`;
-  // Right hand
-  svg += `<circle cx="${CX+47}" cy="263" r="7" fill="${S.skin}"/>`;
+  // ── ARMS — slim, posed, behind body ──
+  // Left arm — hand on hip
+  svg += `<path d="M${CX-32},175 Q${CX-52},190 ${CX-50},215 Q${CX-48},235 ${CX-34},248" fill="none" stroke="${S.skin}" stroke-width="9" stroke-linecap="round"/>`;
+  svg += `<ellipse cx="${CX-33}" cy="250" rx="6" ry="5" fill="${S.skin}"/>`;
+  // Right arm — relaxed
+  svg += `<path d="M${CX+32},175 Q${CX+50},195 ${CX+52},225 Q${CX+53},255 ${CX+48},275" fill="none" stroke="${S.skin}" stroke-width="9" stroke-linecap="round"/>`;
+  svg += `<ellipse cx="${CX+47}" cy="278" rx="6" ry="5" fill="${S.skin}"/>`;
 
-  // Body / outfit — slimmer, more stylised
-  svg += `<path d="M${CX-38},185 Q${CX-42},162 ${CX-22},152 Q${CX},145 ${CX+22},152 Q${CX+42},162 ${CX+38},185 L${CX+32},295 Q${CX+32},305 ${CX},305 Q${CX-32},305 ${CX-32},295 Z" fill="${outfit.color}"/>`;
-  svg += `<path d="M${CX-22},152 Q${CX},145 ${CX+22},152 L${CX+14},180 Q${CX},185 ${CX-14},180 Z" fill="${outfit.color2}" opacity="0.7"/>`;
-  svg += `<path d="M${CX-16},155 Q${CX},162 ${CX+16},155" fill="none" stroke="${outfit.accent}" stroke-width="1.5" opacity="0.8"/>`;
-  svg += `<line x1="${CX}" y1="180" x2="${CX}" y2="285" stroke="${outfit.accent}" stroke-width="1" opacity="0.25"/>`;
-  // Outfit hem detail
-  svg += `<path d="M${CX-32},295 Q${CX},310 ${CX+32},295" fill="none" stroke="${outfit.accent}" stroke-width="1" opacity="0.4"/>`;
+  // ── BODY — mini dress/outfit, cinched waist, fashion silhouette ──
+  // Shoulders to waist to hip flare (mini dress shape)
+  svg += `<path d="M${CX-34},172 Q${CX-36},160 ${CX-20},152 Q${CX},146 ${CX+20},152 Q${CX+36},160 ${CX+34},172 L${CX+26},210 Q${CX+22},218 ${CX+16},220 Q${CX+20},225 ${CX+34},260 Q${CX+36},280 ${CX+28},285 Q${CX},292 ${CX-28},285 Q${CX-36},280 ${CX-34},260 Q${CX-20},225 ${CX-16},220 Q${CX-22},218 ${CX-26},210 Z" fill="${outfit.color}"/>`;
+  // Bust/chest highlight
+  svg += `<path d="M${CX-20},152 Q${CX},146 ${CX+20},152 L${CX+14},178 Q${CX},183 ${CX-14},178 Z" fill="${outfit.color2}" opacity="0.6"/>`;
+  // Neckline
+  svg += `<path d="M${CX-16},155 Q${CX},163 ${CX+16},155" fill="none" stroke="${outfit.accent}" stroke-width="1.5" opacity="0.8"/>`;
+  // Waist cinch detail
+  svg += `<path d="M${CX-16},220 Q${CX},216 ${CX+16},220" fill="none" stroke="${outfit.accent}" stroke-width="1.2" opacity="0.5"/>`;
+  // Skirt hem
+  svg += `<path d="M${CX-28},285 Q${CX},295 ${CX+28},285" fill="none" stroke="${outfit.accent}" stroke-width="1" opacity="0.5"/>`;
+  // Centre accent
+  svg += `<line x1="${CX}" y1="178" x2="${CX}" y2="218" stroke="${outfit.accent}" stroke-width="0.8" opacity="0.2"/>`;
 
-  // Neck — slim and elegant
-  svg += `<rect x="${CX-7}" y="130" width="14" height="24" rx="5" fill="${S.skin}"/>`;
+  // ── NECK — long, slim, elegant ──
+  svg += `<rect x="${CX-6}" y="128" width="12" height="26" rx="4" fill="${S.skin}"/>`;
 
-  // Head — larger, more oval for doll proportions
-  svg += `<ellipse cx="${CX}" cy="90" rx="48" ry="54" fill="${S.skin}"/>`;
+  // ── HEAD — large, heart-shaped, pointed chin ──
+  svg += `<path d="M${CX},140 Q${CX-52},138 ${CX-52},85 Q${CX-52},38 ${CX},42 Q${CX+52},38 ${CX+52},85 Q${CX+52},138 ${CX},140 Z" fill="${S.skin}"/>`;
 
-  // Eyeshadow — dramatic, outfit-coloured
-  svg += `<ellipse cx="${CX-18}" cy="86" rx="14" ry="8" fill="${outfit.color}" opacity="0.2"/>`;
-  svg += `<ellipse cx="${CX+18}" cy="86" rx="14" ry="8" fill="${outfit.color}" opacity="0.2"/>`;
+  // ── EYESHADOW — dramatic, blended, outfit-coloured ──
+  svg += `<ellipse cx="${CX-19}" cy="84" rx="16" ry="10" fill="${outfit.color}" opacity="0.25"/>`;
+  svg += `<ellipse cx="${CX+19}" cy="84" rx="16" ry="10" fill="${outfit.color}" opacity="0.25"/>`;
+  svg += `<ellipse cx="${CX-22}" cy="82" rx="10" ry="6" fill="${outfit.color2}" opacity="0.15"/>`;
+  svg += `<ellipse cx="${CX+22}" cy="82" rx="10" ry="6" fill="${outfit.color2}" opacity="0.15"/>`;
 
-  // Eyes — large, almond-shaped, dramatic
-  // White
-  svg += `<ellipse cx="${CX-18}" cy="90" rx="11" ry="8" fill="#fff"/>`;
-  svg += `<ellipse cx="${CX+18}" cy="90" rx="11" ry="8" fill="#fff"/>`;
-  // Iris
-  svg += `<ellipse cx="${CX-17}" cy="91" rx="7" ry="7.5" fill="#5A3820"/>`;
-  svg += `<ellipse cx="${CX+17}" cy="91" rx="7" ry="7.5" fill="#5A3820"/>`;
+  // ── EYES — huge, cat-eye, ultra dramatic ──
+  // Whites — large almond shape
+  svg += `<ellipse cx="${CX-19}" cy="90" rx="14" ry="10" fill="#fff" transform="rotate(-5,${CX-19},90)"/>`;
+  svg += `<ellipse cx="${CX+19}" cy="90" rx="14" ry="10" fill="#fff" transform="rotate(5,${CX+19},90)"/>`;
+  // Iris — large, coloured
+  svg += `<ellipse cx="${CX-18}" cy="91" rx="9" ry="9.5" fill="#5A3820"/>`;
+  svg += `<ellipse cx="${CX+18}" cy="91" rx="9" ry="9.5" fill="#5A3820"/>`;
+  // Iris ring
+  svg += `<ellipse cx="${CX-18}" cy="91" rx="9" ry="9.5" fill="none" stroke="#3A1810" stroke-width="0.8"/>`;
+  svg += `<ellipse cx="${CX+18}" cy="91" rx="9" ry="9.5" fill="none" stroke="#3A1810" stroke-width="0.8"/>`;
   // Pupil
-  svg += `<ellipse cx="${CX-17}" cy="91" rx="3.5" ry="4" fill="#1a1a1a"/>`;
-  svg += `<ellipse cx="${CX+17}" cy="91" rx="3.5" ry="4" fill="#1a1a1a"/>`;
-  // Eye sparkle
-  svg += `<ellipse cx="${CX-15}" cy="88" rx="2.5" ry="2" fill="#fff"/>`;
-  svg += `<ellipse cx="${CX+19}" cy="88" rx="2.5" ry="2" fill="#fff"/>`;
-  svg += `<circle cx="${CX-19}" cy="93" r="1" fill="#fff" opacity="0.6"/>`;
-  svg += `<circle cx="${CX+15}" cy="93" r="1" fill="#fff" opacity="0.6"/>`;
-  // Upper eyeliner — thick, dramatic
-  svg += `<path d="M${CX-29},87 Q${CX-18},80 ${CX-7},88" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round"/>`;
-  svg += `<path d="M${CX+7},88 Q${CX+18},80 ${CX+29},87" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round"/>`;
-  // Lashes — upper, fanned out
-  svg += `<line x1="${CX-28}" y1="86" x2="${CX-33}" y2="80" stroke="#1a1a1a" stroke-width="1.3" stroke-linecap="round"/>`;
-  svg += `<line x1="${CX-24}" y1="84" x2="${CX-27}" y2="77" stroke="#1a1a1a" stroke-width="1.3" stroke-linecap="round"/>`;
-  svg += `<line x1="${CX-19}" y1="83" x2="${CX-20}" y2="76" stroke="#1a1a1a" stroke-width="1.2" stroke-linecap="round"/>`;
-  svg += `<line x1="${CX+28}" y1="86" x2="${CX+33}" y2="80" stroke="#1a1a1a" stroke-width="1.3" stroke-linecap="round"/>`;
-  svg += `<line x1="${CX+24}" y1="84" x2="${CX+27}" y2="77" stroke="#1a1a1a" stroke-width="1.3" stroke-linecap="round"/>`;
-  svg += `<line x1="${CX+19}" y1="83" x2="${CX+20}" y2="76" stroke="#1a1a1a" stroke-width="1.2" stroke-linecap="round"/>`;
-  // Lower lash line — subtle
-  svg += `<path d="M${CX-27},93 Q${CX-18},98 ${CX-8},93" fill="none" stroke="#1a1a1a" stroke-width="0.8" opacity="0.5"/>`;
-  svg += `<path d="M${CX+8},93 Q${CX+18},98 ${CX+27},93" fill="none" stroke="#1a1a1a" stroke-width="0.8" opacity="0.5"/>`;
+  svg += `<ellipse cx="${CX-18}" cy="91" rx="4.5" ry="5" fill="#0a0a0a"/>`;
+  svg += `<ellipse cx="${CX+18}" cy="91" rx="4.5" ry="5" fill="#0a0a0a"/>`;
+  // Eye sparkles — multiple for that glossy doll look
+  svg += `<ellipse cx="${CX-15}" cy="87" rx="3" ry="2.5" fill="#fff"/>`;
+  svg += `<ellipse cx="${CX+21}" cy="87" rx="3" ry="2.5" fill="#fff"/>`;
+  svg += `<circle cx="${CX-21}" cy="94" r="1.5" fill="#fff" opacity="0.7"/>`;
+  svg += `<circle cx="${CX+15}" cy="94" r="1.5" fill="#fff" opacity="0.7"/>`;
+  svg += `<circle cx="${CX-16}" cy="90" r="0.8" fill="#fff" opacity="0.5"/>`;
+  svg += `<circle cx="${CX+20}" cy="90" r="0.8" fill="#fff" opacity="0.5"/>`;
+  // Upper eyeliner — thick, winged cat-eye
+  svg += `<path d="M${CX-33},86 Q${CX-19},76 ${CX-5},88" fill="none" stroke="#1a1a1a" stroke-width="2.8" stroke-linecap="round"/>`;
+  svg += `<path d="M${CX+5},88 Q${CX+19},76 ${CX+33},86" fill="none" stroke="#1a1a1a" stroke-width="2.8" stroke-linecap="round"/>`;
+  // Wing flick
+  svg += `<line x1="${CX-32}" y1="85" x2="${CX-37}" y2="80" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>`;
+  svg += `<line x1="${CX+32}" y1="85" x2="${CX+37}" y2="80" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>`;
+  // Lashes — long, dramatic, fanned
+  svg += `<line x1="${CX-31}" y1="84" x2="${CX-38}" y2="76" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/>`;
+  svg += `<line x1="${CX-26}" y1="81" x2="${CX-30}" y2="72" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/>`;
+  svg += `<line x1="${CX-21}" y1="80" x2="${CX-23}" y2="71" stroke="#1a1a1a" stroke-width="1.4" stroke-linecap="round"/>`;
+  svg += `<line x1="${CX-15}" y1="80" x2="${CX-15}" y2="72" stroke="#1a1a1a" stroke-width="1.2" stroke-linecap="round"/>`;
+  svg += `<line x1="${CX+31}" y1="84" x2="${CX+38}" y2="76" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/>`;
+  svg += `<line x1="${CX+26}" y1="81" x2="${CX+30}" y2="72" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/>`;
+  svg += `<line x1="${CX+21}" y1="80" x2="${CX+23}" y2="71" stroke="#1a1a1a" stroke-width="1.4" stroke-linecap="round"/>`;
+  svg += `<line x1="${CX+15}" y1="80" x2="${CX+15}" y2="72" stroke="#1a1a1a" stroke-width="1.2" stroke-linecap="round"/>`;
+  // Lower lash line
+  svg += `<path d="M${CX-30},95 Q${CX-19},101 ${CX-7},95" fill="none" stroke="#1a1a1a" stroke-width="1" opacity="0.4"/>`;
+  svg += `<path d="M${CX+7},95 Q${CX+19},101 ${CX+30},95" fill="none" stroke="#1a1a1a" stroke-width="1" opacity="0.4"/>`;
 
-  // Eyebrows — arched, defined
-  svg += `<path d="M${CX-28},76 Q${CX-18},70 ${CX-7},77" fill="none" stroke="${hc}" stroke-width="2.2" stroke-linecap="round"/>`;
-  svg += `<path d="M${CX+7},77 Q${CX+18},70 ${CX+28},76" fill="none" stroke="${hc}" stroke-width="2.2" stroke-linecap="round"/>`;
+  // ── EYEBROWS — high arch, defined ──
+  svg += `<path d="M${CX-32},72 Q${CX-19},64 ${CX-6},73" fill="none" stroke="${hc}" stroke-width="2.5" stroke-linecap="round"/>`;
+  svg += `<path d="M${CX+6},73 Q${CX+19},64 ${CX+32},72" fill="none" stroke="${hc}" stroke-width="2.5" stroke-linecap="round"/>`;
 
-  // Nose — tiny, delicate
-  svg += `<path d="M${CX},100 Q${CX+2},105 ${CX},106" fill="none" stroke="${S.skin}" stroke-width="1.2" opacity="0.4"/>`;
-  svg += `<circle cx="${CX}" cy="106" r="1.5" fill="${S.skin}" stroke="#00000015" stroke-width="0.5"/>`;
+  // ── NOSE — tiny button ──
+  svg += `<circle cx="${CX}" cy="108" r="1.8" fill="${S.skin}" stroke="#00000018" stroke-width="0.5"/>`;
 
-  // Lips — full, glossy, Bratz-inspired
-  svg += `<path d="M${CX-11},114 Q${CX-6},110 ${CX},112 Q${CX+6},110 ${CX+11},114" fill="#D05060" stroke="#B04050" stroke-width="0.5"/>`;
-  svg += `<path d="M${CX-11},114 Q${CX},121 ${CX+11},114" fill="#C04858" stroke="#B04050" stroke-width="0.5"/>`;
-  // Lip gloss highlight
-  svg += `<ellipse cx="${CX}" cy="113" rx="4" ry="1.5" fill="#FF8090" opacity="0.5"/>`;
-  svg += `<ellipse cx="${CX+2}" cy="117" rx="3" ry="1.2" fill="#E06070" opacity="0.3"/>`;
+  // ── LIPS — full, pouty, glossy ──
+  // Upper lip — cupid's bow
+  svg += `<path d="M${CX-14},118 Q${CX-8},113 ${CX},115 Q${CX+8},113 ${CX+14},118" fill="#C83050" stroke="#A02840" stroke-width="0.5"/>`;
+  // Lower lip — full, round
+  svg += `<path d="M${CX-14},118 Q${CX-5},128 ${CX},128 Q${CX+5},128 ${CX+14},118" fill="#B82848" stroke="#A02840" stroke-width="0.5"/>`;
+  // Gloss highlights
+  svg += `<ellipse cx="${CX-4}" cy="116" rx="4" ry="1.5" fill="#FF7090" opacity="0.6"/>`;
+  svg += `<ellipse cx="${CX+4}" cy="116" rx="3" ry="1.2" fill="#FF7090" opacity="0.4"/>`;
+  svg += `<ellipse cx="${CX}" cy="122" rx="5" ry="2" fill="#D04060" opacity="0.3"/>`;
 
-  // Blush — soft, glowy
-  svg += `<ellipse cx="${CX-28}" cy="104" rx="10" ry="6" fill="#F0A0A0" opacity="0.2"/>`;
-  svg += `<ellipse cx="${CX+28}" cy="104" rx="10" ry="6" fill="#F0A0A0" opacity="0.2"/>`;
+  // ── BLUSH — soft, high on cheekbones ──
+  svg += `<ellipse cx="${CX-32}" cy="103" rx="11" ry="7" fill="#F0A0A0" opacity="0.18"/>`;
+  svg += `<ellipse cx="${CX+32}" cy="103" rx="11" ry="7" fill="#F0A0A0" opacity="0.18"/>`;
 
-  // Hair — fuller, more dramatic for doll style
+  // ── HAIR — voluminous, dramatic ──
   if (S.hair === 'short') {
-    svg += `<ellipse cx="${CX}" cy="65" rx="50" ry="36" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX}" cy="55" rx="46" ry="28" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX-40}" cy="78" rx="14" ry="18" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX+40}" cy="78" rx="14" ry="18" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX}" cy="62" rx="54" ry="38" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX}" cy="50" rx="48" ry="28" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-44}" cy="78" rx="16" ry="22" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+44}" cy="78" rx="16" ry="22" fill="${hc}"/>`;
   } else if (S.hair === 'medium') {
-    svg += `<ellipse cx="${CX}" cy="62" rx="52" ry="38" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX-42}" cy="95" rx="16" ry="35" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX+42}" cy="95" rx="16" ry="35" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX-36}" cy="65" rx="20" ry="30" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX+36}" cy="65" rx="20" ry="30" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX}" cy="58" rx="56" ry="40" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-46}" cy="95" rx="18" ry="40" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+46}" cy="95" rx="18" ry="40" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-40}" cy="60" rx="22" ry="34" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+40}" cy="60" rx="22" ry="34" fill="${hc}"/>`;
   } else if (S.hair === 'long') {
-    svg += `<ellipse cx="${CX}" cy="60" rx="52" ry="38" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX-44}" cy="115" rx="18" ry="60" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX+44}" cy="115" rx="18" ry="60" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX-38}" cy="60" rx="22" ry="32" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX+38}" cy="60" rx="22" ry="32" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX-40}" cy="160" rx="14" ry="25" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX+40}" cy="160" rx="14" ry="25" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX}" cy="55" rx="56" ry="40" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-48}" cy="120" rx="20" ry="70" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+48}" cy="120" rx="20" ry="70" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-42}" cy="55" rx="24" ry="36" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+42}" cy="55" rx="24" ry="36" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-44}" cy="180" rx="14" ry="30" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+44}" cy="180" rx="14" ry="30" fill="${hc}"/>`;
   } else if (S.hair === 'curly') {
     for (let a = -4; a <= 4; a++) {
-      svg += `<circle cx="${CX+a*11}" cy="${52+Math.abs(a)*4}" r="${16-Math.abs(a)}" fill="${hc}"/>`;
+      svg += `<circle cx="${CX+a*12}" cy="${48+Math.abs(a)*5}" r="${18-Math.abs(a)}" fill="${hc}"/>`;
     }
-    svg += `<ellipse cx="${CX-46}" cy="95" rx="18" ry="30" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX+46}" cy="95" rx="18" ry="30" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-50}" cy="100" rx="20" ry="35" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+50}" cy="100" rx="20" ry="35" fill="${hc}"/>`;
     for (let a = -3; a <= 3; a++) {
-      svg += `<circle cx="${CX-46+a*6}" cy="${125+Math.abs(a)*4}" r="10" fill="${hc}"/>`;
-      svg += `<circle cx="${CX+46+a*6}" cy="${125+Math.abs(a)*4}" r="10" fill="${hc}"/>`;
+      svg += `<circle cx="${CX-50+a*7}" cy="${135+Math.abs(a)*5}" r="12" fill="${hc}"/>`;
+      svg += `<circle cx="${CX+50+a*7}" cy="${135+Math.abs(a)*5}" r="12" fill="${hc}"/>`;
     }
-    svg += `<ellipse cx="${CX-42}" cy="155" rx="16" ry="20" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX+42}" cy="155" rx="16" ry="20" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-46}" cy="170" rx="18" ry="24" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+46}" cy="170" rx="18" ry="24" fill="${hc}"/>`;
   } else if (S.hair === 'updo') {
-    svg += `<ellipse cx="${CX}" cy="62" rx="50" ry="34" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX}" cy="36" rx="28" ry="26" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX}" cy="18" rx="18" ry="16" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX-12}" cy="28" rx="8" ry="10" fill="${hc}"/>`;
-    svg += `<ellipse cx="${CX+12}" cy="28" rx="8" ry="10" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX}" cy="58" rx="54" ry="36" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX}" cy="30" rx="30" ry="28" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX}" cy="10" rx="20" ry="18" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX-14}" cy="22" rx="10" ry="12" fill="${hc}"/>`;
+    svg += `<ellipse cx="${CX+14}" cy="22" rx="10" ry="12" fill="${hc}"/>`;
   } else if (S.hair === 'shaved') {
-    svg += `<ellipse cx="${CX}" cy="68" rx="49" ry="32" fill="${hc}" opacity="0.35"/>`;
+    svg += `<ellipse cx="${CX}" cy="64" rx="53" ry="34" fill="${hc}" opacity="0.3"/>`;
   }
 
-  // Accessories (adjusted positions for larger head)
+  // ── ACCESSORIES ──
   if (S.accessory === 'Leo') {
-    svg += `<path d="M${CX-30},48 L${CX-22},32 L${CX-10},44 L${CX},26 L${CX+10},44 L${CX+22},32 L${CX+30},48" fill="#FFD700" stroke="#DAA520" stroke-width="1.2"/>`;
-    svg += `<circle cx="${CX}" cy="36" r="5" fill="#FF4040"/>`;
+    svg += `<path d="M${CX-32},46 L${CX-24},28 L${CX-12},40 L${CX},22 L${CX+12},40 L${CX+24},28 L${CX+32},46" fill="#FFD700" stroke="#DAA520" stroke-width="1.2"/>`;
+    svg += `<circle cx="${CX}" cy="32" r="5" fill="#FF4040"/>`;
   } else if (S.accessory === 'Aries') {
-    svg += `<path d="M${CX-40},60 Q${CX-52},32 ${CX-34},26 Q${CX-22},24 ${CX-28},50" fill="none" stroke="${outfit.accent}" stroke-width="3.5"/>`;
-    svg += `<path d="M${CX+40},60 Q${CX+52},32 ${CX+34},26 Q${CX+22},24 ${CX+28},50" fill="none" stroke="${outfit.accent}" stroke-width="3.5"/>`;
+    svg += `<path d="M${CX-44},58 Q${CX-56},26 ${CX-38},20 Q${CX-24},18 ${CX-30},48" fill="none" stroke="${outfit.accent}" stroke-width="4"/>`;
+    svg += `<path d="M${CX+44},58 Q${CX+56},26 ${CX+38},20 Q${CX+24},18 ${CX+30},48" fill="none" stroke="${outfit.accent}" stroke-width="4"/>`;
   } else if (S.accessory === 'Taurus') {
-    svg += `<ellipse cx="${CX}" cy="44" rx="38" ry="9" fill="none" stroke="#4A8060" stroke-width="2.2"/>`;
-    for (let i = -3; i <= 3; i++) { svg += `<circle cx="${CX+i*11}" cy="${42+Math.abs(i)*2}" r="4.5" fill="${['#FF9090','#FFD090','#FF90C0','#C090FF','#90D0FF','#90FF90','#FFB090'][i+3]}"/>`; }
+    svg += `<ellipse cx="${CX}" cy="40" rx="40" ry="10" fill="none" stroke="#4A8060" stroke-width="2.5"/>`;
+    for (let i = -3; i <= 3; i++) { svg += `<circle cx="${CX+i*12}" cy="${38+Math.abs(i)*2}" r="5" fill="${['#FF9090','#FFD090','#FF90C0','#C090FF','#90D0FF','#90FF90','#FFB090'][i+3]}"/>`; }
   } else if (S.accessory === 'Gemini') {
-    svg += `<path d="M${CX-44},54 Q${CX-52},38 ${CX-44},30 L${CX-34},40" fill="${outfit.accent}" opacity="0.7"/>`;
-    svg += `<path d="M${CX+44},54 Q${CX+52},38 ${CX+44},30 L${CX+34},40" fill="${outfit.accent}" opacity="0.7"/>`;
+    svg += `<path d="M${CX-48},52 Q${CX-56},34 ${CX-48},26 L${CX-36},36" fill="${outfit.accent}" opacity="0.7"/>`;
+    svg += `<path d="M${CX+48},52 Q${CX+56},34 ${CX+48},26 L${CX+36},36" fill="${outfit.accent}" opacity="0.7"/>`;
   } else if (S.accessory === 'Cancer') {
-    svg += `<ellipse cx="${CX}" cy="152" rx="20" ry="3.5" fill="none" stroke="#E0E4F0" stroke-width="1.8"/>`;
-    svg += `<circle cx="${CX}" cy="160" r="6" fill="#E8E8F0" stroke="#C0C0D0" stroke-width="1"/>`;
+    svg += `<ellipse cx="${CX}" cy="153" rx="22" ry="4" fill="none" stroke="#E0E4F0" stroke-width="2"/>`;
+    svg += `<circle cx="${CX}" cy="162" r="7" fill="#E8E8F0" stroke="#C0C0D0" stroke-width="1"/>`;
   } else if (S.accessory === 'Virgo') {
-    svg += `<ellipse cx="${CX}" cy="44" rx="36" ry="8" fill="none" stroke="#C0A060" stroke-width="1.8"/>`;
-    for (let i = -2; i <= 2; i++) { svg += `<line x1="${CX+i*14}" y1="40" x2="${CX+i*14+3}" y2="32" stroke="#C0A060" stroke-width="1.5"/>`; }
+    svg += `<ellipse cx="${CX}" cy="40" rx="38" ry="9" fill="none" stroke="#C0A060" stroke-width="2"/>`;
+    for (let i = -2; i <= 2; i++) { svg += `<line x1="${CX+i*15}" y1="36" x2="${CX+i*15+3}" y2="26" stroke="#C0A060" stroke-width="1.8"/>`; }
   } else if (S.accessory === 'Libra') {
-    svg += `<line x1="${CX}" y1="150" x2="${CX}" y2="165" stroke="#E0A0B8" stroke-width="1.5"/>`;
-    svg += `<circle cx="${CX}" cy="168" r="7" fill="none" stroke="#E0A0B8" stroke-width="1.5"/>`;
-    svg += `<line x1="${CX-5}" y1="168" x2="${CX+5}" y2="168" stroke="#E0A0B8" stroke-width="1.2"/>`;
+    svg += `<line x1="${CX}" y1="152" x2="${CX}" y2="168" stroke="#E0A0B8" stroke-width="1.8"/>`;
+    svg += `<circle cx="${CX}" cy="172" r="8" fill="none" stroke="#E0A0B8" stroke-width="1.8"/>`;
+    svg += `<line x1="${CX-5}" y1="172" x2="${CX+5}" y2="172" stroke="#E0A0B8" stroke-width="1.2"/>`;
   } else if (S.accessory === 'Scorpio') {
-    svg += `<ellipse cx="${CX}" cy="44" rx="40" ry="6" fill="none" stroke="#5A1020" stroke-width="2.2"/>`;
-    svg += `<circle cx="${CX}" cy="40" r="5" fill="#FF2040"/>`;
+    svg += `<ellipse cx="${CX}" cy="40" rx="42" ry="6" fill="none" stroke="#5A1020" stroke-width="2.5"/>`;
+    svg += `<circle cx="${CX}" cy="36" r="5" fill="#FF2040"/>`;
   } else if (S.accessory === 'Sagittarius') {
-    svg += `<ellipse cx="${CX}" cy="46" rx="42" ry="5" fill="none" stroke="#9060D0" stroke-width="2"/>`;
-    svg += `<circle cx="${CX}" cy="42" r="4" fill="#E0C0FF"/>`;
+    svg += `<ellipse cx="${CX}" cy="42" rx="44" ry="5.5" fill="none" stroke="#9060D0" stroke-width="2.2"/>`;
+    svg += `<circle cx="${CX}" cy="38" r="4.5" fill="#E0C0FF"/>`;
   } else if (S.accessory === 'Capricorn') {
-    svg += `<path d="M${CX-28},46 L${CX-18},28 L${CX-6},40 L${CX},32 L${CX+6},40 L${CX+18},28 L${CX+28},46" fill="#6A6A70" stroke="#B0B0C0" stroke-width="1.2"/>`;
+    svg += `<path d="M${CX-30},44 L${CX-20},24 L${CX-8},38 L${CX},28 L${CX+8},38 L${CX+20},24 L${CX+30},44" fill="#6A6A70" stroke="#B0B0C0" stroke-width="1.5"/>`;
   } else if (S.accessory === 'Aquarius') {
-    svg += `<ellipse cx="${CX}" cy="44" rx="38" ry="6" fill="none" stroke="#40A0F0" stroke-width="1.8"/>`;
-    for (let i = -2; i <= 2; i++) { svg += `<circle cx="${CX+i*16}" cy="40" r="4" fill="#C0E8FF" stroke="#40A0F0" stroke-width="1"/>`; }
+    svg += `<ellipse cx="${CX}" cy="40" rx="40" ry="6.5" fill="none" stroke="#40A0F0" stroke-width="2"/>`;
+    for (let i = -2; i <= 2; i++) { svg += `<circle cx="${CX+i*17}" cy="36" r="4.5" fill="#C0E8FF" stroke="#40A0F0" stroke-width="1"/>`; }
   } else if (S.accessory === 'Pisces') {
-    svg += `<ellipse cx="${CX}" cy="44" rx="40" ry="9" fill="none" stroke="#60B0A0" stroke-width="1.8"/>`;
-    svg += `<path d="M${CX-10},38 Q${CX},28 ${CX+10},38" fill="#80D0C0" opacity="0.6"/>`;
-    svg += `<circle cx="${CX-14}" cy="42" r="4" fill="#C0FFF0"/>`;
-    svg += `<circle cx="${CX+14}" cy="42" r="4" fill="#C0FFF0"/>`;
+    svg += `<ellipse cx="${CX}" cy="40" rx="42" ry="10" fill="none" stroke="#60B0A0" stroke-width="2"/>`;
+    svg += `<path d="M${CX-12},34 Q${CX},22 ${CX+12},34" fill="#80D0C0" opacity="0.6"/>`;
+    svg += `<circle cx="${CX-16}" cy="38" r="4.5" fill="#C0FFF0"/>`;
+    svg += `<circle cx="${CX+16}" cy="38" r="4.5" fill="#C0FFF0"/>`;
   }
 
   svg += `</svg>`;
@@ -4425,6 +4899,10 @@ function switchPage(page) {
   if (page === 'emporium') renderEmporium();
   if (page === 'avatar') initAvatar();
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
 }
 </script>
 </body>
